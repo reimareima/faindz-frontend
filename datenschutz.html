@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Datenschutzerklärung — Faindz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23faf9f6'/><text x='16' y='24' font-family='Georgia,Times New Roman,serif' font-size='24' font-weight='400' fill='%231a1a1a' text-anchor='middle'>F</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    background: #faf9f6;
+    color: #1a1a1a;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    padding: 24px 32px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: rgba(250, 249, 246, 0.85);
+    backdrop-filter: saturate(180%) blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo-text {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: #1a1a1a;
+    text-decoration: none;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 42px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    line-height: 1.1;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 40px;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+  }
+  p, li {
+    margin-bottom: 12px;
+    color: #444;
+    font-size: 15px;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+  a {
+    color: #1a1a1a;
+    text-decoration: underline;
+    text-decoration-color: rgba(0,0,0,0.2);
+    text-underline-offset: 3px;
+  }
+  a:hover { text-decoration-color: rgba(0,0,0,0.6); }
+  small {
+    color: #888;
+    font-size: 13px;
+    display: block;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  strong { color: #1a1a1a; }
+  @media (max-width: 600px) {
+    h1 { font-size: 32px; }
+    main { padding: 40px 24px 80px; }
+    header { padding: 20px 24px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo-text">Faindz</a>
+  </header>
+  <main>
+    <h1>Datenschutzerklärung</h1>
+
+    <p>
+      Diese Datenschutzerklärung informiert Sie über die Verarbeitung personenbezogener Daten bei der
+      Nutzung von Faindz (im Folgenden: „die App", erreichbar unter faindz.de).
+    </p>
+
+    <h2>1. Verantwortlicher</h2>
+    <p>Verantwortlich im Sinne der DSGVO ist:</p>
+    <p>
+      Armin Karahodza<br>
+      Waiblingerstraße 65<br>
+      71384 Weinstadt<br>
+      Deutschland<br>
+      E-Mail: <a href="mailto:Kontakt@faindz.de">Kontakt@faindz.de</a>
+    </p>
+
+    <h2>2. Welche Daten verarbeitet werden</h2>
+
+    <h3>a) Hochgeladene Bilder</h3>
+    <p>
+      Wenn Sie ein Foto hochladen, wird dieses zur Generierung von Designvorschlägen und Visualisierungen
+      an externe KI-Dienstleister übermittelt (siehe Abschnitt 4). Die Bilder werden weder dauerhaft auf
+      unseren Servern gespeichert noch zu Trainingszwecken weiterverwendet. Auf dem Server (Proxy)
+      werden sie ausschließlich für die Dauer der Anfrage im Arbeitsspeicher gehalten.
+    </p>
+    <p>
+      Generierte Visualisierungen und Produktvorschläge werden im lokalen Browser-Speicher (IndexedDB)
+      Ihres Geräts gespeichert, sofern Sie diese als „Look" abspeichern. Diese Daten verlassen Ihr Gerät
+      nicht. Sie können jederzeit über den Browser-Cache gelöscht werden.
+    </p>
+
+    <h3>b) IP-Adresse</h3>
+    <p>
+      Beim Aufruf der App und bei jeder API-Anfrage wird Ihre IP-Adresse vom Proxy-Server temporär
+      verarbeitet. Dies dient ausschließlich der technischen Bereitstellung des Dienstes sowie der
+      Abwehr von Missbrauch (Rate-Limiting: maximal 20 Anfragen pro Minute, 200 pro Tag und IP).
+      Die IP wird nicht persistent gespeichert und nicht an Dritte weitergegeben — die Zähler werden
+      ausschließlich im Arbeitsspeicher gehalten und nach Ablauf der Limit-Fenster automatisch gelöscht.
+    </p>
+    <p>Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem stabilen, missbrauchsfreien Betrieb).</p>
+
+    <h3>c) Lokale Speicherung im Browser</h3>
+    <p>
+      Faindz nutzt <strong>localStorage</strong> und <strong>IndexedDB</strong> Ihres Browsers für:
+    </p>
+    <ul>
+      <li>Spracheinstellung (DE/EN)</li>
+      <li>Marketplace-Auswahl (Amazon, Otto, Etsy)</li>
+      <li>Gespeicherte Looks und Produkte (Ihre Bibliothek)</li>
+    </ul>
+    <p>
+      Diese Daten verlassen Ihr Gerät nicht und sind nur Ihnen persönlich zugänglich. Es handelt sich
+      um technisch notwendige Speicherung gemäß § 25 Abs. 2 TTDSG; eine Einwilligung ist hierfür nicht
+      erforderlich.
+    </p>
+
+    <h2>3. Hosting und Infrastruktur</h2>
+
+    <h3>a) Frontend-Hosting (Vercel)</h3>
+    <p>
+      Die Webseite wird gehostet bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA.
+      Beim Aufruf werden technische Verbindungsdaten (IP, Browser, Zeitstempel) durch Vercel
+      verarbeitet. Datenschutzerklärung von Vercel:
+      <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">vercel.com/legal/privacy-policy</a>.
+    </p>
+    <p>
+      Mit Vercel besteht ein Auftragsverarbeitungsvertrag (DPA). Vercel garantiert DSGVO-konforme
+      Datenverarbeitung. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.
+    </p>
+
+    <h3>b) Backend-Hosting (Railway)</h3>
+    <p>
+      Der Proxy-Server, der API-Anfragen weiterleitet, wird bei Railway Corp. (548 Market St, San Francisco,
+      CA 94104, USA) gehostet. Zwischen Faindz und Railway besteht ein Auftragsverarbeitungsvertrag.
+      Datenschutzerklärung: <a href="https://railway.com/legal/privacy" target="_blank" rel="noopener">railway.com/legal/privacy</a>.
+    </p>
+
+    <h2>4. Externe KI-Dienste (Bilder &amp; Textanalyse)</h2>
+
+    <h3>a) Anthropic (Claude AI)</h3>
+    <p>
+      Für die Analyse Ihres hochgeladenen Bildes und das Generieren von Produktempfehlungen wird die API
+      von Anthropic, PBC (548 Market St PMB 90375, San Francisco, CA 94104, USA) verwendet.
+      Anthropic verarbeitet Bild- und Textdaten zur Beantwortung der Anfrage und nutzt sie laut
+      eigenen Angaben <strong>nicht zum Modell-Training</strong>.
+      Datenschutzerklärung: <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">anthropic.com/legal/privacy</a>.
+    </p>
+
+    <h3>b) Google (Gemini)</h3>
+    <p>
+      Für die Generierung der Bildvisualisierung wird die Gemini-API von Google LLC (1600 Amphitheatre
+      Parkway, Mountain View, CA 94043, USA) verwendet. Datenschutzerklärung:
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.
+    </p>
+
+    <h3>c) Datenübermittlung in die USA</h3>
+    <p>
+      Die genannten Dienste verarbeiten Daten (auch) in den USA. Anthropic, Google und Vercel sind unter
+      dem EU-US Data Privacy Framework zertifiziert oder bieten Standardvertragsklauseln (SCC) zum
+      Schutz personenbezogener Daten gemäß Art. 46 DSGVO. Rechtsgrundlage für die Übermittlung ist
+      Art. 6 Abs. 1 lit. f DSGVO i.&nbsp;V.&nbsp;m. Art. 49 Abs. 1 lit. b (Vertragserfüllung).
+    </p>
+
+    <h2>5. Affiliate-Links</h2>
+    <p>
+      Faindz nutzt das Amazon-Partnerprogramm (sowie ggf. weitere Partnerprogramme von Otto, Etsy u.&nbsp;a.).
+      Wenn Sie auf einen Produkt-Link klicken, werden Sie auf die Seite des jeweiligen Anbieters
+      weitergeleitet. Beim Klick werden eine eindeutige Partner-ID sowie übliche Tracking-Parameter an
+      den Zielshop übertragen.
+    </p>
+    <p>
+      Die Datenverarbeitung auf der Zielseite unterliegt den Datenschutzbestimmungen des jeweiligen
+      Anbieters (z.&nbsp;B. Amazon: <a href="https://www.amazon.de/gp/help/customer/display.html?nodeId=201909010" target="_blank" rel="noopener">amazon.de/datenschutz</a>).
+    </p>
+
+    <h2>6. Cookies</h2>
+    <p>
+      Faindz setzt <strong>keine Cookies</strong> für Tracking, Werbung oder Analytics. Es werden
+      ausschließlich Browser-Speichermechanismen (localStorage, IndexedDB) für die App-Funktionalität
+      genutzt, wie unter Punkt 2.c beschrieben.
+    </p>
+
+    <h2>7. Ihre Rechte</h2>
+    <p>Sie haben gemäß DSGVO folgende Rechte:</p>
+    <ul>
+      <li><strong>Auskunft</strong> über die zu Ihrer Person gespeicherten Daten (Art. 15 DSGVO)</li>
+      <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16 DSGVO)</li>
+      <li><strong>Löschung</strong> Ihrer Daten (Art. 17 DSGVO)</li>
+      <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18 DSGVO)</li>
+      <li><strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO)</li>
+      <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21 DSGVO)</li>
+      <li><strong>Beschwerde</strong> bei einer Aufsichtsbehörde (Art. 77 DSGVO)</li>
+    </ul>
+    <p>
+      Zur Ausübung dieser Rechte wenden Sie sich bitte per E-Mail an
+      <a href="mailto:Kontakt@faindz.de">Kontakt@faindz.de</a>.
+    </p>
+    <p>
+      Die für uns zuständige Aufsichtsbehörde ist:<br>
+      <strong>Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg</strong><br>
+      Königstraße 10a, 70173 Stuttgart<br>
+      Tel.: 0711/615541-0 · E-Mail: poststelle@lfdi.bwl.de
+    </p>
+
+    <h2>8. Änderungen dieser Datenschutzerklärung</h2>
+    <p>
+      Diese Datenschutzerklärung kann von Zeit zu Zeit aktualisiert werden, etwa bei Änderungen der
+      verwendeten Dienste oder bei Anpassungen aufgrund neuer rechtlicher Anforderungen. Die jeweils
+      aktuelle Version finden Sie stets auf dieser Seite.
+    </p>
+
+    <small>
+      Letzte Aktualisierung: 7. Mai 2026
+    </small>
+  </main>
+</body>
+</html>
