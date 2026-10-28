@@ -120,3 +120,13 @@
     }, { passive: true });
   });
 })();
+
+// Phones: hide the floating "test this look" button once the big try band is on screen
+(function () {
+  var bar = document.querySelector('.sticky-try');
+  var band = document.querySelector('.try');
+  if (!bar || !band || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(function (entries) {
+    bar.classList.toggle('is-hidden', entries[0].isIntersecting);
+  }, { rootMargin: '0px 0px -10% 0px' }).observe(band);
+})();

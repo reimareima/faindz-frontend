@@ -274,10 +274,11 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
   .mz-header .pill { display: none; }
 
   .sticky-try {
-    display: flex; position: sticky; bottom: 16px; z-index: 30;
-    justify-content: center; padding: 8px 22px 24px; pointer-events: none;
+    display: flex; position: sticky; bottom: 16px; z-index: 30; height: 0;
+    justify-content: center; align-items: flex-end; padding: 0 22px; pointer-events: none;
   }
-  .sticky-try .pill { pointer-events: auto; width: 100%; max-width: 420px; }
+  .sticky-try .pill { pointer-events: auto; width: 100%; max-width: 420px; transition: opacity 0.2s ease, transform 0.2s ease; }
+  .sticky-try.is-hidden .pill { opacity: 0; transform: translateY(12px); pointer-events: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pill { transition: none; }
