@@ -5536,6 +5536,9 @@ const PROXY_BASE = (() => {
 })();
 const ANTHROPIC_URL = `${PROXY_BASE}/anthropic`;
 const GEMINI_URL    = `${PROXY_BASE}/gemini`;
+// Image model for generation + edits. Nano Banana 2.1 since Okt 2026
+// (gemini-2.5-flash-image shuts down 15 Mar 2027). Must be whitelisted in reima-proxy.
+const GEMINI_IMAGE_MODEL = 'gemini-nano-banana-2.1';
 
 // ─── PROMPT A/B SWITCH ─────────────────────────────────────────────
 // Set to true to use the new "strict coupling" prompt (forces every JSON
@@ -6365,7 +6368,8 @@ Exactly 6 directions. Make them genuinely distinct (not 6 variations of the same
       },
       signal: myController.signal,
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-5-5',
+        thinking: { type: 'disabled' }, // 5.5 thinks by default; we want instant answers
         // 6 suggestions instead of 3 — roughly doubles output size
         max_tokens: 2000,
         system: systemPrompt,
@@ -8081,7 +8085,9 @@ Prioritize products with maximum visual impact relative to price and effort.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-5-5',
+        thinking: { type: 'between_tools' }, // no pre-answer thinking: ~2x faster, same JSON
+        output_config: { effort: 'medium' },
         // Bumped from 2000 → 4000: the v5 intent-routed prompts produce
         // richer image_prompts + a styling rationale per product. 2000
         // truncated mid-JSON for style_shift requests, causing parse errors.
@@ -8685,8 +8691,10 @@ Return ONLY items that were ADDED by the edit. If nothing genuinely new is visib
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1200,
+        model: 'claude-sonnet-5-5',
+        thinking: { type: 'between_tools' }, // no pre-answer thinking: ~2x faster, same JSON
+        output_config: { effort: 'medium' },
+        max_tokens: 2000, // 5.5 tokenizer counts ~30% more tokens
         system: systemPrompt,
         messages: [{
           role: 'user',
@@ -9198,7 +9206,8 @@ Respond with ONLY the intent word. No JSON, no explanation. Just one of: style_s
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-5-5',
+        thinking: { type: 'disabled' }, // 5.5 thinks by default; we want instant answers
         max_tokens: 20,
         system: systemPrompt,
         messages: [{
@@ -9287,8 +9296,10 @@ Look at the attached image (the current styled version of their room) and produc
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1200,
+      model: 'claude-sonnet-5-5',
+      thinking: { type: 'between_tools' }, // no pre-answer thinking: ~2x faster, same JSON
+      output_config: { effort: 'medium' },
+      max_tokens: 2000, // 5.5 tokenizer counts ~30% more tokens
       system: systemPrompt,
       messages: [{
         role: 'user',
@@ -9649,7 +9660,7 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
 
   const url = GEMINI_URL;
   const body = {
-    model: 'gemini-2.5-flash-image',
+    model: GEMINI_IMAGE_MODEL,
     body: {
       contents: [{
         parts: [
@@ -9728,11 +9739,28 @@ async function generateWithGemini(imagePrompt, products, geminiKey) {
     .slice(0, 5)
     .map(p => p.name);
 
-  const fullPrompt = `${imagePrompt}
+  // v6 prompt (Okt 2026): structured PRESERVE / CHANGE. The old version said
+  // "only modify the smaller items", which contradicted style-shift mode
+  // (where upholstery, walls and textiles are meant to change). The scope of
+  // change now comes only from Claude's image_prompt.
+  const itemsLine = mustHaves.length
+    ? `\nThe following products must be clearly visible and recognizable: ${mustHaves.join(', ')}.\n`
+    : '';
 
-Items to visibly include in the scene: ${mustHaves.join(', ')}.
+  const fullPrompt = `Edit this photograph of a real room. Return one photorealistic image from the identical camera position.
 
-Critical constraints: Maintain the EXACT same room layout, perspective, walls, windows, floor and existing major furniture from the original photo. Only ADD or modify the smaller items. Photorealistic, magazine-quality interior photography with natural soft lighting.`;
+PRESERVE EXACTLY (keep identical to the input photo):
+- Camera angle, lens, framing and crop
+- Room architecture: walls, ceiling, mouldings, windows, doors, radiators
+- Floor material and pattern (it may be partly covered by a rug)
+- The position and footprint of large furniture
+- Direction and colour of the natural light, with matching shadows
+- Everything that the change instructions below do not mention
+
+CHANGE (apply these instructions):
+${imagePrompt}
+${itemsLine}
+Result: a believable photo a real person could take in this home after redecorating, not a 3D render. Natural colours, no added text, no people.`;
 
   const response = await fetch(
     GEMINI_URL,
@@ -9740,7 +9768,7 @@ Critical constraints: Maintain the EXACT same room layout, perspective, walls, w
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemini-2.5-flash-image',
+        model: GEMINI_IMAGE_MODEL,
         body: {
           contents: [{
             parts: [
