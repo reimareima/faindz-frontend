@@ -252,6 +252,12 @@
   }
 
   /* ─── LANGUAGE TOGGLE ────────────────────────────────────── */
+  .header-link {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px;
+    font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none;
+    border-radius: 999px;
+  }
+  .header-link:hover { background: var(--bg-hover); }
   .lang-toggle {
     display: inline-flex;
     background: var(--bg-card);
@@ -4262,6 +4268,7 @@
       <h1 class="logo-text">Faindz</h1>
     </div>
     <div class="controls">
+      <a class="header-link" href="/magazin/">Magazin</a>
       <div class="lang-toggle" role="group" aria-label="Language">
         <button class="lang-toggle-btn" data-lang="en" type="button">EN</button>
         <button class="lang-toggle-btn" data-lang="de" type="button">DE</button>
