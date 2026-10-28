@@ -31,19 +31,36 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 
 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-/* ---------- header (same rhythm as the app) ---------- */
+/* ---------- header: same geometry as the app header on faindz.de ----------
+   App: .container max-width 1280, padding 24px 32px (16px 20px <=768px),
+   header row 8px top/bottom, 44px controls, Fraunces 26 wordmark. */
 .mz-header {
   position: sticky; top: 0; z-index: 40;
-  background: rgba(250, 249, 246, 0.86);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  background: rgba(250, 249, 246, 0.82);
+  backdrop-filter: saturate(1.8) blur(20px);
+  -webkit-backdrop-filter: saturate(1.8) blur(20px);
   border-bottom: 1px solid var(--line);
 }
-.mz-header .wrap { display: flex; align-items: center; gap: 16px; min-height: 64px; }
-.mz-logo { font-family: 'Fraunces', Georgia, serif; font-size: 26px; text-decoration: none; letter-spacing: -0.02em; }
-.mz-section { font-size: 15px; font-weight: 600; text-decoration: none; color: var(--muted); }
-.mz-section[aria-current="page"] { color: var(--ink); }
-.mz-header .spacer { flex: 1; }
+.mz-bar {
+  max-width: 1280px; margin: 0 auto; padding: 24px 32px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mz-logo {
+  font-family: 'Fraunces', 'Times New Roman', Georgia, serif;
+  font-size: 26px; font-weight: 400; line-height: 1; letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  color: var(--ink); text-decoration: none;
+}
+.mz-controls { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.mz-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px;
+  font-size: 14px; font-weight: 500; color: var(--ink); text-decoration: none; border-radius: 999px;
+}
+.mz-link:hover { background: #f3f1ec; }
+.mz-link[aria-current="page"] { background: #f3f1ec; }
+@media (max-width: 768px) {
+  .mz-bar { padding: 16px 20px 8px; }
+}
 
 /* ---------- buttons ---------- */
 .pill {
@@ -179,7 +196,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .sticky-try { display: none; }
 @media (max-width: 720px) {
   .wrap { padding: 0 16px; }
-  .mz-header .pill { display: none; }
   .cover { height: auto; aspect-ratio: 4 / 5; min-height: 0; }
   .cover-text { padding-bottom: 28px; }
   .cover-tag { top: 14px; font-size: 13px; }
