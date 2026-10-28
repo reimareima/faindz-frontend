@@ -258,6 +258,11 @@
     border-radius: 999px;
   }
   .header-link:hover { background: var(--bg-hover); }
+  @media (max-width: 420px) {
+    .controls { gap: 4px; }
+    .header-link { padding: 0 6px; font-size: 13px; }
+    .logo-text { font-size: 22px; }
+  }
   .lang-toggle {
     display: inline-flex;
     background: var(--bg-card);
