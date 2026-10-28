@@ -730,9 +730,8 @@
   }
   /* Mode-switch: white pills on translucent dark wrapper so they pop */
   body:not([data-state="uploaded"]):not([data-state="results"]) .landing-stage .mode-switch {
-    background: rgba(255, 255, 255, 0.12);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-            backdrop-filter: blur(20px) saturate(180%);
+    /* no backdrop blur here: it re-blurred the crossfading hero photos every frame (Chrome lag) */
+    background: rgba(20, 20, 20, 0.32);
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
   body:not([data-state="uploaded"]):not([data-state="results"]) .landing-stage .mode-btn {
@@ -1508,12 +1507,16 @@
     padding: 40px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.35s var(--ease-out);
+    /* hidden lightbox must not keep a full-screen backdrop blur alive (Chrome lag) */
+    visibility: hidden;
+    transition: opacity 0.35s var(--ease-out), visibility 0s linear 0.35s;
     cursor: zoom-out;
   }
   .lightbox.show {
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
+    transition: opacity 0.35s var(--ease-out), visibility 0s;
   }
   .lightbox-img {
     max-width: 100%;
