@@ -127,6 +127,16 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .cover-range { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .cover-range:focus-visible ~ .cover-knob { outline: 3px solid var(--cyan); outline-offset: 3px; }
 
+/* ---------- inline before/after inside an article ---------- */
+.cover.cover-inline {
+  height: auto; min-height: 0; aspect-ratio: 2400 / 1406;
+  max-width: 1000px; margin: 0 auto; border-radius: 24px;
+}
+.cover.cover-inline::after { display: none; }
+.cover-inline .cover-knob { top: 50%; }
+.inline-compare { padding: 8px 24px 0; }
+.inline-compare figcaption { max-width: 1000px; margin: 0 auto; padding: 12px 4px 0; font-size: 15px; color: var(--muted); }
+
 /* ---------- home: below the cover ---------- */
 .home-intro { padding: 72px 0 32px; }
 .home-intro h2 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
@@ -174,6 +184,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .shop-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 20px; }
 .shop-head h2 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.035em; }
 .shop-head p { margin: 0; font-size: 15px; color: var(--muted); }
+.shop h3 { margin: 28px 0 12px; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
 .shop-row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 24px 20px; margin: 0 -24px; }
 .shop-item {
   flex: 0 0 250px; scroll-snap-align: start;
@@ -197,6 +208,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 @media (max-width: 720px) {
   .wrap { padding: 0 16px; }
   .cover { height: auto; aspect-ratio: 4 / 5; min-height: 0; }
+  .cover.cover-inline { aspect-ratio: 2400 / 1406; border-radius: 18px; }
+  .inline-compare { padding: 8px 16px 0; }
   .cover-text { padding-bottom: 28px; }
   .cover-tag { top: 14px; font-size: 13px; }
   .cover-tag.left { left: 14px; } .cover-tag.right { right: 14px; }
