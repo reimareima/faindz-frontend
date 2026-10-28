@@ -4596,20 +4596,6 @@
       <a id="footerImprintLink" href="/impressum.html" data-i18n="footer.imprint">Impressum</a>
       <a id="footerPrivacyLink" href="/datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
     </div>
-    <div class="footer-disclosure" data-i18n="footer.disclosure">As an affiliate of select marketplaces, we may earn from qualifying purchases.</div>
-    <!-- Quiet, crawlable Amazon affiliate links (tag=faindz21-21). Static in
-         the HTML so Amazon's crawler sees genuine tagged links without a search. -->
-    <div class="footer-shop">
-      <span class="footer-shop-label">Bei Amazon shoppen</span>
-      <a href="https://www.amazon.de/s?k=Stehlampe+Bogenlampe+Messing&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Stehlampen</a>
-      <a href="https://www.amazon.de/s?k=Boucl%C3%A9+Sessel+Lounge&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Sessel</a>
-      <a href="https://www.amazon.de/s?k=Monstera+Zimmerpflanze+gro%C3%9F&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Zimmerpflanzen</a>
-      <a href="https://www.amazon.de/s?k=Couchtisch+Travertin+rund&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Couchtische</a>
-      <a href="https://www.amazon.de/s?k=Teppich+Wohnzimmer+Berber&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Teppiche</a>
-      <a href="https://www.amazon.de/s?k=Sideboard+Eiche+Massiv&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Sideboards</a>
-      <a href="https://www.amazon.de/s?k=Wandbild+Poster+Set+Wohnzimmer&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Wandbilder</a>
-      <a href="https://www.amazon.de/s?k=Leinen+Kissenbezug+beige&tag=faindz21-21" target="_blank" rel="sponsored noopener noreferrer">Kissen</a>
-    </div>
   </footer>
 
 </div>
@@ -6070,7 +6056,7 @@ function applyTranslations() {
 // URL the user clicks), so embedding it client-side is safe — there's no
 // secret involved.
 const AFFILIATE_DEFAULTS = {
-  affiliateTag: 'faindz21-21',  // Amazon.de PartnerNet
+  affiliateTag: '',  // no affiliate program active (old Amazon account closed Okt 2026)
 };
 
 // Helper: read setting value from DOM (if settings open) or localStorage,
@@ -6999,11 +6985,9 @@ const MARKETPLACES = {
       <path d="M 50 23 L 56 25 L 52 28" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`,
     searchUrl: (q, tag) => {
-      // Affiliate tag MUST always be present on every Amazon link, otherwise
-      // Amazon cannot attribute the traffic and rejects the account. The
-      // hardcoded fallback guarantees the tag even if null/empty is passed.
-      const finalTag = (tag && tag.trim()) || 'faindz21-21';
-      return `https://www.amazon.de/s?k=${encodeURIComponent(q)}&tag=${encodeURIComponent(finalTag)}`;
+      // No affiliate program active right now: plain Amazon search, no tag.
+      // When a new partner ID exists, add it back here.
+      return `https://www.amazon.de/s?k=${encodeURIComponent(q)}`;
     },
   },
   etsy: {
