@@ -17,7 +17,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23faf9f6'/><text x='16' y='24' font-family='Georgia,Times New Roman,serif' font-size='24' font-weight='400' fill='%231a1a1a' text-anchor='middle'>F</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT@9..144,400,50&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/magazin/magazin.css">
 <script type="application/ld+json">
 {
@@ -37,150 +37,146 @@
 </head>
 <body>
 
-<header class="site-header">
+<header class="mz-header">
   <div class="wrap">
-    <a class="brand" href="/magazin/"><span class="brand-name">Faindz</span><span class="brand-sub">Magazin</span></a>
-    <nav class="site-nav" aria-label="Magazin">
-      <a href="/magazin/">Alle Artikel</a>
-      <a href="/">Raum gestalten</a>
-    </nav>
-    <a class="btn" href="/">Deinen Raum gestalten</a>
+    <a class="mz-logo" href="/">Faindz</a>
+    <a class="mz-section" href="/magazin/">Magazin</a>
+    <span class="spacer"></span>
+    <a class="pill pill-pink pill-small" href="/">Bild hochladen</a>
   </div>
 </header>
 
 <main>
-  <div class="wrap">
-    <nav class="breadcrumb" aria-label="Brotkrümelnavigation">
-      <a href="/magazin/">Magazin</a><span aria-hidden="true">›</span><span>Wohnzimmer</span>
-    </nav>
-
-    <div class="article-head">
-      <span class="eyebrow">Vorher / Nachher · Wohnzimmer</span>
-      <h1 class="article-title">Ein Altbau-Wohnzimmer, drei Looks</h1>
-      <p class="dek">Vom grünen Cord-Sofa zum warmen Boho-Raum – und weiter zu Terrakotta. Was sich ändern muss, was bleiben darf und welche Stücke den Unterschied machen.</p>
-      <p class="meta">Faindz Redaktion · <time datetime="2026-10-28">28. Oktober 2026</time> · 6 Min. Lesezeit</p>
+  <section class="cover" data-cover aria-label="Vorher-Nachher-Vergleich">
+    <img src="/magazin/img/altbau-boho.jpg" alt="Nachher: Boho-Wohnzimmer mit cremefarbenem Ecksofa, Berberteppich, Rattanlampe und Leinenvorhängen" width="1000" height="1000">
+    <img class="before" src="/magazin/img/altbau-vorher.jpg" alt="Vorher: Altbau-Wohnzimmer mit grünem Cord-Ecksofa, Jute-Teppich und bunter Galeriewand" width="1000" height="1000">
+    <div class="cover-line" aria-hidden="true"></div>
+    <input class="cover-range" type="range" min="0" max="100" value="50" aria-label="Vorher-Nachher-Regler">
+    <div class="cover-knob" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-6 6 6 6"/><path d="M15 6l6 6-6 6"/></svg>
     </div>
-
-    <figure class="ba" id="ba">
-      <div class="ba-frame">
-        <img src="/magazin/img/altbau-boho.jpg" alt="Nachher: Boho-Wohnzimmer mit cremefarbenem Ecksofa, Berberteppich, Rattanlampe und Leinenvorhängen" width="1000" height="1000">
-        <img class="ba-before" src="/magazin/img/altbau-vorher.jpg" alt="Vorher: Altbau-Wohnzimmer mit grünem Cord-Ecksofa, Jute-Teppich und bunter Galeriewand" width="1000" height="1000">
-        <div class="ba-line" aria-hidden="true"></div>
-        <div class="ba-knob" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-6 6 6 6"/><path d="M15 6l6 6-6 6"/></svg>
-        </div>
-        <span class="ba-tag ba-tag-before" aria-hidden="true">Vorher</span>
-        <span class="ba-tag ba-tag-after" aria-hidden="true">Nachher</span>
-        <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Vorher-Nachher-Vergleich: Regler nach links für mehr Nachher, nach rechts für mehr Vorher">
+    <span class="cover-tag left" aria-hidden="true">Vorher</span>
+    <span class="cover-tag right" aria-hidden="true">Nachher</span>
+    <div class="cover-text">
+      <div class="wrap">
+        <h1 class="cover-title">Ein Altbau-Wohnzimmer, drei Looks</h1>
+        <p class="cover-dek">Vom grünen Cord-Sofa zum warmen Boho-Raum – ohne Umbau, ohne neues Sofa.</p>
       </div>
-      <figcaption class="ba-caption">Regler ziehen zum Vergleichen. Gleicher Raum, gleiche Perspektive – neu gestaltet mit Faindz.</figcaption>
-    </figure>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <p class="byline"><span>Von der Faindz Redaktion</span><time datetime="2026-10-28">28. Oktober 2026</time><span>6 Minuten Lesezeit</span></p>
   </div>
 
-  <div class="wrap article-layout">
-    <article class="prose">
-      <h2>Die Ausgangslage</h2>
-      <p>Hohe Decken, Stuckleiste, Fischgrätparkett und zwei große Sprossenfenster: Die Architektur dieses Altbaus ist ein Geschenk. Trotzdem wirkt der Raum unruhiger, als er sein müsste. Das grüne Cord-Sofa, die bunte Galeriewand, das Nussbaumregal und der Jute-Teppich sind einzeln schöne Stücke – nur spricht jedes seine eigene Sprache.</p>
-      <p>Unser Ziel: mehr Wärme, weniger Farbchaos. Und zwar ohne Umbau. Grundriss, Boden, Fenster und die Position der großen Möbel bleiben, wie sie sind. Verändert werden nur Dinge, die man an einem Wochenende austauschen kann.</p>
+  <article>
+    <div class="prose">
+      <p>Hohe Decken, Stuckleiste, Fischgrätparkett und zwei große Sprossenfenster: Die Architektur dieses Altbaus ist ein Geschenk. Trotzdem wirkt der Raum unruhiger, als er sein müsste.</p>
+      <p>Das grüne Cord-Sofa, die bunte Galeriewand, das Nussbaumregal und der Jute-Teppich sind einzeln schöne Stücke – nur spricht jedes seine eigene Sprache. Unser Ziel: mehr Wärme, weniger Farbchaos. Und zwar ohne Umbau. Grundriss, Boden, Fenster und die Position der großen Möbel bleiben, wie sie sind. Verändert wird nur, was man an einem Wochenende austauschen kann.</p>
 
       <h2>Was wir geändert haben</h2>
-      <ol>
-        <li><strong>Das Sofa neu beziehen statt neu kaufen.</strong> Ein cremefarbener Bezug in Bouclé-Optik nimmt dem Ecksofa die Schwere. Es bleibt das größte Möbel im Raum, drängt sich aber nicht mehr in den Vordergrund. Viele Ecksofas haben abnehmbare Bezüge – ein Blick auf das Etikett lohnt sich, bevor man an ein neues Sofa denkt.</li>
-        <li><strong>Ein Teppich mit Muster als Hero-Piece.</strong> Der Berberteppich in Creme und Terrakotta ist das eigentliche Herzstück. Er gibt die Farbpalette vor und verbindet alles, was danach kommt. Wichtig ist die Größe: Die vorderen Sofabeine sollten auf dem Teppich stehen, sonst wirkt er verloren.</li>
-        <li><strong>Textilien in Erdtönen.</strong> Kissen in Rost und Senf, eine grob gestrickte Decke über der Armlehne, bodenlange Leinenvorhänge in warmem Weiß. Die Vorhänge filtern das Tageslicht und machen die großen Fenster zum Gestaltungselement statt zur kahlen Fläche.</li>
-        <li><strong>Naturfasern als roter Faden.</strong> Eine Tischlampe mit Rattanschirm, ein Sitzpouf aus Jute, Körbe im Regal und ein geflochtener Wandteller. Keines dieser Stücke ist für sich spektakulär – die Wirkung entsteht, weil das Material mehrmals im Raum wiederkehrt.</li>
-      </ol>
-      <p>Was auffällt: Die Galeriewand ist geblieben, nur die Motive wurden wärmer. Das Nussbaumregal ist ebenfalls geblieben – es passt zum neuen Look besser als zum alten.</p>
 
-      <aside class="try-box" aria-label="Faindz ausprobieren">
-        <div class="try-box-text">
-          <span class="try-box-title">Diesen Look an deinem eigenen Raum testen</span>
-          <span class="try-box-sub">Foto hochladen, „Boho“ eintippen – in Sekunden siehst du deinen Raum neu, mit passenden Produkten.</span>
-        </div>
-        <a class="btn" href="/">Jetzt ausprobieren</a>
-      </aside>
+      <h3>Das Sofa neu beziehen statt neu kaufen</h3>
+      <p>Ein cremefarbener Bezug in Bouclé-Optik nimmt dem Ecksofa die Schwere. Es bleibt das größte Möbel im Raum, drängt sich aber nicht mehr in den Vordergrund. Viele Ecksofas haben abnehmbare Bezüge – ein Blick auf das Etikett lohnt sich, bevor man über ein neues Sofa nachdenkt.</p>
 
-      <h2>Variante 2: Mut zur Farbe</h2>
-      <p>Wem Creme zu zurückhaltend ist: Derselbe Raum, nur das Sofa in Terrakotta. Alles andere bleibt identisch – und trotzdem wirkt der Raum völlig anders. Das Sofa wird zum Statement, der Teppich tritt einen Schritt zurück.</p>
-      <figure>
-        <img src="/magazin/img/altbau-terrakotta.jpg" alt="Derselbe Raum mit terrakottafarbenem Ecksofa, Berberteppich und Rattanlampe" width="1000" height="1000" loading="lazy">
-        <figcaption>Ein einziger Änderungswunsch an Faindz: „Mach das Sofa terrakottafarben.“</figcaption>
-      </figure>
+      <h3>Ein Teppich mit Muster als Herzstück</h3>
+      <p>Der Berberteppich in Creme und Terrakotta gibt die Farbpalette vor und verbindet alles, was danach kommt. Wichtig ist die Größe: Die vorderen Sofabeine sollten auf dem Teppich stehen, sonst wirkt er verloren.</p>
+
+      <h3>Textilien in Erdtönen</h3>
+      <p>Kissen in Rost und Senf, eine grob gestrickte Decke über der Armlehne, bodenlange Leinenvorhänge in warmem Weiß. Die Vorhänge filtern das Tageslicht und machen die großen Fenster zum Gestaltungselement statt zur kahlen Fläche.</p>
+
+      <h3>Naturfasern als roter Faden</h3>
+      <p>Eine Tischlampe mit Rattanschirm, ein Sitzpouf aus Jute, Körbe im Regal und ein geflochtener Wandteller. Keines dieser Stücke ist für sich spektakulär – die Wirkung entsteht, weil das Material mehrmals im Raum wiederkehrt.</p>
+      <p>Was auffällt: Die Galeriewand ist geblieben, nur die Motive wurden wärmer. Auch das Nussbaumregal ist geblieben – es passt zum neuen Look sogar besser als zum alten.</p>
+
+      <div class="inline-cta">
+        <p>Wie sähe dein Wohnzimmer im Boho-Stil aus? Foto hochladen, „Boho“ eintippen, fertig.</p>
+        <a class="pill pill-pink" href="/">Bild hochladen</a>
+      </div>
+
+      <h2>Variante zwei: Mut zur Farbe</h2>
+      <p>Wem Creme zu zurückhaltend ist: derselbe Raum, nur das Sofa in Terrakotta. Alles andere bleibt identisch – und trotzdem wirkt der Raum völlig anders. Das Sofa wird zum Statement, der Teppich tritt einen Schritt zurück.</p>
+    </div>
+
+    <figure class="wide-figure">
+      <img src="/magazin/img/altbau-terrakotta.jpg" alt="Derselbe Raum mit terrakottafarbenem Ecksofa, Berberteppich und Rattanlampe" width="1000" height="1000" loading="lazy">
+      <figcaption>Ein einziger Änderungswunsch an Faindz: „Mach das Sofa terrakottafarben.“</figcaption>
+    </figure>
+
+    <div class="prose">
       <p>Diese Variante funktioniert, weil die Farbe des Sofas schon im Teppich und in den Kissen steckt. Ein knallblaues Sofa hätte hier keinen Anker – Terrakotta schon.</p>
 
       <h2>So setzt du es bei dir um</h2>
       <ul>
         <li><strong>Mit dem Teppich anfangen.</strong> Er ist die größte Farbfläche nach Wand und Boden und gibt die Palette für alles andere vor.</li>
-        <li><strong>Drei Haupttöne plus ein Akzent.</strong> Hier: Creme, Terrakotta und helles Holz, dazu Schwarz in kleinen Dosen bei Bilderrahmen und Lampenfuß.</li>
+        <li><strong>Drei Haupttöne und ein Akzent.</strong> Hier: Creme, Terrakotta und helles Holz, dazu Schwarz in kleinen Dosen bei Bilderrahmen und Lampenfuß.</li>
         <li><strong>Lieber wenige große Stücke als viel kleine Deko.</strong> Ein großer Teppich und gute Vorhänge verändern mehr als zwanzig Dekoartikel.</li>
         <li><strong>Materialien wiederholen.</strong> Rattan, Jute, Leinen – jedes Material mindestens zweimal im Raum, dann wirkt es gewollt.</li>
-        <li><strong>Erst ansehen, dann kaufen.</strong> Probier den Look vorher an einem Foto deines Raums aus. So siehst du, ob die Farben zu deinem Licht und deinem Boden passen.</li>
+        <li><strong>Erst ansehen, dann kaufen.</strong> Probier den Look an einem Foto deines Raums aus, bevor du bestellst. So siehst du, ob die Farben zu deinem Licht und deinem Boden passen.</li>
       </ul>
-    </article>
+    </div>
+  </article>
 
-    <aside class="shop" aria-labelledby="shop-title">
+  <section class="wrap shop" aria-labelledby="shop-title">
+    <div class="shop-head">
       <h2 id="shop-title">Shop the Look</h2>
-      <div class="shop-card">
-        <span class="shop-cat">Hero-Piece · Teppich</span>
-        <span class="shop-name">Berberteppich Creme / Terrakotta, 200 × 300 cm</span>
-        <span class="shop-mat">Wolle oder Wollmischung, flach gewebt</span>
-        <a class="shop-link" href="https://www.amazon.de/s?k=Berber+Teppich+Creme+Terrakotta+200x300" rel="nofollow noopener" target="_blank">Ähnliche ansehen →</a>
+      <p>Diese Stücke hat Faindz für den Raum vorgeschlagen.</p>
+    </div>
+    <div class="shop-row">
+      <div class="shop-item">
+        <span class="what">Teppich</span>
+        <span class="name">Berberteppich Creme und Terrakotta, 200 × 300 cm</span>
+        <span class="mat">Wolle oder Wollmischung, flach gewebt</span>
+        <a class="pill pill-white pill-small" href="https://www.amazon.de/s?k=Berber+Teppich+Creme+Terrakotta+200x300" rel="nofollow noopener" target="_blank">Ähnliche ansehen</a>
       </div>
-      <div class="shop-card">
-        <span class="shop-cat">Textil</span>
-        <span class="shop-name">Bouclé-Bezug für Ecksofa, Creme</span>
-        <span class="shop-mat">Bouclé, idealerweise waschbar</span>
-        <a class="shop-link" href="https://www.amazon.de/s?k=Boucl%C3%A9+Sofabezug+Ecksofa+creme" rel="nofollow noopener" target="_blank">Ähnliche ansehen →</a>
+      <div class="shop-item">
+        <span class="what">Sofa</span>
+        <span class="name">Bouclé-Bezug für Ecksofa, Creme</span>
+        <span class="mat">Bouclé, idealerweise waschbar</span>
+        <a class="pill pill-white pill-small" href="https://www.amazon.de/s?k=Boucl%C3%A9+Sofabezug+Ecksofa+creme" rel="nofollow noopener" target="_blank">Ähnliche ansehen</a>
       </div>
-      <div class="shop-card">
-        <span class="shop-cat">Licht</span>
-        <span class="shop-name">Tischlampe mit Rattanschirm</span>
-        <span class="shop-mat">Rattan, Keramikfuß in Terrakotta</span>
-        <a class="shop-link" href="https://www.amazon.de/s?k=Rattan+Tischlampe+Keramik+terrakotta" rel="nofollow noopener" target="_blank">Ähnliche ansehen →</a>
+      <div class="shop-item">
+        <span class="what">Licht</span>
+        <span class="name">Tischlampe mit Rattanschirm</span>
+        <span class="mat">Rattan, Keramikfuß in Terrakotta</span>
+        <a class="pill pill-white pill-small" href="https://www.amazon.de/s?k=Rattan+Tischlampe+Keramik+terrakotta" rel="nofollow noopener" target="_blank">Ähnliche ansehen</a>
       </div>
-      <div class="shop-card">
-        <span class="shop-cat">Textil</span>
-        <span class="shop-name">Leinenvorhänge, beige, halbtransparent</span>
-        <span class="shop-mat">Leinen, bodenlang</span>
-        <a class="shop-link" href="https://www.amazon.de/s?k=Leinen+Vorhang+beige+halbtransparent" rel="nofollow noopener" target="_blank">Ähnliche ansehen →</a>
+      <div class="shop-item">
+        <span class="what">Fenster</span>
+        <span class="name">Leinenvorhänge, beige, halbtransparent</span>
+        <span class="mat">Leinen, bodenlang</span>
+        <a class="pill pill-white pill-small" href="https://www.amazon.de/s?k=Leinen+Vorhang+beige+halbtransparent" rel="nofollow noopener" target="_blank">Ähnliche ansehen</a>
       </div>
-      <div class="shop-card">
-        <span class="shop-cat">Akzent</span>
-        <span class="shop-name">Sitzpouf aus Jute</span>
-        <span class="shop-mat">Jute, geflochten</span>
-        <a class="shop-link" href="https://www.amazon.de/s?k=Sitzpouf+Jute+geflochten" rel="nofollow noopener" target="_blank">Ähnliche ansehen →</a>
+      <div class="shop-item">
+        <span class="what">Akzent</span>
+        <span class="name">Sitzpouf aus Jute</span>
+        <span class="mat">Jute, geflochten</span>
+        <a class="pill pill-white pill-small" href="https://www.amazon.de/s?k=Sitzpouf+Jute+geflochten" rel="nofollow noopener" target="_blank">Ähnliche ansehen</a>
       </div>
-      <p class="shop-note">Die Produkte sind Vorschläge, die Faindz für diesen Raum gemacht hat. Die Links führen zu einer Suche nach ähnlichen Stücken.</p>
-    </aside>
-  </div>
+    </div>
+  </section>
 
-  <a class="try-bar" href="/" aria-label="Diesen Look an deinem Raum testen – Faindz öffnen"><span class="try-bar-text">Diesen Look an deinem Raum testen</span><span class="btn btn-light">Ausprobieren</span></a>
+  <section class="try" aria-labelledby="try-title">
+    <img src="/magazin/img/altbau-terrakotta.jpg" alt="" width="1000" height="1000" loading="lazy">
+    <div class="wrap">
+      <h2 id="try-title">Wie sähe das bei dir aus?</h2>
+      <p>Foto von deinem Raum hochladen, Stil wählen – und du siehst ihn neu eingerichtet, mit passenden Produkten.</p>
+      <a class="pill pill-pink" href="/">Bild hochladen</a>
+    </div>
+  </section>
+
+  <div class="sticky-try"><a class="pill pill-pink" href="/">Diesen Look bei mir testen</a></div>
 </main>
 
-<footer class="site-footer">
+<footer class="mz-footer">
   <div class="wrap">
-    <a class="brand" href="/magazin/"><span class="brand-name">Faindz</span></a>
-    <nav aria-label="Rechtliches"><a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></nav>
+    <a href="/magazin/">Faindz Magazin</a>
+    <span class="spacer"></span>
+    <a href="/impressum.html">Impressum</a>
+    <a href="/datenschutz.html">Datenschutz</a>
   </div>
 </footer>
 
-<script>
-(function () {
-  var root = document.getElementById('ba');
-  if (!root) return;
-  var range = root.querySelector('.ba-range');
-  var before = root.querySelector('.ba-before');
-  var line = root.querySelector('.ba-line');
-  var knob = root.querySelector('.ba-knob');
-  function update() {
-    var v = Number(range.value);
-    before.style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
-    line.style.left = v + '%';
-    knob.style.left = v + '%';
-  }
-  range.addEventListener('input', update);
-  update();
-})();
-</script>
+<script src="/magazin/cover.js" defer></script>
 </body>
 </html>

@@ -17,81 +17,74 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23faf9f6'/><text x='16' y='24' font-family='Georgia,Times New Roman,serif' font-size='24' font-weight='400' fill='%231a1a1a' text-anchor='middle'>F</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT@9..144,400,50&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/magazin/magazin.css">
 </head>
 <body>
 
-<header class="site-header">
+<header class="mz-header">
   <div class="wrap">
-    <a class="brand" href="/magazin/"><span class="brand-name">Faindz</span><span class="brand-sub">Magazin</span></a>
-    <nav class="site-nav" aria-label="Magazin">
-      <a href="/magazin/">Alle Artikel</a>
-      <a href="/">Raum gestalten</a>
-    </nav>
-    <a class="btn" href="/">Deinen Raum gestalten</a>
+    <a class="mz-logo" href="/">Faindz</a>
+    <a class="mz-section" href="/magazin/" aria-current="page">Magazin</a>
+    <span class="spacer"></span>
+    <a class="pill pill-pink pill-small" href="/">Bild hochladen</a>
   </div>
 </header>
 
 <main>
-  <section class="wrap cover" aria-labelledby="cover-title">
+  <section class="cover" data-cover aria-label="Titelgeschichte: Vorher-Nachher-Vergleich">
+    <img src="/magazin/img/altbau-boho.jpg" alt="Nachher: Boho-Wohnzimmer mit cremefarbenem Ecksofa und Berberteppich" width="1000" height="1000">
+    <img class="before" src="/magazin/img/altbau-vorher.jpg" alt="Vorher: Altbau-Wohnzimmer mit grünem Cord-Ecksofa und Jute-Teppich" width="1000" height="1000">
+    <div class="cover-line" aria-hidden="true"></div>
+    <input class="cover-range" type="range" min="0" max="100" value="50" aria-label="Vorher-Nachher-Regler">
+    <div class="cover-knob" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-6 6 6 6"/><path d="M15 6l6 6-6 6"/></svg>
+    </div>
+    <span class="cover-tag left" aria-hidden="true">Vorher</span>
+    <span class="cover-tag right" aria-hidden="true">Nachher</span>
     <div class="cover-text">
-      <span class="eyebrow">Titelgeschichte · Vorher / Nachher</span>
-      <h1 class="cover-title" id="cover-title"><a href="/magazin/altbau-wohnzimmer-drei-looks/">Ein Altbau-Wohnzimmer, drei Looks</a></h1>
-      <p class="dek">Vom grünen Cord-Sofa zum warmen Boho-Raum – und weiter zu Terrakotta. Was sich ändern muss, was bleiben darf und welche Stücke den Unterschied machen.</p>
-      <p class="meta">Faindz Redaktion · 6 Min. Lesezeit</p>
-      <div class="actions">
-        <a class="btn" href="/magazin/altbau-wohnzimmer-drei-looks/">Artikel lesen</a>
-        <a class="btn btn-ghost" href="/">An meinem Raum testen</a>
-      </div>
-    </div>
-    <div class="cover-images">
-      <figure>
-        <img src="/magazin/img/altbau-vorher.jpg" alt="Wohnzimmer vorher: grünes Cord-Ecksofa, Jute-Teppich, bunte Galeriewand" width="1000" height="1000">
-        <figcaption class="label">Vorher</figcaption>
-      </figure>
-      <figure>
-        <img src="/magazin/img/altbau-boho.jpg" alt="Wohnzimmer nachher: cremefarbenes Sofa, Berberteppich, Rattan und Terrakotta" width="1000" height="1000">
-        <figcaption class="label label-accent">Nachher · Boho</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section class="tool-band" aria-labelledby="tool-title">
-    <div class="wrap">
-      <div class="tool-band-text">
-        <span class="eyebrow">Faindz ausprobieren</span>
-        <h2 id="tool-title">Wie sähe das bei dir aus?</h2>
-        <p>Foto von deinem Raum hochladen, Stil wählen – und du siehst ihn neu eingerichtet, mit passenden Produkten zum Nachkaufen.</p>
-        <div><a class="btn btn-light" href="/">Kostenlos ausprobieren</a></div>
-      </div>
-      <div class="tool-band-images">
-        <img src="/magazin/img/altbau-vorher.jpg" alt="Beispielraum vorher" width="1000" height="1000" loading="lazy">
-        <img src="/magazin/img/altbau-boho.jpg" alt="Derselbe Raum im Boho-Stil" width="1000" height="1000" loading="lazy">
-        <img src="/magazin/img/altbau-terrakotta.jpg" alt="Derselbe Raum mit Terrakotta-Sofa" width="1000" height="1000" loading="lazy">
+      <div class="wrap">
+        <h1 class="cover-title">Ein Altbau-Wohnzimmer, drei Looks</h1>
+        <p class="cover-dek">Vom grünen Cord-Sofa zum warmen Boho-Raum – ohne Umbau, ohne neues Sofa.</p>
+        <a class="pill pill-white" href="/magazin/altbau-wohnzimmer-drei-looks/">Artikel lesen</a>
       </div>
     </div>
   </section>
 
-  <section class="wrap coming" aria-labelledby="coming-title">
-    <div class="section-head">
-      <h2 class="section-title" id="coming-title">Demnächst im Magazin</h2>
-    </div>
-    <ul class="coming-list">
-      <li><span class="eyebrow">Kleine Räume</span><span class="serif">Kleines Wohnzimmer größer wirken lassen</span></li>
-      <li><span class="eyebrow">Stile</span><span class="serif">Japandi einrichten: Ruhe ohne Kälte</span></li>
-      <li><span class="eyebrow">Mietwohnung</span><span class="serif">Schöner wohnen ohne Bohren</span></li>
-      <li><span class="eyebrow">Kaufberatung</span><span class="serif">Welche Teppichgröße wirklich passt</span></li>
+  <section class="wrap home-intro" aria-labelledby="intro-title">
+    <h2 id="intro-title">Echte Räume, echte Vorher-Nachher</h2>
+    <p>Jeder Artikel zeigt einen Raum, wie er war, und wie er mit wenigen Änderungen werden kann – und jeden Look kannst du direkt an einem Foto deines eigenen Zuhauses testen.</p>
+  </section>
+
+  <section class="wrap" aria-labelledby="soon-title">
+    <h2 id="soon-title" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Demnächst</h2>
+    <ul class="next-up">
+      <li><span class="topic">Kleine Räume</span><span class="title">Kleines Wohnzimmer größer wirken lassen</span><span class="soon">Erscheint demnächst</span></li>
+      <li><span class="topic">Japandi</span><span class="title">Ruhe ohne Kälte: Japandi im Alltag</span><span class="soon">Erscheint demnächst</span></li>
+      <li><span class="topic">Mietwohnung</span><span class="title">Schöner wohnen ohne Bohren</span><span class="soon">Erscheint demnächst</span></li>
+      <li><span class="topic">Teppiche</span><span class="title">Welche Teppichgröße wirklich passt</span><span class="soon">Erscheint demnächst</span></li>
     </ul>
+  </section>
+
+  <section class="try" aria-labelledby="try-title">
+    <img src="/magazin/img/altbau-terrakotta.jpg" alt="" width="1000" height="1000" loading="lazy">
+    <div class="wrap">
+      <h2 id="try-title">Wie sähe das bei dir aus?</h2>
+      <p>Foto von deinem Raum hochladen, Stil wählen – und du siehst ihn neu eingerichtet, mit passenden Produkten.</p>
+      <a class="pill pill-pink" href="/">Bild hochladen</a>
+    </div>
   </section>
 </main>
 
-<footer class="site-footer">
+<footer class="mz-footer">
   <div class="wrap">
-    <a class="brand" href="/magazin/"><span class="brand-name">Faindz</span></a>
-    <nav aria-label="Rechtliches"><a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></nav>
+    <a href="/magazin/">Faindz Magazin</a>
+    <span class="spacer"></span>
+    <a href="/impressum.html">Impressum</a>
+    <a href="/datenschutz.html">Datenschutz</a>
   </div>
 </footer>
 
+<script src="/magazin/cover.js" defer></script>
 </body>
 </html>
