@@ -1,37 +1,56 @@
 // Faindz Magazin — draggable before/after cover
 // Mouse: press anywhere and drag. Touch: a horizontal swipe moves the divider,
 // a vertical swipe scrolls the page as usual. Keyboard: the hidden range input.
+// Rendering uses transforms only (no clip-path), batched per animation frame.
 (function () {
-  document.querySelectorAll('[data-cover]').forEach(function (cover) {
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var covers = document.querySelectorAll('[data-cover]');
+
+  covers.forEach(function (cover, index) {
     var before = cover.querySelector('.before');
     var line = cover.querySelector('.cover-line');
     var knob = cover.querySelector('.cover-knob');
     var range = cover.querySelector('.cover-range');
-    var touched = false;      // user has interacted -> stop the intro sweep
-    var drag = null;          // { id, x0, y0, active, isTouch }
+    if (!before) return;
+
+    // Wrap the "before" image so both can be moved with transforms.
+    var wrap = document.createElement('div');
+    wrap.className = 'before-wrap';
+    before.parentNode.insertBefore(wrap, before);
+    wrap.appendChild(before);
 
     cover.querySelectorAll('img').forEach(function (img) {
       img.draggable = false;
       img.addEventListener('dragstart', function (e) { e.preventDefault(); });
     });
 
-    function set(pct) {
-      pct = Math.max(0, Math.min(100, pct));
-      before.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
+    var pct = 50, pending = false, touched = false, drag = null;
+
+    function render() {
+      pending = false;
+      var off = 100 - pct;
+      wrap.style.transform = 'translate3d(' + (-off) + '%,0,0)';
+      before.style.transform = 'translate3d(' + off + '%,0,0)';
       line.style.left = pct + '%';
       knob.style.left = pct + '%';
       if (range) range.value = Math.round(pct);
     }
+    function set(p) {
+      pct = Math.max(0, Math.min(100, p));
+      if (!pending) { pending = true; requestAnimationFrame(render); }
+    }
+    var rect = null;
     function moveTo(clientX) {
-      var r = cover.getBoundingClientRect();
-      set(((clientX - r.left) / r.width) * 100);
+      if (!rect) rect = cover.getBoundingClientRect();
+      set(((clientX - rect.left) / rect.width) * 100);
     }
 
     cover.addEventListener('pointerdown', function (e) {
       if (e.button > 0 || e.target.closest('a, button, input')) return;
       touched = true;
+      rect = cover.getBoundingClientRect();
       var isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
-      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, active: !isTouch, isTouch: isTouch };
+      drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, active: !isTouch };
       if (!isTouch) {
         e.preventDefault();
         cover.setPointerCapture(e.pointerId);
@@ -51,19 +70,17 @@
       moveTo(e.clientX);
     });
 
-    function end(e) { if (drag && e.pointerId === drag.id) drag = null; }
+    function end(e) { if (drag && e.pointerId === drag.id) { drag = null; rect = null; } }
     cover.addEventListener('pointerup', end);
     cover.addEventListener('pointercancel', end);
     cover.addEventListener('lostpointercapture', end);
 
-    if (range) {
-      range.addEventListener('input', function () { touched = true; set(Number(range.value)); });
-    }
+    if (range) range.addEventListener('input', function () { touched = true; set(Number(range.value)); });
 
     set(50);
 
-    // One hint on load: the divider sweeps once so people see it moves.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // One hint on load, only for the first slider on the page.
+    if (index !== 0 || reduceMotion) return;
     var start = null;
     function sweep(t) {
       if (touched) return;
