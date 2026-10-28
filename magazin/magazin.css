@@ -206,25 +206,73 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 
 /* ---------- phone ---------- */
 .sticky-try { display: none; }
+/* ---------- swipe gallery (phones only): Vorher | Nachher side by side, swipe to switch ---------- */
+.swipe { display: none; }
+
 @media (max-width: 720px) {
-  .wrap { padding: 0 16px; }
-  .cover { height: auto; aspect-ratio: 4 / 5; min-height: 0; }
-  .cover.cover-inline { aspect-ratio: 2400 / 1406; border-radius: 18px; }
-  .inline-compare { padding: 8px 16px 0; }
-  .cover-text { padding-bottom: 28px; }
-  .cover-tag { top: 14px; font-size: 13px; }
-  .cover-tag.left { left: 14px; } .cover-tag.right { right: 14px; }
-  .cover-knob { width: 48px; height: 48px; margin: -24px 0 0 -24px; }
-  .prose { padding: 32px 16px 16px; font-size: 18px; }
-  .prose > p:first-child { font-size: 20px; }
-  .prose h2 { font-size: 28px; margin-top: 44px; }
-  .wide-figure { padding: 0 16px; }
+  .wrap { padding: 0 22px; }
+
+  /* No slider on phones: the cover keeps only its text, the photos move into .swipe */
+  .cover, .cover.cover-inline {
+    height: auto; min-height: 0; aspect-ratio: auto; overflow: visible;
+    background: none; cursor: auto; touch-action: auto; contain: none; border-radius: 0;
+  }
+  .cover::after,
+  .cover img, .cover .before-wrap, .cover-line, .cover-knob, .cover-tag, .cover-range { display: none; }
+  .cover-text { position: static; color: var(--ink); padding: 24px 0 4px; pointer-events: auto; }
+  .cover-title { font-size: 38px; line-height: 1.05; letter-spacing: -0.04em; text-shadow: none; max-width: none; }
+  .cover-dek { color: var(--muted); font-size: 18px; }
+  .cover-text .pill-white { background: var(--ink); color: #fff; box-shadow: none; }
+  .inline-compare { padding: 0; }
+  .inline-compare figcaption { padding: 4px 22px 0; }
+
+  .swipe { display: block; padding-top: 16px; }
+  .swipe-track {
+    display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 0 22px; scroll-padding: 0 22px; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .swipe-track::-webkit-scrollbar { display: none; }
+  .swipe-slide { position: relative; margin: 0; flex: 0 0 86%; scroll-snap-align: start; }
+  .swipe-slide img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 20px; }
+  .swipe-tag {
+    position: absolute; top: 12px; left: 12px; padding: 7px 13px; border-radius: 999px;
+    font-size: 14px; font-weight: 600; background: rgba(20,20,20,0.6); color: #fff;
+  }
+  .swipe-slide.after .swipe-tag { background: #fff; color: var(--ink); }
+  .swipe-nav { display: flex; align-items: center; gap: 8px; padding: 14px 22px 0; }
+  .swipe-nav button {
+    min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.14);
+    background: transparent; font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer;
+  }
+  .swipe-nav button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .byline { padding-top: 20px; font-size: 14px; gap: 4px 16px; }
+  .prose { padding: 36px 22px 16px; font-size: 18px; line-height: 1.75; }
+  .prose > p:first-child { font-size: 20px; line-height: 1.6; }
+  .prose p { margin-bottom: 22px; }
+  .prose h2 { font-size: 29px; margin-top: 56px; margin-bottom: 16px; }
+  .prose h3 { margin-top: 36px; margin-bottom: 8px; }
+  .inline-cta { margin: 40px 0; padding: 22px; flex-direction: column; align-items: flex-start; }
+  .wide-figure { padding: 0 22px; }
   .wide-figure img { border-radius: 18px; }
-  .shop-row { padding: 4px 16px 20px; margin: 0 -16px; }
+
+  .home-intro { padding: 56px 0 28px; }
+  .next-up { gap: 14px; padding-bottom: 64px; }
+
+  .shop { padding-top: 56px; }
+  .shop-head h2 { font-size: 29px; }
+  .shop-row { gap: 14px; padding: 4px 22px 24px; margin: 0 -22px; }
+  .shop-item { flex-basis: 78%; padding: 22px; }
+
   .try { padding: 72px 0; }
+  .try h2 { font-size: 36px; }
+  .mz-footer .wrap { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .mz-footer .spacer { display: none; }
+
   .sticky-try {
-    display: flex; position: sticky; bottom: 14px; z-index: 30;
-    justify-content: center; padding: 0 16px; margin-top: -8px; pointer-events: none;
+    display: flex; position: sticky; bottom: 16px; z-index: 30;
+    justify-content: center; padding: 0 22px; margin-top: -8px; pointer-events: none;
   }
   .sticky-try .pill { pointer-events: auto; width: 100%; max-width: 420px; }
 }

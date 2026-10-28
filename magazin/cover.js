@@ -4,6 +4,7 @@
 // Rendering uses transforms only (no clip-path), batched per animation frame.
 (function () {
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (window.matchMedia('(max-width: 720px)').matches) return; // phones use the swipe gallery
   var covers = document.querySelectorAll('[data-cover]');
 
   covers.forEach(function (cover, index) {
@@ -91,5 +92,31 @@
       if (p < 1) requestAnimationFrame(sweep);
     }
     setTimeout(function () { if (!touched) requestAnimationFrame(sweep); }, 700);
+  });
+})();
+
+// Phones: Vorher | Nachher swipe gallery with two buttons
+(function () {
+  document.querySelectorAll('.swipe').forEach(function (sw) {
+    var track = sw.querySelector('.swipe-track');
+    var slides = sw.querySelectorAll('.swipe-slide');
+    var buttons = sw.querySelectorAll('.swipe-nav button');
+    function mark(i) {
+      buttons.forEach(function (b, j) { b.setAttribute('aria-pressed', String(i === j)); });
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener('click', function () {
+        track.scrollTo({ left: slides[i].offsetLeft - slides[0].offsetLeft, behavior: 'smooth' });
+        mark(i);
+      });
+    });
+    var t = null;
+    track.addEventListener('scroll', function () {
+      clearTimeout(t);
+      t = setTimeout(function () {
+        var i = track.scrollLeft > (slides[1].offsetLeft - slides[0].offsetLeft) / 2 ? 1 : 0;
+        mark(i);
+      }, 60);
+    }, { passive: true });
   });
 })();
