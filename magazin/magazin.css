@@ -29,7 +29,7 @@ img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); outline-offset: 3px; }
 
-.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
 
 /* ---------- header: same geometry as the app header on faindz.de ----------
    App: .container max-width 1280, padding 24px 32px (16px 20px <=768px),
@@ -212,7 +212,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .swipe { display: none; }
 
 @media (max-width: 720px) {
-  .wrap { padding: 0 22px; }
+  .wrap { padding-left: 22px; padding-right: 22px; }
 
   /* No slider on phones: the cover keeps only its text, the photos move into .swipe */
   .cover, .cover.cover-inline {
