@@ -283,3 +283,79 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 @media (prefers-reduced-motion: reduce) {
   .pill { transition: none; }
 }
+
+/* ---------- era viewer: one room, several decades (crossfade, tabs) ---------- */
+.era { position: relative; background: #2a2622; color: #fff; overflow: hidden; }
+.era-stage { position: relative; height: min(86vh, 820px); min-height: 520px; }
+.era-stage img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 0.7s ease;
+}
+.era-stage img.is-on { opacity: 1; }
+.era-stage::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.66) 100%);
+}
+.era-year {
+  position: absolute; top: 20px; left: 20px; z-index: 2;
+  padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
+  background: rgba(20,20,20,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.28);
+}
+.era-text { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding-bottom: 36px; }
+.era-text .wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.era-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.era-tabs button {
+  min-height: 40px; padding: 0 16px; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: 14px; font-weight: 600;
+  background: rgba(20,20,20,0.45); color: #fff; border: 1px solid rgba(255,255,255,0.35);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.era-tabs button:hover { background: rgba(20,20,20,0.7); }
+.era-tabs button[aria-selected="true"] { background: #fff; color: var(--ink); border-color: #fff; }
+
+/* era chapters inside the article */
+.era-fig { max-width: 1000px; margin: 8px auto 0; padding: 0 24px; }
+.era-fig img { width: 100%; aspect-ratio: 2400 / 1757; object-fit: cover; border-radius: 24px; }
+.era-fig figcaption { padding: 12px 4px 0; font-size: 15px; color: var(--muted); }
+.prose .era-kicker { display: block; margin: 72px 0 6px; font-size: 14px; font-weight: 600; color: var(--cyan-text); letter-spacing: 0; }
+.prose .era-kicker + h2 { margin-top: 0; }
+.back-box { margin: 28px 0 8px; padding: 20px 22px; border-radius: 20px; background: var(--white); }
+.back-box p { margin: 0; font-size: 17px; line-height: 1.6; }
+.back-box strong { display: block; margin-bottom: 4px; font-size: 14px; color: var(--cyan-text); }
+
+@media (max-width: 720px) {
+  .era { background: none; color: var(--ink); }
+  .era-stage { height: auto; min-height: 0; aspect-ratio: 4 / 5; margin: 16px 22px 0; border-radius: 20px; overflow: hidden; }
+  .era-stage::after { display: none; }
+  .era-year { top: 12px; left: 12px; }
+  .era-text { position: static; padding: 14px 0 4px; }
+  .era-text .wrap { gap: 14px; }
+  .era-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -22px; padding: 0 22px; width: calc(100% + 44px); }
+  .era-tabs::-webkit-scrollbar { display: none; }
+  .era-tabs button { flex: 0 0 auto; background: transparent; color: var(--muted); border-color: rgba(0,0,0,0.14); }
+  .era-tabs button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .era .cover-title { order: 2; }
+  .era .cover-dek { order: 3; }
+  .era-fig { padding: 0 22px; }
+  .era-fig img { border-radius: 18px; }
+  .era-fig figcaption { padding: 10px 0 0; font-size: 14px; }
+  .prose .era-kicker { margin-top: 64px; }
+}
+@media (prefers-reduced-motion: reduce) { .era-stage img { transition: none; } }
+
+/* ---------- home: article cards ---------- */
+.articles { padding-top: 56px; padding-bottom: 8px; }
+.articles > h2 { margin: 0 0 18px; font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: -0.005em; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px 24px; }
+.card { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--ink); }
+.card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 20px; transition: transform 0.4s ease; }
+.card:hover img { transform: scale(1.015); }
+.card .topic { font-size: 14px; font-weight: 600; color: var(--cyan-text); }
+.card .title { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+.card .dek { font-size: 16px; color: var(--muted); line-height: 1.5; }
+@media (max-width: 720px) {
+  .articles { padding-top: 48px; }
+  .card-grid { grid-template-columns: 1fr; gap: 32px; }
+  .card img { border-radius: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .card img { transition: none; } }
