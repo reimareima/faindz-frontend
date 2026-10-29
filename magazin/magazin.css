@@ -359,3 +359,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
   .card img { border-radius: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { .card img { transition: none; } }
+
+/* ---------- tables in articles ---------- */
+.table-wrap { overflow-x: auto; margin: 8px 0 20px; }
+.prose table { width: 100%; border-collapse: collapse; font-size: 17px; line-height: 1.5; }
+.prose th { text-align: left; font-size: 14px; font-weight: 600; color: var(--muted); padding: 0 12px 10px 0; border-bottom: 1px solid var(--line); }
+.prose td { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.prose td:first-child { white-space: nowrap; font-weight: 600; color: var(--ink); }
+.prose a { color: var(--cyan-text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+@media (max-width: 720px) { .prose table { font-size: 16px; } }
