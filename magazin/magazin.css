@@ -257,6 +257,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
   .prose h2 { font-size: 29px; margin-top: 56px; margin-bottom: 16px; }
   .prose h3 { margin-top: 36px; margin-bottom: 8px; }
   .inline-cta { margin: 40px 0; padding: 22px; flex-direction: column; align-items: flex-start; }
+  .inline-cta p { flex: none; }
   .wide-figure { padding: 0 22px; }
   .wide-figure img { border-radius: 18px; }
 
