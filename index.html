@@ -4261,6 +4261,14 @@
   }
 
 
+
+  /* Phones: move the EN/DE switch from the header into the footer */
+  .footer-lang { display: none; }
+  @media (max-width: 600px) {
+    header .controls .lang-toggle { display: none; }
+    footer .footer-lang { display: inline-flex; margin-top: 8px; }
+  }
+
   /* ─── Landing: below the hero (before/after, how it works, magazine) ─── */
   body[data-state="uploaded"] .home-more,
   body[data-state="results"] .home-more { display: none; }
@@ -4712,6 +4720,11 @@
       <a href="/magazin/">Magazin</a>
       <a id="footerImprintLink" href="/impressum.html" data-i18n="footer.imprint">Impressum</a>
       <a id="footerPrivacyLink" href="/datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
+    </div>
+    <!-- Phones: the language switch lives here instead of the crowded header -->
+    <div class="lang-toggle footer-lang" role="group" aria-label="Language">
+      <button class="lang-toggle-btn" data-lang="en" type="button">EN</button>
+      <button class="lang-toggle-btn" data-lang="de" type="button">DE</button>
     </div>
   </footer>
 
