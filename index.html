@@ -4260,6 +4260,59 @@
     footer .footer-disclosure { text-align: left; }
   }
 
+
+  /* ─── Landing: below the hero (before/after, how it works, magazine) ─── */
+  body[data-state="uploaded"] .home-more,
+  body[data-state="results"] .home-more { display: none; }
+  .home-more { padding-top: 96px; }
+  .hm-block + .hm-block { margin-top: 120px; }
+  .hm-eyebrow { display: block; font-size: 14px; font-weight: 600; color: var(--cyan-deep); margin-bottom: 10px; }
+  .hm-title { margin: 0; font-size: clamp(32px, 4.2vw, 52px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.04; color: var(--text); }
+  .hm-lead { margin: 14px 0 0; max-width: 52ch; font-size: 18px; line-height: 1.55; color: var(--text-muted); }
+  .hm-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; margin-bottom: 32px; }
+
+  .hm-ba { position: relative; aspect-ratio: 2400 / 1340; border-radius: var(--radius-xl); overflow: hidden; background: #ddd8cf; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+  .hm-ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .hm-ba .hm-before { clip-path: inset(0 50% 0 0); }
+  .hm-ba-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px; background: #fff; pointer-events: none; }
+  .hm-ba-knob { position: absolute; top: 50%; left: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: #fff; color: var(--text); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25); pointer-events: none; }
+  .hm-ba-tag { position: absolute; top: 18px; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; background: rgba(20,20,20,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.28); pointer-events: none; }
+  .hm-ba-tag.l { left: 18px; } .hm-ba-tag.r { right: 18px; }
+  .hm-ba input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+  .hm-ba input:focus-visible ~ .hm-ba-knob { outline: 3px solid var(--cyan-bright); outline-offset: 3px; }
+
+  .hm-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: hm; }
+  .hm-steps li { background: var(--bg-card); border-radius: var(--radius-xl); padding: 28px; counter-increment: hm; }
+  .hm-steps li::before { content: counter(hm); display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--text); color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 18px; }
+  .hm-steps h3 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+  .hm-steps p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--text-muted); }
+
+  .hm-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 24px; }
+  .hm-card { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--text); }
+  .hm-card img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 20px; transition: transform 0.4s var(--ease-out); }
+  .hm-card:hover img { transform: scale(1.015); }
+  .hm-card .t { font-size: 14px; font-weight: 600; color: var(--cyan-deep); }
+  .hm-card .n { font-size: 21px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+  .hm-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--border-strong); font-size: 15px; font-weight: 600; color: var(--text); text-decoration: none; white-space: nowrap; }
+  .hm-link:hover { background: var(--bg-hover); }
+
+  .hm-cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 28px; border: 0; border-radius: 999px; cursor: pointer; font: inherit; font-size: 16px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #ff3d8b 0%, #e91e63 100%); box-shadow: 0 10px 26px rgba(233, 30, 99, 0.35); transition: transform 0.25s var(--ease-spring); }
+  .hm-cta:hover { transform: translateY(-2px); }
+  .hm-center { text-align: center; margin-top: 40px; }
+
+  @media (max-width: 768px) {
+    .home-more { padding-top: 56px; }
+    .hm-block + .hm-block { margin-top: 80px; }
+    .hm-ba { aspect-ratio: 4 / 5; border-radius: 20px; }
+    .hm-ba-knob { width: 48px; height: 48px; margin: -24px 0 0 -24px; }
+    .hm-steps { grid-template-columns: 1fr; gap: 12px; }
+    .hm-steps li { padding: 22px; display: grid; grid-template-columns: 36px 1fr; column-gap: 16px; }
+    .hm-steps li::before { margin: 0; grid-row: span 2; }
+    .hm-cards { grid-template-columns: 1fr; gap: 32px; }
+    .hm-cta { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hm-card img, .hm-cta { transition: none; } }
+
   @media (max-width: 768px) {
     .container { padding: 16px 20px 80px; }
     header { margin: 0 -20px 48px; padding: 12px 20px; }
@@ -4586,6 +4639,70 @@
     <!-- Save-Look CTA removed — Auto-Save handles persistence for signed-in users -->
   </section>
 
+  <!-- Landing only: below the hero -->
+  <div class="home-more">
+    <section class="hm-block" aria-labelledby="hmBaTitle">
+      <div class="hm-head">
+        <div>
+          <span class="hm-eyebrow" data-i18n="home.ba.eyebrow">Before / After</span>
+          <h2 class="hm-title" id="hmBaTitle" data-i18n="home.ba.title">Same room. New look.</h2>
+          <p class="hm-lead" data-i18n="home.ba.lead">A cramped, dark living room, redesigned with Faindz. Same walls, same window. Drag the slider to compare.</p>
+        </div>
+      </div>
+      <div class="hm-ba" id="hmBa">
+        <img src="/magazin/img/klein-nachher-1200.jpg" srcset="/magazin/img/klein-nachher-1200.jpg 1200w, /magazin/img/klein-nachher-2400.jpg 2400w" sizes="(max-width: 1280px) 100vw, 1216px" alt="Nachher: helles Wohnzimmer mit schlankem Sofa, langen Leinenvorhängen und großem Teppich" width="2400" height="1340" loading="lazy">
+        <img class="hm-before" src="/magazin/img/klein-vorher-1200.jpg" srcset="/magazin/img/klein-vorher-1200.jpg 1200w, /magazin/img/klein-vorher-2400.jpg 2400w" sizes="(max-width: 1280px) 100vw, 1216px" alt="Vorher: enges, dunkles Wohnzimmer mit Ledersofa und Schrankwand" width="2400" height="1340" loading="lazy">
+        <div class="hm-ba-line" aria-hidden="true"></div>
+        <span class="hm-ba-tag l" aria-hidden="true" data-i18n="home.ba.before">Before</span>
+        <span class="hm-ba-tag r" aria-hidden="true" data-i18n="home.ba.after">After</span>
+        <input type="range" min="0" max="100" value="50" data-i18n-aria-label="home.ba.slider" aria-label="Before/after slider">
+        <div class="hm-ba-knob" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l-6 6 6 6"/><path d="M15 6l6 6-6 6"/></svg></div>
+      </div>
+    </section>
+
+    <section class="hm-block" aria-labelledby="hmHowTitle">
+      <div class="hm-head">
+        <div>
+          <span class="hm-eyebrow" data-i18n="home.how.eyebrow">How it works</span>
+          <h2 class="hm-title" id="hmHowTitle" data-i18n="home.how.title">Three steps to a new room</h2>
+        </div>
+      </div>
+      <ol class="hm-steps">
+        <li><h3 data-i18n="home.how.s1.t">Upload a photo</h3><p data-i18n="home.how.s1.d">A normal phone photo of your room is enough. No measuring, no floor plan.</p></li>
+        <li><h3 data-i18n="home.how.s2.t">Pick a style</h3><p data-i18n="home.how.s2.d">Japandi, Boho, dark and cosy, or simply calmer. Faindz suggests what suits your room.</p></li>
+        <li><h3 data-i18n="home.how.s3.t">See it and shop it</h3><p data-i18n="home.how.s3.d">You see your room redesigned, with matching products you can buy right away.</p></li>
+      </ol>
+      <div class="hm-center"><button type="button" class="hm-cta" id="hmUpload" data-i18n="upload.title.empty">Upload an image</button></div>
+    </section>
+
+    <section class="hm-block" aria-labelledby="hmMagTitle">
+      <div class="hm-head">
+        <div>
+          <span class="hm-eyebrow" data-i18n="home.mag.eyebrow">Magazine</span>
+          <h2 class="hm-title" id="hmMagTitle" data-i18n="home.mag.title">Ideas you can actually copy</h2>
+        </div>
+        <a class="hm-link" href="/magazin/" data-i18n="home.mag.all">All articles</a>
+      </div>
+      <div class="hm-cards">
+        <a class="hm-card" href="/magazin/80er-revival/">
+          <img src="/magazin/img/achtziger-nachher-1200.jpg" alt="Wohnzimmer mit Apricot-Wand, Chrom-Freischwinger und Terrazzo-Tisch" width="1200" height="670" loading="lazy">
+          <span class="t">80er</span>
+          <span class="n">80er-Revival: Memphis, Terrazzo und Chrom für heute</span>
+        </a>
+        <a class="hm-card" href="/magazin/schlafzimmer-ruhig-einrichten/">
+          <img src="/magazin/img/schlaf-nachher-1200.jpg" alt="Ruhiges Schlafzimmer mit Leinenbettwäsche und warmen Nachttischlampen" width="1200" height="670" loading="lazy">
+          <span class="t">Schlafzimmer</span>
+          <span class="n">Ein Schlafzimmer, das wirklich zur Ruhe kommt</span>
+        </a>
+        <a class="hm-card" href="/magazin/wandfarbe-waehlen/">
+          <img src="/magazin/img/wandfarbe-nachher-1200.jpg" alt="Wohnzimmer mit Wänden in einem warmen, hellen Lehmton" width="1200" height="670" loading="lazy">
+          <span class="t">Farben</span>
+          <span class="n">Wandfarbe wählen, ohne es zu bereuen</span>
+        </a>
+      </div>
+    </section>
+  </div>
+
   <footer>
     <div class="footer-mark">
       <span class="footer-dot"></span>
@@ -4599,6 +4716,28 @@
   </footer>
 
 </div>
+
+<script>
+// Landing: before/after slider and the second upload button
+(function () {
+  var ba = document.getElementById('hmBa');
+  if (ba) {
+    var before = ba.querySelector('.hm-before'), line = ba.querySelector('.hm-ba-line'),
+        knob = ba.querySelector('.hm-ba-knob'), range = ba.querySelector('input');
+    var set = function (v) {
+      before.style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
+      line.style.left = v + '%'; knob.style.left = v + '%';
+    };
+    range.addEventListener('input', function () { set(Number(range.value)); });
+    set(50);
+  }
+  var btn = document.getElementById('hmUpload'), input = document.getElementById('fileInput');
+  if (btn && input) btn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    input.click();
+  });
+})();
+</script>
 
 <!-- Supabase JS SDK (v2) — loaded from official CDN before main app script -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -5743,6 +5882,24 @@ const I18N = {
     'error.api.credits': 'Your API account is out of credits or quota. Check your Anthropic billing.',
     'error.api.network': 'Network hiccup. Check your connection and try again.',
     'error.api.parse': "The AI's response was malformed. Just try again.",
+    // Landing: below the hero
+    'home.ba.eyebrow': 'Before / After',
+    'home.ba.title': 'Same room. New look.',
+    'home.ba.lead': 'A cramped, dark living room, redesigned with Faindz. Same walls, same window. Drag the slider to compare.',
+    'home.ba.before': 'Before',
+    'home.ba.after': 'After',
+    'home.ba.slider': 'Before/after slider',
+    'home.how.eyebrow': 'How it works',
+    'home.how.title': 'Three steps to a new room',
+    'home.how.s1.t': 'Upload a photo',
+    'home.how.s1.d': 'A normal phone photo of your room is enough. No measuring, no floor plan.',
+    'home.how.s2.t': 'Pick a style',
+    'home.how.s2.d': 'Japandi, Boho, dark and cosy, or simply calmer. Faindz suggests what suits your room.',
+    'home.how.s3.t': 'See it and shop it',
+    'home.how.s3.d': 'You see your room redesigned, with matching products you can buy right away.',
+    'home.mag.eyebrow': 'Magazine',
+    'home.mag.title': 'Ideas you can actually copy',
+    'home.mag.all': 'All articles',
     // Footer
     'footer.tagline': 'Faindz · Interior intelligence',
     'footer.imprint': 'Imprint',
@@ -5934,6 +6091,24 @@ const I18N = {
     'error.api.credits': 'Dein API-Konto hat kein Guthaben mehr. Prüfe dein Anthropic-Billing.',
     'error.api.network': 'Netzwerk-Problem. Verbindung prüfen und nochmal versuchen.',
     'error.api.parse': 'Die KI-Antwort war fehlerhaft. Einfach nochmal versuchen.',
+    // Landing: unter dem Hero
+    'home.ba.eyebrow': 'Vorher / Nachher',
+    'home.ba.title': 'Gleicher Raum. Neuer Look.',
+    'home.ba.lead': 'Ein enges, dunkles Wohnzimmer, neu gestaltet mit Faindz. Gleiche Wände, gleiches Fenster. Zieh den Regler zum Vergleichen.',
+    'home.ba.before': 'Vorher',
+    'home.ba.after': 'Nachher',
+    'home.ba.slider': 'Vorher-Nachher-Regler',
+    'home.how.eyebrow': "So funktioniert's",
+    'home.how.title': 'In drei Schritten zum neuen Raum',
+    'home.how.s1.t': 'Foto hochladen',
+    'home.how.s1.d': 'Ein normales Handyfoto von deinem Raum reicht. Kein Ausmessen, kein Grundriss.',
+    'home.how.s2.t': 'Stil wählen',
+    'home.how.s2.d': 'Japandi, Boho, dunkel und gemütlich oder einfach ruhiger. Faindz schlägt vor, was zu deinem Raum passt.',
+    'home.how.s3.t': 'Ansehen und nachkaufen',
+    'home.how.s3.d': 'Du siehst deinen Raum neu eingerichtet, mit passenden Produkten, die du direkt kaufen kannst.',
+    'home.mag.eyebrow': 'Magazin',
+    'home.mag.title': 'Ideen, die man wirklich nachmachen kann',
+    'home.mag.all': 'Alle Artikel',
     // Footer
     'footer.tagline': 'Faindz · Interior Intelligence',
     'footer.imprint': 'Impressum',

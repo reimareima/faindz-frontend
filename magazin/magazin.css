@@ -371,3 +371,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .prose td:first-child { white-space: nowrap; font-weight: 600; color: var(--ink); }
 .prose a:not(.pill) { color: var(--cyan-text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 @media (max-width: 720px) { .prose table { font-size: 16px; } }
+
+/* ---------- related articles at the end of an article ---------- */
+.related { padding-top: 72px; padding-bottom: 16px; }
+.related-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.related-head h2 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.035em; }
+.related-all { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.12); }
+.related-all:hover { background: #f3f1ec; }
+@media (max-width: 720px) {
+  .related { padding-top: 56px; }
+  .related-head h2 { font-size: 29px; }
+}
