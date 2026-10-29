@@ -4262,6 +4262,107 @@
 
 
 
+
+  /* ═══ Upload screen ("uploaded" state): photo + studio panel ═══ */
+  body[data-state="uploaded"] .mode-switch-wrap { justify-content: flex-start; margin: 0 0 20px; }
+  body[data-state="uploaded"] .preview-wrap { margin-top: 0; }
+  body[data-state="uploaded"] .preview-img {
+    display: block; width: 100%; height: auto; max-height: min(74vh, 760px);
+    object-fit: contain; border: 0; border-radius: 28px;
+    background: #24211e; box-shadow: 0 30px 60px -30px rgba(36, 33, 30, 0.55);
+  }
+  body[data-state="uploaded"] .preview-img:hover { transform: none; box-shadow: 0 30px 60px -30px rgba(36, 33, 30, 0.55); }
+  body[data-state="uploaded"] .change-photo-pill {
+    top: auto; bottom: 16px; left: 16px; right: auto;
+    background: rgba(20, 20, 20, 0.55); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  }
+  body[data-state="uploaded"] .change-photo-pill:hover { background: rgba(20, 20, 20, 0.75); }
+
+  body[data-state="uploaded"] .prompt-section { margin-top: 0; }
+  body[data-state="uploaded"] .prompt-label {
+    font-size: clamp(26px, 2.4vw, 34px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.1;
+    color: var(--text); margin-bottom: 18px;
+  }
+  body[data-state="uploaded"] .prompt-label .optional-tag {
+    display: block; padding: 0; margin: 8px 0 0; background: none; border: 0;
+    font-size: 15px; font-weight: 500; letter-spacing: 0; line-height: 1.3; text-transform: none; color: var(--text-subtle);
+  }
+  body[data-state="uploaded"] .prompt-input {
+    min-height: 128px; padding: 18px 20px; resize: none;
+    font-size: 17px; line-height: 1.5; color: var(--text);
+    background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 20px;
+    box-shadow: none;
+  }
+  body[data-state="uploaded"] .prompt-input:focus {
+    border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.14); outline: none;
+  }
+  body[data-state="uploaded"] .prompt-input::placeholder { font-style: normal; color: #9b9b9b; }
+
+  body[data-state="uploaded"] .preset-chips.style-picks { flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+  body[data-state="uploaded"] .style-picks .chip {
+    min-height: 40px; padding: 0 16px; font-size: 14px; font-weight: 600; color: var(--text);
+    background: transparent; border: 1px solid var(--border-strong);
+  }
+  body[data-state="uploaded"] .style-picks .chip:hover { background: var(--bg-card); border-color: var(--text); transform: none; }
+  body[data-state="uploaded"] .style-picks .chip.is-picked { background: var(--text); border-color: var(--text); color: #fff; }
+
+  body[data-state="uploaded"] .ideas-trigger-wrap { margin-top: 10px; }
+  body[data-state="uploaded"] .ideas-trigger-btn {
+    min-height: 40px; padding: 0 14px 0 10px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    background: var(--bg-card); color: var(--text); border: 1px dashed rgba(233, 30, 99, 0.45);
+  }
+  body[data-state="uploaded"] .ideas-trigger-btn:hover { border-style: solid; border-color: #e91e63; }
+
+  body[data-state="uploaded"] .marketplace-section { margin-top: 32px; padding-top: 0; border-top: 0; }
+  body[data-state="uploaded"] .marketplace-label { margin-bottom: 12px; font-size: 15px; font-weight: 600; color: var(--text); }
+  body[data-state="uploaded"] .marketplace-hint { font-size: 14px; font-weight: 500; color: var(--text-subtle); }
+  body[data-state="uploaded"] .marketplace-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  body[data-state="uploaded"] .market-chip {
+    flex-direction: row; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px 0 14px;
+    border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; box-shadow: none;
+  }
+  body[data-state="uploaded"] .market-chip:hover { transform: none; box-shadow: none; border-color: var(--text); }
+  body[data-state="uploaded"] .market-chip .market-meta { display: none; }
+  body[data-state="uploaded"] .market-chip .market-name { font-size: 15px; font-weight: 600; }
+  body[data-state="uploaded"] .market-chip::before {
+    content: ''; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); flex: none;
+  }
+  body[data-state="uploaded"] .market-chip.active { background: var(--text); border-color: var(--text); color: #fff; box-shadow: none; }
+  body[data-state="uploaded"] .market-chip.active::after { display: none; }
+  body[data-state="uploaded"] .market-chip.active::before {
+    border-color: #fff; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat;
+  }
+
+  body[data-state="uploaded"] .analyze-btn {
+    margin-top: 32px; min-height: 60px; padding: 0 28px; border-radius: 999px;
+    font-size: 17px; color: #fff;
+    background: linear-gradient(135deg, #ff3d8b 0%, #e91e63 100%);
+    box-shadow: 0 14px 30px -10px rgba(233, 30, 99, 0.55);
+  }
+  body[data-state="uploaded"] .analyze-btn:hover:not(:disabled) { box-shadow: 0 18px 36px -10px rgba(233, 30, 99, 0.6); }
+
+  @media (min-width: 1024px) {
+    body[data-state="uploaded"] .container {
+      display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(380px, 1fr);
+      column-gap: 56px; align-items: start;
+    }
+    body[data-state="uploaded"] .container > * { grid-column: 1 / -1; }
+    body[data-state="uploaded"] .container > header { grid-row: 1; }
+    body[data-state="uploaded"] .container > #landingStage { grid-column: 1; grid-row: 2; }
+    body[data-state="uploaded"] .container > #promptSection { grid-column: 2; grid-row: 2; padding-top: 68px; }
+    body[data-state="uploaded"] .container > #loading { grid-column: 2; grid-row: 3; }
+  }
+  @media (max-width: 1023px) {
+    body[data-state="uploaded"] .prompt-section { margin-top: 28px; }
+    body[data-state="uploaded"] .preview-img { border-radius: 22px; max-height: 62vh; }
+    body[data-state="uploaded"] .analyze-btn { position: sticky; bottom: 14px; z-index: 30; }
+    body[data-state="uploaded"] .marketplace-label { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body[data-state="uploaded"] .analyze-btn, body[data-state="uploaded"] .chip { transition: none; }
+  }
+
   /* Phones: move the EN/DE switch from the header into the footer */
   .footer-lang { display: none; }
   @media (max-width: 600px) {
@@ -4471,6 +4572,16 @@
     <textarea class="prompt-input" id="promptInput"
       data-placeholder-reimagine="Warm minimalism with natural materials, or a productive desk with cozy ambient lighting…"
       data-placeholder-shop="Focus on the lighting and the chair, or skip anything that looks expensive…"></textarea>
+
+    <!-- Reimagine mode: quick style picks (fill the vision field) -->
+    <div class="preset-chips chips-reimagine style-picks">
+      <button class="chip" type="button" data-prompt-key="chips.style.japandiPrompt" data-i18n="chips.style.japandi">Japandi</button>
+      <button class="chip" type="button" data-prompt-key="chips.style.bohoPrompt" data-i18n="chips.style.boho">Boho</button>
+      <button class="chip" type="button" data-prompt-key="chips.style.scandiPrompt" data-i18n="chips.style.scandi">Scandi</button>
+      <button class="chip" type="button" data-prompt-key="chips.style.cosyPrompt" data-i18n="chips.style.cosy">Dark &amp; cosy</button>
+      <button class="chip" type="button" data-prompt-key="chips.style.minimalPrompt" data-i18n="chips.style.minimal">Minimal</button>
+      <button class="chip" type="button" data-prompt-key="chips.style.eightiesPrompt" data-i18n="chips.style.eighties">80s revival</button>
+    </div>
 
     <!-- "Give me ideas" CTA — only shown in Reimagine mode -->
     <div class="ideas-trigger-wrap chips-reimagine">
@@ -4734,6 +4845,23 @@
 
 </div>
 
+<script>
+// Keep the vision field placeholder in the current language, and clear the
+// picked style chip as soon as the person edits the text themselves.
+window.addEventListener('load', function () {
+  var input = document.getElementById('promptInput');
+  if (!input || typeof t !== 'function') return;
+  var setPh = function () {
+    var shop = document.body.getAttribute('data-mode') === 'shop';
+    input.placeholder = t(shop ? 'prompt.placeholder.shop' : 'prompt.placeholder.reimagine');
+  };
+  setPh();
+  window.addEventListener('faindzLangChange', setPh);
+  input.addEventListener('input', function () {
+    document.querySelectorAll('.style-picks .chip.is-picked').forEach(function (c) { c.classList.remove('is-picked'); });
+  });
+});
+</script>
 <script>
 // Landing: before/after slider and the second upload button
 (function () {
@@ -5804,6 +5932,20 @@ const I18N = {
     'chips.shop.accents': 'Accents only',
     'chips.shop.budget': 'Budget-friendly',
     'chips.shop.everything': 'Find everything',
+    'chips.style.japandi': 'Japandi',
+    'chips.style.japandiPrompt': 'Japandi: calm, warm wood, linen, low furniture and very little decoration',
+    'chips.style.boho': 'Boho',
+    'chips.style.bohoPrompt': 'Boho: rattan, jute, warm earth tones, plants and soft textiles',
+    'chips.style.scandi': 'Scandi',
+    'chips.style.scandiPrompt': 'Scandinavian: bright, light wood, white and soft grey, cosy textiles',
+    'chips.style.cosy': 'Dark & cosy',
+    'chips.style.cosyPrompt': 'Dark and cosy: deep wall colour, velvet, brass and warm light',
+    'chips.style.minimal': 'Minimal',
+    'chips.style.minimalPrompt': 'Minimal: a few good pieces, calm colours and lots of free space',
+    'chips.style.eighties': '80s revival',
+    'chips.style.eightiesPrompt': '80s revival: a chrome cantilever chair, terrazzo and one pastel accent, modern and not costume-like',
+    'prompt.placeholder.reimagine': 'For example: calm and natural, light wood, linen, more storage',
+    'prompt.placeholder.shop': 'For example: focus on the lighting and the chair',
     'chips.shop.lightingPrompt': 'Focus on the lighting and mood pieces',
     'chips.shop.furniturePrompt': 'Only the furniture pieces — chairs, tables, sofas',
     'chips.shop.accentsPrompt': 'Only the smaller accents — vases, art, plants, decor',
@@ -6013,6 +6155,20 @@ const I18N = {
     'chips.shop.accents': 'Nur Akzente',
     'chips.shop.budget': 'Günstig',
     'chips.shop.everything': 'Alles finden',
+    'chips.style.japandi': 'Japandi',
+    'chips.style.japandiPrompt': 'Japandi: ruhig, warmes Holz, Leinen, niedrige Möbel und wenig Deko',
+    'chips.style.boho': 'Boho',
+    'chips.style.bohoPrompt': 'Boho: Rattan, Jute, warme Erdtöne, Pflanzen und weiche Textilien',
+    'chips.style.scandi': 'Skandi',
+    'chips.style.scandiPrompt': 'Skandinavisch: hell, helles Holz, Weiß und sanftes Grau, gemütliche Textilien',
+    'chips.style.cosy': 'Dunkel & gemütlich',
+    'chips.style.cosyPrompt': 'Dunkel und gemütlich: kräftige Wandfarbe, Samt, Messing und warmes Licht',
+    'chips.style.minimal': 'Minimalistisch',
+    'chips.style.minimalPrompt': 'Minimalistisch: wenige, gute Möbel, ruhige Farben und viel freie Fläche',
+    'chips.style.eighties': '80er-Revival',
+    'chips.style.eightiesPrompt': '80er-Revival: ein Freischwinger aus Chrom, Terrazzo und ein Akzent in Pastell, modern statt Kostüm',
+    'prompt.placeholder.reimagine': 'Zum Beispiel: ruhig und natürlich, helles Holz, Leinen, mehr Stauraum',
+    'prompt.placeholder.shop': 'Zum Beispiel: Fokus auf die Beleuchtung und den Sessel',
     'chips.shop.lightingPrompt': 'Fokus auf Beleuchtung und Stimmungselemente',
     'chips.shop.furniturePrompt': 'Nur die Möbel: Stühle, Tische, Sofas',
     'chips.shop.accentsPrompt': 'Nur die kleineren Akzente: Vasen, Kunst, Pflanzen, Deko',
@@ -7330,10 +7486,7 @@ function setMode(newMode) {
 
   // Update placeholder
   if (promptInput) {
-    const ph = newMode === 'shop'
-      ? promptInput.dataset.placeholderShop
-      : promptInput.dataset.placeholderReimagine;
-    if (ph) promptInput.placeholder = ph;
+    promptInput.placeholder = t(newMode === 'shop' ? 'prompt.placeholder.shop' : 'prompt.placeholder.reimagine');
   }
 }
 
@@ -7433,6 +7586,8 @@ document.querySelectorAll('.chip').forEach(chip => {
     e.preventDefault();
     const promptKey = chip.dataset.promptKey;
     promptInput.value = promptKey ? t(promptKey) : (chip.dataset.prompt || '');
+    const group = chip.parentElement;
+    if (group) group.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-picked', c === chip));
     promptInput.focus();
   });
 });
