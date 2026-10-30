@@ -3648,6 +3648,219 @@
     .shop-mono { width: 22px; height: 22px; font-size: 10.5px; border-radius: 6px; }
   }
 
+  /* ─── PRODUCT LIST (compact rows) ─────────────────────── */
+  .products-grid.is-product-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    align-items: start;
+  }
+  .is-product-list .pl-heading {
+    grid-column: 1 / -1;
+    order: 0;
+    margin: 2px 2px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .is-product-list .pl-heading-more { order: 3; margin-top: 18px; }
+  .is-product-list:not(.show-all) .pl-heading-more,
+  .is-product-list:not(.show-all) .product-row.is-nice { display: none; }
+  .is-product-list .product-card-skeleton { order: 6; grid-column: 1 / -1; min-height: 0; }
+
+  .pl-more {
+    grid-column: 1 / -1;
+    order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 50px;
+    margin-top: 6px;
+    border-radius: 14px;
+    border: 1px dashed var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .pl-more:hover { background: var(--bg-hover); border-color: var(--text-subtle); }
+  .pl-more svg { transition: transform 0.35s var(--ease-spring); }
+  .is-product-list.show-all .pl-more { order: 5; margin-top: 14px; }
+  .is-product-list.show-all .pl-more svg { transform: rotate(180deg); }
+
+  .product-row {
+    order: 1;
+    min-width: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: border-color 0.25s, box-shadow 0.3s var(--ease-out);
+    animation: pr-enter 0.5s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  .product-row.is-nice { order: 4; }
+  .product-row:hover { border-color: var(--border-strong); }
+  .product-row.is-open { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  @keyframes pr-enter {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .pr-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 14px 14px 16px;
+    border-radius: 16px;
+    cursor: pointer;
+    outline: none;
+  }
+  .pr-main:focus-visible { box-shadow: inset 0 0 0 2px var(--cyan); }
+  .pr-num {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--bg);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .product-row.is-nice .pr-num { background: var(--bg-hover); color: var(--text); }
+  .pr-text { flex: 1; min-width: 0; }
+  .pr-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+  .pr-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .pr-price { color: var(--text); font-weight: 500; }
+  .pr-sep { color: var(--text-subtle); }
+  .pr-new { color: var(--cyan); font-weight: 500; }
+
+  .pr-shop {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 13px 0 14px;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--bg);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: transform 0.3s var(--ease-spring), background 0.2s, box-shadow 0.3s;
+  }
+  .pr-shop:hover { background: #000; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .pr-shop:active { transform: scale(0.97); }
+  .pr-shop .shop-ico { opacity: 0.75; }
+  .pr-shop:hover .shop-ico { transform: translate(2px, -2px); opacity: 1; }
+  .pr-shop:focus-visible, .pr-alt:focus-visible, .pr-save:focus-visible, .pl-more:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+
+  .pr-details {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s var(--ease-out);
+  }
+  .product-row.is-open .pr-details { grid-template-rows: 1fr; }
+  .pr-details-inner { overflow: hidden; min-height: 0; }
+  .pr-reason {
+    margin: 0;
+    padding: 0 16px 12px 60px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+  .pr-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 16px 16px 60px;
+  }
+  .pr-alt,
+  .product-row .heart-btn.pr-save {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    width: auto;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    box-shadow: none;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .pr-alt { padding-left: 6px; }
+  .pr-alt .shop-mono { width: 20px; height: 20px; border-radius: 6px; font-size: 10.5px; }
+  .pr-alt .shop-ico { width: 12px; height: 12px; color: var(--text-subtle); }
+  .pr-alt:hover, .product-row .heart-btn.pr-save:hover { background: var(--bg-hover); border-color: var(--text-subtle); }
+  .product-row .heart-btn.pr-save:hover { transform: none; color: var(--text); box-shadow: none; }
+  .product-row .heart-btn.pr-save:hover svg { color: #ef4444; }
+  .pr-save .pr-save-on { display: none; }
+  .product-row .heart-btn.pr-save.is-saved { background: rgba(239, 68, 68, 0.07); border-color: rgba(239, 68, 68, 0.35); color: #c93636; }
+  .product-row .heart-btn.pr-save.is-saved svg { fill: currentColor; }
+  .pr-save.is-saved .pr-save-on { display: inline; }
+  .pr-save.is-saved .pr-save-off { display: none; }
+
+  @media (max-width: 900px) {
+    .products-grid.is-product-list { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .products-grid.is-product-list { gap: 6px; }
+    .pr-main { gap: 11px; padding: 11px 10px 11px 12px; }
+    .pr-num { width: 26px; height: 26px; font-size: 11.5px; }
+    .pr-title { font-size: 14.5px; }
+    .pr-meta { font-size: 12px; gap: 5px; }
+    .pr-shop { height: 34px; padding: 0 12px; gap: 7px; font-size: 12.5px; }
+    .pr-shop .shop-ico { display: none; }
+    .pr-reason { padding: 0 12px 10px 49px; font-size: 13px; }
+    .pr-actions { padding: 0 12px 14px 49px; }
+    .pl-more { height: 46px; font-size: 13.5px; }
+  }
+
   /* ─── HEART (FAVORITE) ICON ON PRODUCT CARDS ──────────── */
   .heart-btn {
     position: absolute;
@@ -6182,6 +6395,13 @@ const I18N = {
     'shop.viewAt': 'View at {market}',
     'shop.alsoAt': 'Also available at',
     'shop.more': 'More shops',
+    'row.save': 'Save',
+    'row.saved': 'Saved',
+    'list.main': 'The essentials',
+    'list.details': 'Decor & details',
+    'list.more': 'Show {count} more pieces',
+    'list.less': 'Show fewer',
+    'list.total': 'approx. {range}',
     'results.viz.before': 'Before',
     'results.viz.after': 'After',
     'results.viz.title': 'Before · After',
@@ -6408,6 +6628,13 @@ const I18N = {
     'shop.viewAt': 'Bei {market} ansehen',
     'shop.alsoAt': 'Auch erhältlich bei',
     'shop.more': 'Weitere Shops',
+    'row.save': 'Merken',
+    'row.saved': 'Gemerkt',
+    'list.main': 'Das Wichtigste',
+    'list.details': 'Deko & Details',
+    'list.more': '{count} weitere Teile anzeigen',
+    'list.less': 'Weniger anzeigen',
+    'list.total': 'ca. {range}',
     'results.viz.before': 'Vorher',
     'results.viz.after': 'Nachher',
     'results.viz.title': 'Vorher · Nachher',
@@ -8078,6 +8305,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
   "products": [
     {
       "category": "${currentLang === 'de' ? 'MÖBEL/BELEUCHTUNG/etc — auf DEUTSCH' : 'FURNITURE/LIGHTING/etc — in ENGLISH'}",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "A specific German Amazon search query for this item (always German for marketplace results). Be detailed enough to find similar pieces. Example: 'Stehlampe Bogenlampe Messing Marmorfuß' rather than 'Lampe'.",
       "reason": "${currentLang === 'de' ? 'EIN klarer deutscher Satz (max 15 Wörter), was du im Bild siehst.' : 'ONE plain English sentence (max 15 words) describing what you see.'}",
       "price_range": "e.g. '60-150€' — realistic estimated range on Amazon DE for similar items",
@@ -8091,6 +8319,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
 Example of CORRECT product object (note both x and y are present and are numbers):
 {
   "category": "${currentLang === 'de' ? 'BELEUCHTUNG' : 'LIGHTING'}",
+  "title": "LED-Streifen RGB",
   "name": "LED Streifen RGB selbstklebend 5m",
   "reason": "${currentLang === 'de' ? 'Cyan LED-Streifen hinter dem Schreibtisch erzeugen Ambient-Licht.' : 'Cyan LED strips behind the desk create ambient glow.'}",
   "price_range": "20-40€",
@@ -8148,6 +8377,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in diesem Format (keine Markdown-Zä
   "products": [
     {
       "category": "z.B. BELEUCHTUNG, ERGONOMIE, DEKO, ORDNUNG, TECHNIK, TEXTIL",
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Konkreter Produktname als Suchbegriff für Amazon (Deutsch). Sei spezifisch genug für gute Suchergebnisse, z.B. 'Schreibtischlampe LED dimmbar Holz' statt nur 'Lampe'",
       "reason": "1-2 Sätze warum dieses Produkt zum Raum passt und was es verbessert",
       "price_range": "z.B. '20-40€'",
@@ -8352,6 +8582,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON.
 
       "category": "BELEUCHTUNG | MÖBEL | TEXTIL | DEKO | KUNST | PFLANZEN | ORDNUNG | TECHNIK",
 
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen beschreibenden Wörtern",
 
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
@@ -8432,6 +8663,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
   "products": [
     {
       "category": "e.g. LIGHTING, ERGONOMICS, DECOR, ORGANIZATION, TECH, TEXTILES",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Concrete product name as a German Amazon search query (always German for marketplace results). Be specific enough for good search results, e.g. 'Schreibtischlampe LED dimmbar Holz' instead of just 'Lampe'",
       "reason": "1-2 sentences on why this product fits the room and what it improves",
       "price_range": "e.g. '20-40€'",
@@ -8636,6 +8868,7 @@ Respond ONLY with valid JSON.
 
       "category": "LIGHTING | FURNITURE | TEXTILE | DECOR | ART | PLANTS | STORAGE | TECH",
 
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Mass-market-friendly Amazon search phrase with 3–5 simple descriptive words",
 
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
@@ -8819,59 +9052,176 @@ Prioritize products with maximum visual impact relative to price and effort.`;
   }
 }
 
-// Build a single product card. Used by renderResults() and by appendEditProducts().
-// opts.tag        — affiliate tag (Amazon)
-// opts.region     — amazon region (default amazon.de)
-// opts.fromVersion— if set (e.g. "V2"), card gets a version badge
-function buildProductCard(p, i, opts = {}) {
-  const tag = opts.tag || getSetting('affiliateTag');
-  const fromVersion = opts.fromVersion || null;
-  const num = String(i + 1).padStart(2, '0');
-  const priorityClass = p.priority === 'must' ? 'must' : 'nice';
-  const priorityLabel = p.priority === 'must' ? t('results.priority.must') : t('results.priority.nice');
+// ─── PRODUCT LIST ────────────────────────────────────────────────
+// Compact rows instead of cards: number, short title, price, one shop
+// button. Tapping a row reveals the reason, other shops and "save".
+// "nice" items are collapsed behind a "show more" button (see
+// updateProductListChrome, which keeps headings + toggle in sync).
 
-  const shopActions = buildShopActions(p, { variant: 'card' });
+// Short display title. New looks get `title` from the AI; older looks
+// only have the long search query, so we trim that to a few words.
+function productTitle(p) {
+  if (p && p.title && String(p.title).trim()) return String(p.title).trim();
+  const words = String((p && p.name) || '').trim().split(/\s+/).filter(Boolean);
+  const out = [];
+  for (const w of words) {
+    if (out.length >= 3) break;
+    if (out.length >= 2 && /\d/.test(w)) break;   // stop before sizes like 160x230
+    out.push(w);
+  }
+  return out.join(' ') || (p && p.name) || '';
+}
+
+function buildProductCard(p, i, opts = {}) {
+  const fromVersion = opts.fromVersion || null;
+  const num = i + 1;
+  // Items added by an edit stay visible so the user sees what changed
+  const isNice = p.priority === 'nice' && !fromVersion;
+  const shops = p.name ? getShopsForProduct(p) : [];
+  const best = shops[0];
+  const linkAttrs = key => `href="${escapeHtml(shopUrl(key, p.name))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${key}"`;
+
+  const metaParts = [];
+  if (p.price_range) {
+    const r = parsePriceRange(p.price_range);
+    const nf = new Intl.NumberFormat(currentLang === 'de' ? 'de-DE' : 'en-US');
+    const priceText = r ? (r[0] === r[1] ? `${nf.format(r[0])} €` : `${nf.format(r[0])}–${nf.format(r[1])} €`) : String(p.price_range);
+    metaParts.push(`<span class="pr-price">${escapeHtml(priceText)}</span>`);
+  }
+  if (p.category) metaParts.push(`<span class="pr-cat">${escapeHtml(String(p.category).charAt(0) + String(p.category).slice(1).toLowerCase())}</span>`);
+  if (fromVersion) metaParts.push(`<span class="pr-new">${escapeHtml(currentLang === 'de' ? `Neu in ${fromVersion}` : `New in ${fromVersion}`)}</span>`);
+
+  const bestBtn = best ? `
+      <a class="pr-shop" ${linkAttrs(best)} aria-label="${escapeHtml(t('shop.viewAt', { market: SHOPS[best].name }))}">
+        <span class="shop-dot" style="--brand:${SHOPS[best].color}"></span>
+        <span class="pr-shop-name">${escapeHtml(SHOPS[best].short || SHOPS[best].name)}</span>
+        ${SHOP_ICON_OUT}
+      </a>` : '';
+
+  const altLinks = shops.slice(1).map(key => `
+        <a class="pr-alt" ${linkAttrs(key)}>
+          <span class="shop-mono" style="--brand:${SHOPS[key].color}">${escapeHtml(SHOPS[key].name.charAt(0).toUpperCase())}</span>
+          ${escapeHtml(SHOPS[key].short || SHOPS[key].name)}
+          ${SHOP_ICON_OUT}
+        </a>`).join('');
 
   const card = document.createElement('article');
-  card.className = 'product-card' + (fromVersion ? ' is-new-version' : '') + (shopActions ? ' is-shoppable' : '');
-  card.dataset.num = num;
+  card.className = 'product-row' + (isNice ? ' is-nice' : '') + (fromVersion ? ' is-new-version' : '');
+  card.dataset.num = String(num);
   card.dataset.productIndex = String(i);
   if (fromVersion) card.dataset.fromVersion = fromVersion;
   card.id = `product-card-${i}`;
-
-  const badgeLabel = currentLang === 'de' ? `Hinzugefügt in ${fromVersion}` : `Added in ${fromVersion}`;
-  const badgeHtml = fromVersion
-    ? `<span class="product-version-badge" title="${escapeHtml(badgeLabel)}">${escapeHtml(badgeLabel)}</span>`
-    : '';
+  card.style.setProperty('--i', String(i % 12));
+  const detailsId = `prDetails${i}`;
 
   card.innerHTML = `
-    <button class="heart-btn" type="button" data-product-idx="${i}" aria-label="Save this item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-      </svg>
-    </button>
-    ${badgeHtml}
-    <div class="product-category">${escapeHtml(p.category)}</div>
-    <h3 class="product-name">${escapeHtml(p.name)}</h3>
-    <p class="product-reason">${escapeHtml(p.reason)}</p>
-    <div class="product-meta">
-      <span class="product-priority ${priorityClass}">${priorityLabel}</span>
+    <div class="pr-main" role="button" tabindex="0" aria-expanded="false" aria-controls="${detailsId}">
+      <span class="pr-num" aria-hidden="true">${num}</span>
+      <div class="pr-text">
+        <h3 class="pr-title">${escapeHtml(productTitle(p))}</h3>
+        <p class="pr-meta">${metaParts.join('<span class="pr-sep" aria-hidden="true">·</span>')}</p>
+      </div>
+      ${bestBtn}
     </div>
-    ${shopActions}
+    <div class="pr-details" id="${detailsId}">
+      <div class="pr-details-inner">
+        ${p.reason ? `<p class="pr-reason">${escapeHtml(p.reason)}</p>` : ''}
+        <div class="pr-actions">
+          <button class="heart-btn pr-save" type="button" data-product-idx="${i}" aria-label="${escapeHtml(t('row.save'))}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="pr-save-off">${escapeHtml(t('row.save'))}</span><span class="pr-save-on">${escapeHtml(t('row.saved'))}</span>
+          </button>
+          ${altLinks}
+        </div>
+      </div>
+    </div>
   `;
 
-  // The whole card leads to the best shop. Buttons, links and the
-  // heart keep their own behaviour; selecting text doesn't navigate.
-  if (shopActions) {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('a, button, .shop-panel')) return;
-      const sel = window.getSelection && String(window.getSelection());
-      if (sel) return;
-      const main = card.querySelector('.shop-main');
-      if (main) main.click();
-    });
-  }
+  const main = card.querySelector('.pr-main');
+  const toggle = () => {
+    const open = !card.classList.contains('is-open');
+    card.classList.toggle('is-open', open);
+    main.setAttribute('aria-expanded', String(open));
+  };
+  main.addEventListener('click', (e) => {
+    if (e.target.closest('a, button')) return;
+    toggle();
+  });
+  main.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target === main) { e.preventDefault(); toggle(); }
+  });
   return card;
+}
+
+// Parse "60–150€", "€60–150", "700-1.400 €" → [min, max]
+function parsePriceRange(str) {
+  const nums = String(str || '').replace(/(\d)\.(\d{3})/g, '$1$2').match(/\d+(?:,\d+)?/g);
+  if (!nums || !nums.length) return null;
+  const v = nums.map(n => parseFloat(n.replace(',', '.')));
+  return [v[0], v[v.length - 1]];
+}
+
+// Headings, "show more" toggle and the total in the results header.
+// Runs automatically whenever rows are added or removed.
+function updateProductListChrome() {
+  const grid = productsGrid;
+  if (!grid) return;
+  const rows = [...grid.querySelectorAll('.product-row')];
+  grid.querySelectorAll('.pl-chrome').forEach(el => el.remove());
+  grid.classList.toggle('is-product-list', rows.length > 0);
+  if (!rows.length) return;
+
+  let hidden = rows.filter(r => r.classList.contains('is-nice'));
+  // Old looks without priorities: keep the first 5 open
+  if (!hidden.length && rows.length > 6) {
+    hidden = rows.slice(5);
+    hidden.forEach(r => r.classList.add('is-nice'));
+  }
+  // Not worth a toggle for a single item
+  if (hidden.length === 1) { hidden[0].classList.remove('is-nice'); hidden = []; }
+
+  const mk = (cls, html, tag = 'div') => { const el = document.createElement(tag); el.className = 'pl-chrome ' + cls; el.innerHTML = html; return el; };
+  if (hidden.length) {
+    grid.prepend(mk('pl-heading pl-heading-main', escapeHtml(t('list.main'))));
+    const btn = mk('pl-more', '', 'button');
+    btn.type = 'button';
+    const label = () => {
+      const open = grid.classList.contains('show-all');
+      btn.innerHTML = `<span>${escapeHtml(open ? t('list.less') : t('list.more', { count: hidden.length }))}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    label();
+    btn.addEventListener('click', () => { grid.classList.toggle('show-all'); label(); });
+    grid.appendChild(btn);
+    grid.appendChild(mk('pl-heading pl-heading-more', escapeHtml(t('list.details'))));
+  }
+
+  // Header: "8 Teile · ca. 1.150–2.300 €"
+  if (typeof resultsMeta !== 'undefined' && resultsMeta && currentLookData && Array.isArray(currentLookData.products)) {
+    const prods = currentLookData.products;
+    const ranges = prods.map(p => parsePriceRange(p.price_range)).filter(Boolean);
+    let text = t('results.meta', { count: prods.length });
+    if (ranges.length && ranges.length >= prods.length / 2) {
+      const fmt = n => Math.round(n / 10) * 10;
+      const lo = fmt(ranges.reduce((a, r) => a + r[0], 0));
+      const hi = fmt(ranges.reduce((a, r) => a + r[1], 0));
+      const nf = new Intl.NumberFormat(currentLang === 'de' ? 'de-DE' : 'en-US');
+      text += ` · ${t('list.total', { range: `${nf.format(lo)}–${nf.format(hi)} €` })}`;
+    }
+    resultsMeta.textContent = text;
+  }
+}
+
+if (productsGrid) {
+  let chromeQueued = false;
+  new MutationObserver((muts) => {
+    if (muts.every(m => [...m.addedNodes, ...m.removedNodes].every(n => n.classList && n.classList.contains('pl-chrome')))) return;
+    if (chromeQueued) return;
+    chromeQueued = true;
+    requestAnimationFrame(() => { chromeQueued = false; updateProductListChrome(); });
+  }).observe(productsGrid, { childList: true });
 }
 
 // renderResults(data, options)
@@ -9284,6 +9634,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON, keine Markdown-Zäune, kein Vorab-T
   "products": [
     {
       "category": "z.B. MÖBEL, BELEUCHTUNG, DEKO, TEXTIL, WANDGESTALTUNG",
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Konkreter deutscher Suchbegriff für Amazon, spezifisch genug für gute Treffer",
       "reason": "1 Satz: was hat sich verändert und warum passt das neue Item",
       "price_range": "z.B. '200-400€'",
@@ -9302,6 +9653,7 @@ Respond ONLY with valid JSON, no markdown fences, no preamble:
   "products": [
     {
       "category": "e.g. FURNITURE, LIGHTING, DECOR, TEXTILES, WALL DESIGN",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Concrete German Amazon search query, specific enough for good hits",
       "reason": "1 sentence: what changed and why it fits",
       "price_range": "e.g. '200-400€'",
@@ -9513,6 +9865,7 @@ const REIMAGINE_OUTPUT_SCHEMA_DE = `Antworte AUSSCHLIESSLICH mit gültigem JSON 
       "role": "hero | supporting | accent",
       "visual_impact": "high | medium | low",
       "category": "BELEUCHTUNG | MÖBEL | TEXTIL | DEKO | KUNST | PFLANZEN | ORDNUNG | TECHNIK",
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen Wörtern (Deutsch)",
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
       "reason": "1 Satz: was dieses Produkt für DIESEN Raum konkret verbessert",
@@ -9545,6 +9898,7 @@ const REIMAGINE_OUTPUT_SCHEMA_EN = `Respond ONLY with valid JSON in THIS structu
       "role": "hero | supporting | accent",
       "visual_impact": "high | medium | low",
       "category": "LIGHTING | FURNITURE | TEXTILE | DECOR | ART | PLANTS | STORAGE | TECH",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Mass-market-friendly Amazon search phrase with 3–5 simple words (in German for marketplace results)",
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
       "reason": "One sentence: what this specifically improves about THIS room",
@@ -10145,7 +10499,7 @@ async function applyEdit(rawPrompt) {
           appendEditProducts(newProducts, newVersion.label);
           // Scroll the first new card gently into view so the user notices
           const firstNew = productsGrid.querySelector(
-            `.product-card[data-from-version="${newVersion.label}"]`
+            `.product-row[data-from-version="${newVersion.label}"]`
           );
           if (firstNew) {
             // Small delay so the appendEditProducts animation can start first
@@ -10828,7 +11182,7 @@ function openItemDetailModal(item) {
       <div class="item-detail-sheet" role="dialog" aria-label="${escapeHtml(p.name || '')}">
         <button class="item-detail-close" id="itemDetailClose" aria-label="Close">✕</button>
         <div class="item-detail-category">${escapeHtml(p.category || '—')}</div>
-        <h2 class="item-detail-name">${escapeHtml(p.name || '')}</h2>
+        <h2 class="item-detail-name">${escapeHtml(productTitle(p))}</h2>
         ${p.reason ? `<p class="item-detail-reason">${escapeHtml(p.reason)}</p>` : ''}
         ${p.material ? `
           <div class="item-detail-info-row">
@@ -11019,7 +11373,7 @@ function renderItemsGrid(items) {
             <div class="lib-item-header">
               <div>
                 <div class="lib-item-cat">${escapeHtml(p.category || 'Item')}</div>
-                <h3 class="lib-item-name">${escapeHtml(p.name || 'Unnamed')}</h3>
+                <h3 class="lib-item-name">${escapeHtml(productTitle(p) || 'Unnamed')}</h3>
               </div>
               <button class="lib-item-delete" data-item-id="${escapeHtml(item.id)}" aria-label="Remove">✕</button>
             </div>
