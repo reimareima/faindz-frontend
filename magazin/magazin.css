@@ -202,6 +202,18 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .shop-item .mat { font-size: 15px; color: var(--muted); flex: 1; }
 .shop-item .pill { align-self: flex-start; margin-top: 8px; }
 
+/* Desktop: show every piece, wrap instead of hidden horizontal scroll */
+@media (min-width: 721px) {
+  .shop-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    overflow: visible;
+    margin: 0;
+    padding: 4px 0 20px;
+  }
+  .shop-item { flex: none; }
+}
+
 /* ---------- footer ---------- */
 .mz-footer { padding: 40px 0 56px; font-size: 14px; color: var(--muted); }
 .mz-footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
