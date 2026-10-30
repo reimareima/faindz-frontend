@@ -3627,8 +3627,6 @@
     }
     .shop-actions--card .shop-main,
     .shop-actions--lib .shop-main { justify-content: center; }
-    .shop-actions--card .shop-main-pre,
-    .shop-actions--card .shop-main-post,
     .shop-actions--card .shop-main .shop-ico,
     .shop-actions--lib .shop-main .shop-ico { display: none; }
     .shop-actions--card .shop-name-long { display: none; }
@@ -3640,7 +3638,12 @@
     .shop-more { width: 32px; height: 38px; border-radius: 10px; }
     .shop-more svg { width: 14px; height: 14px; }
     .shop-panel { padding: 4px; border-radius: 12px; bottom: calc(100% + 6px); }
-    .shop-panel-label { font-size: 9px; padding: 7px 8px 5px; }
+    .shop-panel-label { font-size: 9px; padding: 7px 8px 5px; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Single-column phones have room for "Bei … ansehen" again */
+    @container (min-width: 240px) {
+      .shop-actions--card .shop-main-pre,
+      .shop-actions--card .shop-main-post { display: inline; }
+    }
     .shop-row { gap: 8px; padding: 7px 8px; font-size: 12px; border-radius: 8px; }
     .shop-mono { width: 22px; height: 22px; font-size: 10.5px; border-radius: 6px; }
   }
@@ -7642,7 +7645,7 @@ function buildShopActions(p, opts = {}) {
   return `
     <div class="shop-actions shop-actions--${variant}${expanded ? ' is-open' : ''}">
       <div class="shop-panel" id="${panelId}" role="group" aria-label="${escapeHtml(t('shop.alsoAt'))}">
-        <div class="shop-panel-label">${escapeHtml(t('shop.alsoAt'))}</div>
+        <div class="shop-panel-label">${escapeHtml(t('shop.more'))}</div>
         ${rows}
       </div>
       <div class="shop-split">${main}${toggle}</div>
