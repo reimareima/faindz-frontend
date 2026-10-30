@@ -108,7 +108,7 @@
       Waiblingerstraße 65<br>
       71384 Weinstadt<br>
       Deutschland<br>
-      E-Mail: <a href="mailto:Kontakt@faindz.de">Kontakt@faindz.de</a>
+      E-Mail: <a href="mailto:kontakt@faindz.de">kontakt@faindz.de</a>
     </p>
 
     <h2>2. Welche Daten verarbeitet werden</h2>
@@ -116,14 +116,18 @@
     <h3>a) Hochgeladene Bilder</h3>
     <p>
       Wenn Sie ein Foto hochladen, wird dieses zur Generierung von Designvorschlägen und Visualisierungen
-      an externe KI-Dienstleister übermittelt (siehe Abschnitt 4). Die Bilder werden weder dauerhaft auf
-      unseren Servern gespeichert noch zu Trainingszwecken weiterverwendet. Auf dem Server (Proxy)
-      werden sie ausschließlich für die Dauer der Anfrage im Arbeitsspeicher gehalten.
+      an externe KI-Dienstleister übermittelt (siehe Abschnitt 4). Die Bilder werden nicht zu
+      Trainingszwecken weiterverwendet. Auf dem Server (Proxy) werden sie ausschließlich für die Dauer
+      der Anfrage im Arbeitsspeicher gehalten.
     </p>
     <p>
-      Generierte Visualisierungen und Produktvorschläge werden im lokalen Browser-Speicher (IndexedDB)
-      Ihres Geräts gespeichert, sofern Sie diese als „Look" abspeichern. Diese Daten verlassen Ihr Gerät
-      nicht. Sie können jederzeit über den Browser-Cache gelöscht werden.
+      <strong>Ohne Nutzerkonto</strong> werden Foto, Visualisierungen und Produktvorschläge nur im lokalen
+      Browser-Speicher Ihres Geräts abgelegt (siehe 2.c) und nicht dauerhaft auf unseren Servern gespeichert.
+    </p>
+    <p>
+      <strong>Mit Nutzerkonto</strong> werden Ihr Originalfoto, die generierten Visualisierungen, die
+      Produktvorschläge und Ihr Eingabetext in Ihrem Konto gespeichert, damit Sie Ihre Looks auf allen
+      Geräten wiederfinden (siehe 2.d).
     </p>
 
     <h3>b) IP-Adresse</h3>
@@ -141,13 +145,36 @@
       Faindz nutzt <strong>localStorage</strong> und <strong>IndexedDB</strong> Ihres Browsers für:
     </p>
     <ul>
-      <li>Spracheinstellung (DE/EN)</li>
-      <li>Gespeicherte Looks und Produkte (Ihre Bibliothek)</li>
+      <li>Spracheinstellung (DE/EN) und gewählter Modus</li>
+      <li>Die aktuelle Sitzung (hochgeladenes Foto und Ergebnis), damit sie nach dem Neuladen der Seite erhalten bleibt</li>
+      <li>Ihren Anmeldestatus (Sitzungs-Token), wenn Sie ein Nutzerkonto verwenden</li>
+      <li>Früher lokal gespeicherte Looks und Produkte</li>
     </ul>
     <p>
-      Diese Daten verlassen Ihr Gerät nicht und sind nur Ihnen persönlich zugänglich. Es handelt sich
+      Diese Daten bleiben auf Ihrem Gerät und können jederzeit über die Browser-Einstellungen gelöscht
+      werden. Es handelt sich
       um technisch notwendige Speicherung gemäß § 25 Abs. 2 TDDDG; eine Einwilligung ist hierfür nicht
       erforderlich.
+    </p>
+
+    <h3>d) Nutzerkonto und Anmeldung mit Google</h3>
+    <p>
+      Sie können Faindz ohne Konto nutzen. Optional können Sie sich mit Ihrem Google-Konto anmelden.
+      Dabei übermittelt Google uns Ihre E-Mail-Adresse, Ihren Namen und, sofern vorhanden, Ihr Profilbild.
+      Ihr Google-Passwort erhalten wir nicht.
+    </p>
+    <p>In Ihrem Nutzerkonto speichern wir:</p>
+    <ul>
+      <li>Profildaten: E-Mail-Adresse, Name, Profilbild</li>
+      <li>Ihre Looks: Originalfoto, generierte Visualisierungen, Produktvorschläge und Eingabetext</li>
+      <li>Produkte, die Sie in Ihrer Wishlist merken</li>
+    </ul>
+    <p>
+      Zweck ist die Bereitstellung Ihres Kontos und die Synchronisierung Ihrer Looks zwischen Geräten.
+      Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Nutzungsvertrag). Die Daten werden gespeichert,
+      bis Sie sie löschen oder die Löschung Ihres Kontos verlangen. Einzelne Looks und Wishlist-Einträge
+      können Sie jederzeit in der App löschen. Für die vollständige Löschung Ihres Kontos genügt eine
+      E-Mail an <a href="mailto:kontakt@faindz.de">kontakt@faindz.de</a>.
     </p>
 
     <h2>3. Hosting und Infrastruktur</h2>
@@ -171,7 +198,16 @@
       Datenschutzerklärung: <a href="https://railway.com/legal/privacy" target="_blank" rel="noopener">railway.com/legal/privacy</a>.
     </p>
 
-    <h2>4. Externe KI-Dienste (Bilder &amp; Textanalyse)</h2>
+    <h3>c) Datenbank und Nutzerkonten (Supabase)</h3>
+    <p>
+      Nutzerkonten, Anmeldung und die gespeicherten Looks werden über Supabase (Supabase, Inc.)
+      bereitgestellt. Die Daten liegen auf Servern in Frankfurt am Main (EU). Die Zugriffe sind so
+      eingerichtet, dass jeder Nutzer nur seine eigenen Daten sehen kann. Datenschutzerklärung:
+      <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a>.
+      Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.
+    </p>
+
+    <h2>4. Externe Dienste (KI und Anmeldung)</h2>
 
     <h3>a) Anthropic (Claude AI)</h3>
     <p>
@@ -189,9 +225,18 @@
       <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.
     </p>
 
-    <h3>c) Datenübermittlung in die USA</h3>
+    <h3>c) Anmeldung mit Google</h3>
     <p>
-      Die genannten Dienste verarbeiten Daten (auch) in den USA. Anthropic, Google und Vercel sind unter
+      Für die optionale Anmeldung nutzen wir „Mit Google anmelden“ von Google Ireland Limited, Gordon House,
+      Barrow Street, Dublin 4, Irland. Die Anmeldung findet auf einer Seite von Google statt; dabei gelten
+      die Datenschutzbestimmungen von Google:
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.
+    </p>
+
+    <h3>d) Datenübermittlung in die USA</h3>
+    <p>
+      Die genannten Dienste verarbeiten Daten (auch) in den USA oder werden von US-Unternehmen betrieben.
+      Anthropic, Google, Vercel und Supabase sind unter
       dem EU-US Data Privacy Framework zertifiziert oder bieten Standardvertragsklauseln (SCC) zum
       Schutz personenbezogener Daten gemäß Art. 46 DSGVO. Rechtsgrundlage für die Übermittlung ist
       Art. 6 Abs. 1 lit. f DSGVO i.&nbsp;V.&nbsp;m. Art. 49 Abs. 1 lit. b (Vertragserfüllung).
@@ -212,7 +257,8 @@
     <p>
       Faindz setzt <strong>keine Cookies</strong> für Tracking, Werbung oder Analytics. Es werden
       ausschließlich Browser-Speichermechanismen (localStorage, IndexedDB) für die App-Funktionalität
-      genutzt, wie unter Punkt 2.c beschrieben.
+      genutzt, wie unter Punkt 2.c beschrieben. Bei der Anmeldung mit Google setzt Google auf seinen
+      eigenen Seiten Cookies nach seinen Bestimmungen.
     </p>
 
     <h2>7. Ihre Rechte</h2>
@@ -228,7 +274,7 @@
     </ul>
     <p>
       Zur Ausübung dieser Rechte wenden Sie sich bitte per E-Mail an
-      <a href="mailto:Kontakt@faindz.de">Kontakt@faindz.de</a>.
+      <a href="mailto:kontakt@faindz.de">kontakt@faindz.de</a>.
     </p>
     <p>
       Die für uns zuständige Aufsichtsbehörde ist:<br>
@@ -245,7 +291,7 @@
     </p>
 
     <small>
-      Letzte Aktualisierung: 7. Mai 2026
+      Letzte Aktualisierung: 30. Oktober 2026
     </small>
   </main>
 </body>

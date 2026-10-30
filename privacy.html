@@ -123,7 +123,7 @@
       Waiblingerstraße 65<br>
       71384 Weinstadt<br>
       Germany<br>
-      Email: <a href="mailto:Kontakt@faindz.de">Kontakt@faindz.de</a>
+      Email: <a href="mailto:kontakt@faindz.de">kontakt@faindz.de</a>
     </p>
 
     <h2>2. Which data is processed</h2>
@@ -131,14 +131,17 @@
     <h3>a) Uploaded images</h3>
     <p>
       When you upload a photograph, it is transmitted to external AI service providers (see Section 4)
-      for the purpose of generating design suggestions and visualizations. The images are neither
-      permanently stored on our servers nor used for training purposes. On the proxy server, they are
-      held in memory only for the duration of the request.
+      for the purpose of generating design suggestions and visualizations. The images are not used for
+      training purposes. On the proxy server, they are held in memory only for the duration of the request.
     </p>
     <p>
-      Generated visualizations and product suggestions are stored in your device's local browser
-      storage (IndexedDB) if you save them as a "Look". These data do not leave your device. They can
-      be deleted at any time via your browser cache.
+      <strong>Without an account</strong>, the photo, visualizations and product suggestions are kept only
+      in your device's local browser storage (see 2.c) and are not permanently stored on our servers.
+    </p>
+    <p>
+      <strong>With an account</strong>, your original photo, the generated visualizations, the product
+      suggestions and your prompt are stored in your account so you can find your Looks on all devices
+      (see 2.d).
     </p>
 
     <h3>b) IP address</h3>
@@ -156,13 +159,34 @@
       Faindz uses your browser's <strong>localStorage</strong> and <strong>IndexedDB</strong> for:
     </p>
     <ul>
-      <li>Language preference (DE/EN)</li>
-      <li>Saved Looks and products (your library)</li>
+      <li>Language preference (DE/EN) and selected mode</li>
+      <li>The current session (uploaded photo and result) so it survives a page reload</li>
+      <li>Your sign-in status (session token) if you use an account</li>
+      <li>Looks and products saved locally in earlier versions</li>
     </ul>
     <p>
-      These data do not leave your device and are accessible only to you personally. This constitutes
+      These data stay on your device and can be deleted at any time in your browser settings. This constitutes
       technically necessary storage under § 25(2) TDDDG (the German Telecommunications Digital Services
       Data Protection Act); no consent is required.
+    </p>
+
+    <h3>d) User account and Sign in with Google</h3>
+    <p>
+      You can use Faindz without an account. Optionally, you can sign in with your Google account.
+      Google then transmits your email address, your name and, if available, your profile picture to us.
+      We do not receive your Google password.
+    </p>
+    <p>In your account we store:</p>
+    <ul>
+      <li>Profile data: email address, name, profile picture</li>
+      <li>Your Looks: original photo, generated visualizations, product suggestions and prompt</li>
+      <li>Products you save to your wishlist</li>
+    </ul>
+    <p>
+      The purpose is to provide your account and sync your Looks across devices. Legal basis:
+      Art. 6(1)(b) GDPR (contract of use). The data is stored until you delete it or request deletion of
+      your account. You can delete individual Looks and wishlist items in the App at any time. To delete
+      your account completely, simply email <a href="mailto:kontakt@faindz.de">kontakt@faindz.de</a>.
     </p>
 
     <h2>3. Hosting and infrastructure</h2>
@@ -187,7 +211,16 @@
       <a href="https://railway.com/legal/privacy" target="_blank" rel="noopener">railway.com/legal/privacy</a>.
     </p>
 
-    <h2>4. External AI services (images &amp; text analysis)</h2>
+    <h3>c) Database and user accounts (Supabase)</h3>
+    <p>
+      User accounts, sign-in and saved Looks are provided via Supabase (Supabase, Inc.). The data is
+      hosted on servers in Frankfurt am Main (EU). Access is configured so that each user can only see
+      their own data. Privacy policy:
+      <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a>.
+      Legal basis: Art. 6(1)(b) GDPR.
+    </p>
+
+    <h2>4. External services (AI and sign-in)</h2>
 
     <h3>a) Anthropic (Claude AI)</h3>
     <p>
@@ -205,10 +238,17 @@
       <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.
     </p>
 
-    <h3>c) Data transfers to the United States</h3>
+    <h3>c) Sign in with Google</h3>
     <p>
-      The services mentioned above process data (also) in the United States. Anthropic, Google, and
-      Vercel are either certified under the EU-US Data Privacy Framework or provide Standard
+      For the optional sign-in we use "Sign in with Google" by Google Ireland Limited, Gordon House,
+      Barrow Street, Dublin 4, Ireland. Sign-in takes place on a Google page, where Google's privacy
+      policy applies: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.
+    </p>
+
+    <h3>d) Data transfers to the United States</h3>
+    <p>
+      The services mentioned above process data (also) in the United States or are operated by US
+      companies. Anthropic, Google, Vercel and Supabase are either certified under the EU-US Data Privacy Framework or provide Standard
       Contractual Clauses (SCCs) for the protection of personal data in accordance with Art. 46
       GDPR. The legal basis for the transfer is Art. 6(1)(f) GDPR in conjunction with Art. 49(1)(b)
       (performance of contract).
@@ -229,7 +269,7 @@
     <p>
       Faindz does <strong>not set cookies</strong> for tracking, advertising, or analytics. Only
       browser storage mechanisms (localStorage, IndexedDB) are used for the App's functionality, as
-      described in Section 2.c.
+      described in Section 2.c. When you sign in with Google, Google sets its own cookies on its own pages under its own terms.
     </p>
 
     <h2>7. Your rights</h2>
@@ -245,7 +285,7 @@
     </ul>
     <p>
       To exercise these rights, please contact us by email at
-      <a href="mailto:Kontakt@faindz.de">Kontakt@faindz.de</a>.
+      <a href="mailto:kontakt@faindz.de">kontakt@faindz.de</a>.
     </p>
     <p>
       The supervisory authority responsible for us is:<br>
@@ -263,7 +303,7 @@
     </p>
 
     <small>
-      Last updated: May 7, 2026
+      Last updated: October 30, 2026
     </small>
   </main>
 </body>
