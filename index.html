@@ -3436,6 +3436,215 @@
     font-weight: 600;
   }
 
+  /* ─── SHOP ACTIONS (best shop + more shops) ───────────── */
+  .product-card.is-shoppable { cursor: pointer; }
+  .shop-actions {
+    position: relative;
+    margin-top: 16px;
+  }
+  .shop-split {
+    display: flex;
+    gap: 6px;
+    container-type: inline-size;
+  }
+  @container (max-width: 300px) {
+    .shop-main-pre,
+    .shop-main-post { display: none; }
+  }
+  .shop-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 46px;
+    padding: 0 14px 0 16px;
+    border-radius: 12px;
+    background: var(--text);
+    color: var(--bg);
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-out), background 0.2s;
+  }
+  .shop-main:hover {
+    background: #000;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .shop-main:active { transform: scale(0.98); transition-duration: 0.1s; }
+  .shop-main:focus-visible,
+  .shop-more:focus-visible,
+  .shop-row:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+  .shop-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+  }
+  .shop-main-label {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .shop-main-pre,
+  .shop-main-post {
+    font-weight: 500;
+    opacity: 0.72;
+  }
+  .shop-name-short { display: none; }
+  .shop-ico {
+    flex: none;
+    transition: transform 0.3s var(--ease-spring), opacity 0.2s, color 0.2s;
+  }
+  .shop-main .shop-ico { margin-left: auto; opacity: 0.75; }
+  .shop-main:hover .shop-ico { transform: translate(2px, -2px); opacity: 1; }
+
+  .shop-more {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elevated);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.3s var(--ease-spring);
+  }
+  .shop-more:hover { border-color: var(--text); background: var(--bg-hover); }
+  .shop-more:active { transform: scale(0.94); }
+  .shop-more svg { transition: transform 0.35s var(--ease-spring); }
+  .shop-actions.is-open .shop-more { border-color: var(--text); background: var(--bg-hover); }
+  .shop-actions.is-open .shop-more svg { transform: rotate(180deg); }
+
+  /* Panel floats up over the card text, so opening it never shifts the grid */
+  .shop-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 8px);
+    z-index: 3;
+    padding: 6px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px) scale(0.98);
+    transform-origin: bottom center;
+    transition: opacity 0.2s var(--ease-out), transform 0.35s var(--ease-spring), visibility 0s linear 0.2s;
+  }
+  .shop-actions.is-open .shop-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 0.2s var(--ease-out), transform 0.35s var(--ease-spring), visibility 0s;
+  }
+  .shop-panel-label {
+    padding: 8px 10px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .shop-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: background 0.15s;
+  }
+  .shop-row:hover { background: var(--bg-hover); }
+  .shop-row .shop-ico { margin-left: auto; color: var(--text-subtle); }
+  .shop-row:hover .shop-ico { color: var(--text); transform: translate(2px, -2px); }
+  .shop-mono {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand);
+    background: #f3f1ec;
+    background: color-mix(in srgb, var(--brand) 12%, #ffffff);
+  }
+  .shop-row-name {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Wishlist grid: a bit tighter */
+  .shop-actions--lib { margin-top: 0; }
+  .shop-actions--lib .shop-main,
+  .shop-actions--lib .shop-more { height: 40px; }
+  .shop-actions--lib .shop-more { width: 40px; }
+  .shop-actions--lib .shop-main { font-size: 12.5px; }
+
+  /* Item detail modal: alternatives always visible, in the flow */
+  .shop-actions--detail { margin-top: 0; display: flex; flex-direction: column-reverse; gap: 12px; }
+  .shop-actions--detail .shop-main { height: 48px; border-radius: 999px; padding: 0 18px 0 20px; font-size: 14px; }
+  .shop-actions--detail .shop-panel {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: transparent;
+    border-radius: 14px;
+  }
+
+  @media (max-width: 720px) {
+    .shop-actions { margin-top: 10px; }
+    .shop-split { gap: 5px; }
+    .shop-main {
+      height: 38px;
+      gap: 6px;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    .shop-actions--card .shop-main,
+    .shop-actions--lib .shop-main { justify-content: center; }
+    .shop-actions--card .shop-main-pre,
+    .shop-actions--card .shop-main-post,
+    .shop-actions--card .shop-main .shop-ico,
+    .shop-actions--lib .shop-main .shop-ico { display: none; }
+    .shop-actions--card .shop-name-long { display: none; }
+    .shop-actions--card .shop-name-short { display: inline; }
+    .shop-actions--card .shop-main .shop-dot { display: none; }
+    .shop-actions--card .shop-row .shop-ico { display: none; }
+    .shop-dot { width: 7px; height: 7px; }
+    .shop-ico { width: 13px; height: 13px; }
+    .shop-more { width: 32px; height: 38px; border-radius: 10px; }
+    .shop-more svg { width: 14px; height: 14px; }
+    .shop-panel { padding: 4px; border-radius: 12px; bottom: calc(100% + 6px); }
+    .shop-panel-label { font-size: 9px; padding: 7px 8px 5px; }
+    .shop-row { gap: 8px; padding: 7px 8px; font-size: 12px; border-radius: 8px; }
+    .shop-mono { width: 22px; height: 22px; font-size: 10.5px; border-radius: 6px; }
+  }
+
   /* ─── HEART (FAVORITE) ICON ON PRODUCT CARDS ──────────── */
   .heart-btn {
     position: absolute;
@@ -4605,17 +4814,6 @@
       <button class="chip" data-prompt-key="chips.shop.accentsPrompt" data-i18n="chips.shop.accents">Accents only</button>
       <button class="chip" data-prompt-key="chips.shop.budgetPrompt" data-i18n="chips.shop.budget">Budget-friendly</button>
       <button class="chip" data-prompt-key="chips.shop.everythingPrompt" data-i18n="chips.shop.everything">Find everything</button>
-    </div>
-
-    <!-- Marketplace selector -->
-    <div class="marketplace-section">
-      <div class="marketplace-label">
-        <span data-i18n="market.heading">Where to shop</span>
-        <span class="marketplace-hint" data-i18n="market.subheading">Pick one or more</span>
-      </div>
-      <div class="marketplace-chips" id="marketplaceChips">
-        <!-- Rendered dynamically from MARKETPLACES config -->
-      </div>
     </div>
 
     <button class="analyze-btn" id="analyzeBtn">
@@ -5978,6 +6176,9 @@ const I18N = {
     'results.priority.must': 'Essential',
     'results.priority.nice': 'Refined',
     'results.shopOn': 'Shop on {market}',
+    'shop.viewAt': 'View at {market}',
+    'shop.alsoAt': 'Also available at',
+    'shop.more': 'More shops',
     'results.viz.before': 'Before',
     'results.viz.after': 'After',
     'results.viz.title': 'Before · After',
@@ -6063,7 +6264,7 @@ const I18N = {
     'footer.tagline': 'Faindz · Interior intelligence',
     'footer.imprint': 'Imprint',
     'footer.privacy': 'Privacy',
-    'footer.disclosure': 'As an Amazon Associate and affiliate of select marketplaces, we earn from qualifying purchases.',
+    'footer.disclosure': 'Some links are affiliate links. If you buy through them, we may earn a commission. The price stays the same for you.',
     // Header
     'header.libraryLabel': 'My library',
     'header.settingsLabel': 'Settings',
@@ -6201,6 +6402,9 @@ const I18N = {
     'results.priority.must': 'Essenziell',
     'results.priority.nice': 'Akzent',
     'results.shopOn': 'Bei {market} kaufen',
+    'shop.viewAt': 'Bei {market} ansehen',
+    'shop.alsoAt': 'Auch erhältlich bei',
+    'shop.more': 'Weitere Shops',
     'results.viz.before': 'Vorher',
     'results.viz.after': 'Nachher',
     'results.viz.title': 'Vorher · Nachher',
@@ -6286,7 +6490,7 @@ const I18N = {
     'footer.tagline': 'Faindz · Interior Intelligence',
     'footer.imprint': 'Impressum',
     'footer.privacy': 'Datenschutz',
-    'footer.disclosure': 'Als Amazon-Partner und Partner ausgewählter Marktplätze verdienen wir an qualifizierten Käufen.',
+    'footer.disclosure': 'Einige Links sind Affiliate-Links. Kaufst du darüber ein, erhalten wir ggf. eine Provision. Für dich bleibt der Preis gleich.',
     // Header
     'header.libraryLabel': 'Meine Bibliothek',
     'header.settingsLabel': 'Einstellungen',
@@ -7318,100 +7522,169 @@ if (logoWrap) {
   });
 }
 
-// ─── MARKETPLACE SELECTOR ───
-const MARKETPLACES = {
-  amazon: {
-    name: 'Amazon',
-    meta: 'Fast · Standard',
-    domain: 'amazon.de',
-    color: '#FF9900',
-    bgColor: '#131A22',
-    textColor: '#FFFFFF',
-    logo: `<svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg" aria-label="Amazon">
-      <text x="0" y="22" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="currentColor" letter-spacing="-0.5">amazon</text>
-      <path d="M 4 25 Q 30 32 56 25" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M 50 23 L 56 25 L 52 28" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`,
-    searchUrl: (q, tag) => {
-      // No affiliate program active right now: plain Amazon search, no tag.
-      // When a new partner ID exists, add it back here.
-      return `https://www.amazon.de/s?k=${encodeURIComponent(q)}`;
-    },
-  },
-  etsy: {
-    name: 'Etsy',
-    meta: 'Handmade · Unique',
-    domain: 'etsy.com',
-    color: '#F1641E',
-    bgColor: '#F1641E',
-    textColor: '#FFFFFF',
-    logo: `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg" aria-label="Etsy">
-      <text x="0" y="24" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="26" font-weight="700" fill="currentColor">Etsy</text>
-    </svg>`,
-    searchUrl: (q) => `https://www.etsy.com/search?q=${encodeURIComponent(q)}`,
-  },
-  otto: {
-    name: 'Otto',
-    meta: 'German · Reliable',
-    domain: 'otto.de',
-    color: '#D6011A',
-    bgColor: '#D6011A',
-    textColor: '#FFFFFF',
-    logo: `<svg viewBox="0 0 70 30" xmlns="http://www.w3.org/2000/svg" aria-label="OTTO">
-      <text x="0" y="24" font-family="Arial Black, Arial, sans-serif" font-size="24" font-weight="900" fill="currentColor" letter-spacing="-0.5">OTTO</text>
-    </svg>`,
-    searchUrl: (q) => `https://www.otto.de/suche/${encodeURIComponent(q)}/`,
-  },
+// ─── SHOPS ───────────────────────────────────────────────────────
+// Every product gets ONE best shop (direct button) plus a small list of
+// alternatives behind the chevron. Which shops are shown is decided by
+// keyword routes on category + product name.
+//
+// Activating an Awin shop after approval:
+//   1. set `search` to the shop's search URL (check it in the browser)
+//   2. set `active: true`
+// The link is then wrapped in an Awin deeplink automatically.
+const AWIN_PUBLISHER_ID = '2903059';
+
+const SHOPS = {
+  amazon:     { name: 'Amazon',      color: '#FF9900', active: true,
+                search: q => `https://www.amazon.de/s?k=${encodeURIComponent(q)}` },
+  otto:       { name: 'OTTO',        color: '#D6011A', active: true,
+                search: q => `https://www.otto.de/suche/${encodeURIComponent(q)}/` },
+  etsy:       { name: 'Etsy',        color: '#F1641E', active: true,
+                search: q => `https://www.etsy.com/de/search?q=${encodeURIComponent(q)}` },
+
+  // Awin partners. Applied 30.10.2026, waiting for approval.
+  naduvi:     { name: 'NADUVI',        color: '#4F8A6E', awinMid: 25929,  active: false, search: null },
+  happylamps: { name: 'Happy Lamps',   color: '#E8A200', awinMid: 29733,  active: false, search: null },
+  bassetti:   { name: 'Bassetti',      color: '#B83B5E', awinMid: 99313,  active: false, search: null },
+  teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: false, search: null },
+  dublino:    { name: 'Dublino',       color: '#A0785A', awinMid: 50865,  active: false, search: null },
+  hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: false, search: null },
+  vidaxl:     { name: 'vidaXL',        color: '#C8102E', awinMid: 57681,  active: false, search: null },
+  rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: false, search: null },
+  sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
 };
 
-// Restore selected marketplaces from localStorage
-let selectedMarkets = ['amazon'];
-try {
-  const saved = JSON.parse(localStorage.getItem('reima_markets') || '["amazon"]');
-  if (Array.isArray(saved) && saved.length > 0) {
-    const valid = saved.filter(m => MARKETPLACES[m]);
-    selectedMarkets = valid.length > 0 ? valid : ['amazon'];
+// Specialists per product type. Order inside `shops` = preference.
+// All matching routes are collected; `unless` keeps e.g. a
+// "Schreibtischlampe" out of the furniture route.
+const LAMP_RE = /lampe|leuchte|licht|lamp|lighting|beleuchtung/;
+const SHOP_ROUTES = [
+  { match: /teppich|läufer|fußmatte|\brugs?\b/,                                   shops: ['rugvista', 'teppichde'] },
+  { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams', 'hoeffner'] },
+  { match: /bettwäsche|kissen|plaid|\w*decke\b|überwurf|handtuch|\bbezug|bedding|cushion|pillow|throw/,
+                                                                                    shops: ['bassetti'] },
+  { match: /(kinder|tier|einhorn|nachtlicht|katze|hund)/, needs: LAMP_RE,          shops: ['happylamps'] },
+  { match: /tisch|stuhl|regal|schrank|kommode|sideboard|\bbett\b|bettgestell|hocker|\bbank\b|vitrine|konsole|möbel|furniture|seating|storage|aufbewahrung|sitzmöbel/,
+    unless: LAMP_RE,                                                                shops: ['naduvi', 'dublino', 'hoeffner', 'vidaxl'] },
+  { match: /vase|deko|skulptur|figur|kerze|spiegel|\bbild|poster|kunst|wandbild|\bart\b|decor|übertopf|blumentopf|tablett|schale|keramik/,
+    unless: LAMP_RE,                                                                shops: ['naduvi', 'etsy'] },
+];
+const SHOP_FALLBACK = ['amazon', 'otto'];
+const SHOP_MAX = 4;
+
+function isShopUsable(key) {
+  const s = SHOPS[key];
+  return !!(s && s.active && typeof s.search === 'function');
+}
+
+function getShopsForProduct(p) {
+  const text = `${p.category || ''} ${p.name || ''}`.toLowerCase();
+  const picked = [];
+  for (const r of SHOP_ROUTES) {
+    if (!r.match.test(text)) continue;
+    if (r.needs && !r.needs.test(text)) continue;
+    if (r.unless && r.unless.test(text)) continue;
+    picked.push(...r.shops);
   }
-} catch (e) {}
+  picked.push(...SHOP_FALLBACK);
+  return [...new Set(picked)].filter(isShopUsable).slice(0, SHOP_MAX);
+}
 
-function renderMarketplaceChips() {
-  const container = document.getElementById('marketplaceChips');
-  if (!container) return;
+function shopUrl(key, query) {
+  const s = SHOPS[key];
+  const target = s.search(query);
+  if (!s.awinMid) return target;
+  return `https://www.awin1.com/cread.php?awinmid=${s.awinMid}&awinaffid=${AWIN_PUBLISHER_ID}&ued=${encodeURIComponent(target)}`;
+}
 
-  container.innerHTML = Object.entries(MARKETPLACES).map(([key, market]) => `
-    <button class="market-chip" data-market="${key}" type="button">
-      <span class="market-name">${escapeHtml(market.name)}</span>
-      <span class="market-meta">${escapeHtml(market.meta)}</span>
-    </button>
-  `).join('');
+const SHOP_ICON_OUT = `<svg class="shop-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>`;
+const SHOP_ICON_CHEVRON = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+let shopPanelSeq = 0;
 
-  // Wire up click handlers
-  container.querySelectorAll('.market-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const market = chip.dataset.market;
-      if (selectedMarkets.includes(market)) {
-        // Don't allow deselecting the last one
-        if (selectedMarkets.length > 1) {
-          selectedMarkets = selectedMarkets.filter(m => m !== market);
-        }
-      } else {
-        selectedMarkets.push(market);
-      }
-      updateMarketChips();
-      try { localStorage.setItem('reima_markets', JSON.stringify(selectedMarkets)); } catch (e) {}
-    });
+// Renders the shop button group for a product.
+// opts.variant  — 'card' (results), 'lib' (wishlist grid), 'detail' (item modal)
+function buildShopActions(p, opts = {}) {
+  if (!p || !p.name) return '';
+  const shops = getShopsForProduct(p);
+  if (!shops.length) return '';
+  const variant = opts.variant || 'card';
+  const [best, ...more] = shops;
+  const b = SHOPS[best];
+  const linkAttrs = key => `href="${escapeHtml(shopUrl(key, p.name))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${key}"`;
+
+  // Split "Bei {market} ansehen" around the shop name so the
+  // prefix/suffix can be hidden on narrow cards.
+  const MARK = '\u0001';
+  const [pre, post = ''] = t('shop.viewAt', { market: MARK }).split(MARK);
+
+  const main = `
+    <a class="shop-main" ${linkAttrs(best)}>
+      <span class="shop-dot" style="--brand:${b.color}"></span>
+      <span class="shop-main-label"><span class="shop-main-pre">${escapeHtml(pre)}</span><span class="shop-main-name"><span class="shop-name-long">${escapeHtml(b.name)}</span><span class="shop-name-short">${escapeHtml(b.short || b.name)}</span></span><span class="shop-main-post">${escapeHtml(post)}</span></span>
+      ${SHOP_ICON_OUT}
+    </a>`;
+
+  if (!more.length) {
+    return `<div class="shop-actions shop-actions--${variant} is-single"><div class="shop-split">${main}</div></div>`;
+  }
+
+  const panelId = `shopPanel${++shopPanelSeq}`;
+  const expanded = variant === 'detail';
+  const rows = more.map(key => `
+    <a class="shop-row" ${linkAttrs(key)}>
+      <span class="shop-mono" style="--brand:${SHOPS[key].color}">${escapeHtml(SHOPS[key].name.charAt(0).toUpperCase())}</span>
+      <span class="shop-row-name"><span class="shop-name-long">${escapeHtml(SHOPS[key].name)}</span><span class="shop-name-short">${escapeHtml(SHOPS[key].short || SHOPS[key].name)}</span></span>
+      ${SHOP_ICON_OUT}
+    </a>`).join('');
+
+  const toggle = expanded ? '' : `
+    <button class="shop-more" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="${escapeHtml(t('shop.more'))}" title="${escapeHtml(t('shop.more'))}">${SHOP_ICON_CHEVRON}</button>`;
+
+  return `
+    <div class="shop-actions shop-actions--${variant}${expanded ? ' is-open' : ''}">
+      <div class="shop-panel" id="${panelId}" role="group" aria-label="${escapeHtml(t('shop.alsoAt'))}">
+        <div class="shop-panel-label">${escapeHtml(t('shop.alsoAt'))}</div>
+        ${rows}
+      </div>
+      <div class="shop-split">${main}${toggle}</div>
+    </div>`;
+}
+
+function closeShopPanels(except) {
+  document.querySelectorAll('.shop-actions.is-open:not(.shop-actions--detail)').forEach(el => {
+    if (el === except) return;
+    el.classList.remove('is-open');
+    const btn = el.querySelector('.shop-more');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
   });
 }
 
-function updateMarketChips() {
-  document.querySelectorAll('.market-chip').forEach(chip => {
-    const isActive = selectedMarkets.includes(chip.dataset.market);
-    chip.classList.toggle('active', isActive);
-  });
-}
+// One delegated listener for every shop group on the page.
+document.addEventListener('click', (e) => {
+  const toggle = e.target.closest('.shop-more');
+  if (toggle) {
+    e.preventDefault();
+    e.stopPropagation();
+    const wrap = toggle.closest('.shop-actions');
+    const open = !wrap.classList.contains('is-open');
+    closeShopPanels(wrap);
+    wrap.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    return;
+  }
+  if (e.target.closest('.shop-row')) {
+    // Let the link open, then fold the panel away.
+    setTimeout(() => closeShopPanels(), 150);
+    return;
+  }
+  if (!e.target.closest('.shop-panel')) closeShopPanels();
+}, true);
 
-renderMarketplaceChips();
-updateMarketChips();
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeShopPanels();
+});
+
+// Kept for saved-look metadata and the shop-mode prompt.
+const selectedMarkets = [...SHOP_FALLBACK];
 
 // ─── MODE SWITCHER (Reimagine vs Shop a Look) ───
 const modeSwitch = document.querySelector('.mode-switch');
@@ -7758,10 +8031,8 @@ async function analyzeRoom() {
 
   if (currentMode === 'shop') {
     // Build marketplace context for AI
-    const marketNames = selectedMarkets.map(m => MARKETPLACES[m]?.name).filter(Boolean).join(', ');
-    const marketGuidance = selectedMarkets.includes('etsy')
-      ? '\n\nNOTE: User has Etsy enabled — for handmade, vintage, or artisan-style items use search queries that work well on Etsy (e.g. "handmade ceramic vase boho" rather than just "Vase").'
-      : '';
+    const marketNames = 'Amazon, OTTO and specialised German home shops';
+    const marketGuidance = '';
 
     // Build language-specific guidance — same bulletproof pattern as Reimagine mode.
     const shopLangBlock = currentLang === 'de' ? `
@@ -8556,21 +8827,10 @@ function buildProductCard(p, i, opts = {}) {
   const priorityClass = p.priority === 'must' ? 'must' : 'nice';
   const priorityLabel = p.priority === 'must' ? t('results.priority.must') : t('results.priority.nice');
 
-  const marketButtons = selectedMarkets.map((marketKey, idx) => {
-    const market = MARKETPLACES[marketKey];
-    if (!market) return '';
-    const url = market.searchUrl(p.name, marketKey === 'amazon' ? tag : null);
-    const isPrimary = idx === 0;
-    const cls = isPrimary ? 'buy-btn primary' : 'buy-btn secondary';
-    const arrow = isPrimary ? ' →' : '';
-    const label = t('results.shopOn', { market: market.name }) + arrow;
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${cls}">
-      <span class="buy-btn-label">${escapeHtml(label)}</span>
-    </a>`;
-  }).join('');
+  const shopActions = buildShopActions(p, { variant: 'card' });
 
   const card = document.createElement('article');
-  card.className = 'product-card' + (fromVersion ? ' is-new-version' : '');
+  card.className = 'product-card' + (fromVersion ? ' is-new-version' : '') + (shopActions ? ' is-shoppable' : '');
   card.dataset.num = num;
   card.dataset.productIndex = String(i);
   if (fromVersion) card.dataset.fromVersion = fromVersion;
@@ -8594,8 +8854,20 @@ function buildProductCard(p, i, opts = {}) {
     <div class="product-meta">
       <span class="product-priority ${priorityClass}">${priorityLabel}</span>
     </div>
-    <div class="buy-btns">${marketButtons}</div>
+    ${shopActions}
   `;
+
+  // The whole card leads to the best shop. Buttons, links and the
+  // heart keep their own behaviour; selecting text doesn't navigate.
+  if (shopActions) {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a, button, .shop-panel')) return;
+      const sel = window.getSelection && String(window.getSelection());
+      if (sel) return;
+      const main = card.querySelector('.shop-main');
+      if (main) main.click();
+    });
+  }
   return card;
 }
 
@@ -10546,24 +10818,7 @@ function openItemDetailModal(item) {
   const p = item.product || {};
   const tag = getSetting('affiliateTag');
 
-  // Build a buy button for each marketplace the user has enabled — same
-  // pattern as the product cards on the results page so the UX is consistent.
-  const buyButtonsHtml = selectedMarkets.map((marketKey, idx) => {
-    const market = MARKETPLACES[marketKey];
-    if (!market) return '';
-    const url = market.searchUrl(p.name || '', marketKey === 'amazon' ? tag : null);
-    const isPrimary = idx === 0;
-    const cls = isPrimary ? 'item-detail-buy-btn primary' : 'item-detail-buy-btn secondary';
-    const label = t('results.shopOn', { market: market.name });
-    return `<a class="${cls}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-        <polyline points="15 3 21 3 21 9"></polyline>
-        <line x1="10" y1="14" x2="21" y2="3"></line>
-      </svg>
-      <span>${escapeHtml(label)}</span>
-    </a>`;
-  }).join('');
+  const shopActionsHtml = buildShopActions(p, { variant: 'detail' });
 
   itemDetailMount.innerHTML = `
     <div class="item-detail-overlay show" id="itemDetailOverlay">
@@ -10583,7 +10838,7 @@ function openItemDetailModal(item) {
             <span class="item-detail-info-value">${escapeHtml(p.placement)}</span>
           </div>` : ''}
         <div class="item-detail-actions">
-          ${buyButtonsHtml}
+          ${shopActionsHtml}
           <button class="item-detail-remove-btn" id="itemDetailRemoveBtn" type="button">
             ${escapeHtml(t('detail.removeFromWishlist'))}
           </button>
@@ -10659,8 +10914,8 @@ function wireLibraryInteractions(itemsArray) {
   // Item-card click — open detail modal
   libraryMount.querySelectorAll('.lib-item-card').forEach(card => {
     card.addEventListener('click', (e) => {
-      // Ignore clicks on the delete X
-      if (e.target.closest('.lib-item-delete')) return;
+      // Ignore clicks on the delete X and on shop links/buttons
+      if (e.target.closest('.lib-item-delete, a, button, .shop-panel')) return;
       const id = card.dataset.itemId;
       const item = (itemsArray || []).find(it => it.id === id);
       if (item) openItemDetailModal(item);
@@ -10754,23 +11009,10 @@ function renderItemsGrid(items) {
         const date = new Date(item.createdAt);
         const dateStr = date.toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US', { day: 'numeric', month: 'short' });
 
-        // Build buy buttons using user's currently-selected marketplaces.
-        // Same primary/secondary pattern as the main result cards for consistency.
-        const buyButtons = selectedMarkets.map((marketKey, idx) => {
-          const market = MARKETPLACES[marketKey];
-          if (!market || !p.name) return '';
-          const url = market.searchUrl(p.name, marketKey === 'amazon' ? tag : null);
-          const isPrimary = idx === 0;
-          const cls = isPrimary ? 'buy-btn primary' : 'buy-btn secondary';
-          const arrow = isPrimary ? ' →' : '';
-          const label = t('results.shopOn', { market: market.name }) + arrow;
-          return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${cls}">
-            <span class="buy-btn-label">${escapeHtml(label)}</span>
-          </a>`;
-        }).join('');
+        const shopActions = buildShopActions(p, { variant: 'lib' });
 
         return `
-          <article class="lib-item-card">
+          <article class="lib-item-card" data-item-id="${escapeHtml(item.id)}">
             <div class="lib-item-header">
               <div>
                 <div class="lib-item-cat">${escapeHtml(p.category || 'Item')}</div>
@@ -10782,7 +11024,7 @@ function renderItemsGrid(items) {
             <div class="lib-item-meta-row">
               <span class="lib-item-date">${dateStr}</span>
             </div>
-            <div class="buy-btns lib-item-buys">${buyButtons}</div>
+            ${shopActions}
           </article>
         `;
       }).join('')}
