@@ -8078,6 +8078,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
   "products": [
     {
       "category": "${currentLang === 'de' ? 'MÖBEL/BELEUCHTUNG/etc — auf DEUTSCH' : 'FURNITURE/LIGHTING/etc — in ENGLISH'}",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "A specific German Amazon search query for this item (always German for marketplace results). Be detailed enough to find similar pieces. Example: 'Stehlampe Bogenlampe Messing Marmorfuß' rather than 'Lampe'.",
       "reason": "${currentLang === 'de' ? 'EIN klarer deutscher Satz (max 15 Wörter), was du im Bild siehst.' : 'ONE plain English sentence (max 15 words) describing what you see.'}",
       "price_range": "e.g. '60-150€' — realistic estimated range on Amazon DE for similar items",
@@ -8091,6 +8092,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
 Example of CORRECT product object (note both x and y are present and are numbers):
 {
   "category": "${currentLang === 'de' ? 'BELEUCHTUNG' : 'LIGHTING'}",
+  "title": "LED-Streifen RGB",
   "name": "LED Streifen RGB selbstklebend 5m",
   "reason": "${currentLang === 'de' ? 'Cyan LED-Streifen hinter dem Schreibtisch erzeugen Ambient-Licht.' : 'Cyan LED strips behind the desk create ambient glow.'}",
   "price_range": "20-40€",
@@ -8148,6 +8150,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in diesem Format (keine Markdown-Zä
   "products": [
     {
       "category": "z.B. BELEUCHTUNG, ERGONOMIE, DEKO, ORDNUNG, TECHNIK, TEXTIL",
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Konkreter Produktname als Suchbegriff für Amazon (Deutsch). Sei spezifisch genug für gute Suchergebnisse, z.B. 'Schreibtischlampe LED dimmbar Holz' statt nur 'Lampe'",
       "reason": "1-2 Sätze warum dieses Produkt zum Raum passt und was es verbessert",
       "price_range": "z.B. '20-40€'",
@@ -8352,6 +8355,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON.
 
       "category": "BELEUCHTUNG | MÖBEL | TEXTIL | DEKO | KUNST | PFLANZEN | ORDNUNG | TECHNIK",
 
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen beschreibenden Wörtern",
 
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
@@ -8432,6 +8436,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
   "products": [
     {
       "category": "e.g. LIGHTING, ERGONOMICS, DECOR, ORGANIZATION, TECH, TEXTILES",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Concrete product name as a German Amazon search query (always German for marketplace results). Be specific enough for good search results, e.g. 'Schreibtischlampe LED dimmbar Holz' instead of just 'Lampe'",
       "reason": "1-2 sentences on why this product fits the room and what it improves",
       "price_range": "e.g. '20-40€'",
@@ -8636,6 +8641,7 @@ Respond ONLY with valid JSON.
 
       "category": "LIGHTING | FURNITURE | TEXTILE | DECOR | ART | PLANTS | STORAGE | TECH",
 
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Mass-market-friendly Amazon search phrase with 3–5 simple descriptive words",
 
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
@@ -8819,6 +8825,31 @@ Prioritize products with maximum visual impact relative to price and effort.`;
   }
 }
 
+// Short display title. New looks get `title` from the AI; older looks
+// only have the long search query, so we trim that to a few words.
+function productTitle(p) {
+  if (p && p.title && String(p.title).trim()) return String(p.title).trim();
+  const words = String((p && p.name) || '').trim().split(/\s+/).filter(Boolean);
+  const out = [];
+  for (const w of words) {
+    if (out.length >= 3) break;
+    if (out.length >= 2 && /\d/.test(w)) break;   // stop before sizes like 160x230
+    out.push(w);
+  }
+  return out.join(' ') || (p && p.name) || '';
+}
+
+// "60–150€", "€60–150", "700-1.400 €" → "60–150 €" / "700–1.400 €"
+function formatPriceRange(str) {
+  if (!str) return '';
+  const nums = String(str).replace(/(\d)\.(\d{3})/g, '$1$2').match(/\d+(?:,\d+)?/g);
+  if (!nums || !nums.length) return String(str);
+  const v = nums.map(n => parseFloat(n.replace(',', '.')));
+  const nf = new Intl.NumberFormat(currentLang === 'de' ? 'de-DE' : 'en-US');
+  const lo = v[0], hi = v[v.length - 1];
+  return lo === hi ? `${nf.format(lo)} €` : `${nf.format(lo)}–${nf.format(hi)} €`;
+}
+
 // Build a single product card. Used by renderResults() and by appendEditProducts().
 // opts.tag        — affiliate tag (Amazon)
 // opts.region     — amazon region (default amazon.de)
@@ -8852,10 +8883,12 @@ function buildProductCard(p, i, opts = {}) {
     </button>
     ${badgeHtml}
     <div class="product-category">${escapeHtml(p.category)}</div>
-    <h3 class="product-name">${escapeHtml(p.name)}</h3>
+    <h3 class="product-name">${escapeHtml(productTitle(p))}</h3>
     <p class="product-reason">${escapeHtml(p.reason)}</p>
     <div class="product-meta">
-      <span class="product-priority ${priorityClass}">${priorityLabel}</span>
+      ${p.price_range
+        ? `<span class="product-price">${escapeHtml(formatPriceRange(p.price_range))}</span>`
+        : `<span class="product-priority ${priorityClass}">${priorityLabel}</span>`}
     </div>
     ${shopActions}
   `;
@@ -9284,6 +9317,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON, keine Markdown-Zäune, kein Vorab-T
   "products": [
     {
       "category": "z.B. MÖBEL, BELEUCHTUNG, DEKO, TEXTIL, WANDGESTALTUNG",
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Konkreter deutscher Suchbegriff für Amazon, spezifisch genug für gute Treffer",
       "reason": "1 Satz: was hat sich verändert und warum passt das neue Item",
       "price_range": "z.B. '200-400€'",
@@ -9302,6 +9336,7 @@ Respond ONLY with valid JSON, no markdown fences, no preamble:
   "products": [
     {
       "category": "e.g. FURNITURE, LIGHTING, DECOR, TEXTILES, WALL DESIGN",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Concrete German Amazon search query, specific enough for good hits",
       "reason": "1 sentence: what changed and why it fits",
       "price_range": "e.g. '200-400€'",
@@ -9513,6 +9548,7 @@ const REIMAGINE_OUTPUT_SCHEMA_DE = `Antworte AUSSCHLIESSLICH mit gültigem JSON 
       "role": "hero | supporting | accent",
       "visual_impact": "high | medium | low",
       "category": "BELEUCHTUNG | MÖBEL | TEXTIL | DEKO | KUNST | PFLANZEN | ORDNUNG | TECHNIK",
+      "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen Wörtern (Deutsch)",
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
       "reason": "1 Satz: was dieses Produkt für DIESEN Raum konkret verbessert",
@@ -9545,6 +9581,7 @@ const REIMAGINE_OUTPUT_SCHEMA_EN = `Respond ONLY with valid JSON in THIS structu
       "role": "hero | supporting | accent",
       "visual_impact": "high | medium | low",
       "category": "LIGHTING | FURNITURE | TEXTILE | DECOR | ART | PLANTS | STORAGE | TECH",
+      "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Mass-market-friendly Amazon search phrase with 3–5 simple words (in German for marketplace results)",
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
       "reason": "One sentence: what this specifically improves about THIS room",
@@ -10828,7 +10865,7 @@ function openItemDetailModal(item) {
       <div class="item-detail-sheet" role="dialog" aria-label="${escapeHtml(p.name || '')}">
         <button class="item-detail-close" id="itemDetailClose" aria-label="Close">✕</button>
         <div class="item-detail-category">${escapeHtml(p.category || '—')}</div>
-        <h2 class="item-detail-name">${escapeHtml(p.name || '')}</h2>
+        <h2 class="item-detail-name">${escapeHtml(productTitle(p))}</h2>
         ${p.reason ? `<p class="item-detail-reason">${escapeHtml(p.reason)}</p>` : ''}
         ${p.material ? `
           <div class="item-detail-info-row">
@@ -11019,7 +11056,7 @@ function renderItemsGrid(items) {
             <div class="lib-item-header">
               <div>
                 <div class="lib-item-cat">${escapeHtml(p.category || 'Item')}</div>
-                <h3 class="lib-item-name">${escapeHtml(p.name || 'Unnamed')}</h3>
+                <h3 class="lib-item-name">${escapeHtml(productTitle(p) || 'Unnamed')}</h3>
               </div>
               <button class="lib-item-delete" data-item-id="${escapeHtml(item.id)}" aria-label="Remove">✕</button>
             </div>
