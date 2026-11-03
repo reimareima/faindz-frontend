@@ -7579,7 +7579,9 @@ const SHOPS = {
   bassetti:   { name: 'Bassetti',      color: '#B83B5E', awinMid: 99313,  active: false, search: null },
   teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: false, search: null },
   dublino:    { name: 'Dublino',       color: '#A0785A', awinMid: 50865,  active: false, search: null },
-  hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: false, search: null },
+  // Approved 03.11.2026
+  hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: true,
+                search: q => `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q)}` },
   vidaxl:     { name: 'vidaXL',        color: '#C8102E', awinMid: 57681,  active: false, search: null },
   rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: false, search: null },
   sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
