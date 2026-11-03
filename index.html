@@ -5087,7 +5087,7 @@
       <button class="lang-toggle-btn" data-lang="en" type="button">EN</button>
       <button class="lang-toggle-btn" data-lang="de" type="button">DE</button>
     </div>
-    <div class="footer-disclosure" data-i18n="footer.disclosure">Mit „Partner“ markierte Shop-Links sind Affiliate-Links (Werbung). Kaufst du darüber ein, erhalten wir ggf. eine Provision. Für dich bleibt der Preis gleich.</div>
+    <div class="footer-disclosure" data-i18n="footer.disclosure">Einige Shop-Links sind Affiliate-Links (Werbung). Kaufst du darüber ein, erhalten wir ggf. eine Provision. Für dich bleibt der Preis gleich.</div>
   </footer>
 
 </div>
@@ -6315,7 +6315,7 @@ const I18N = {
     'footer.tagline': 'Faindz · Interior intelligence',
     'footer.imprint': 'Imprint',
     'footer.privacy': 'Privacy',
-    'footer.disclosure': 'Shop links marked “Partner” are affiliate links (advertising). If you buy through them, we may earn a commission. The price stays the same for you.',
+    'footer.disclosure': 'Some shop links are affiliate links (advertising). If you buy through them, we may earn a commission. The price stays the same for you.',
     // Header
     'header.libraryLabel': 'My library',
     'header.settingsLabel': 'Settings',
@@ -6543,7 +6543,7 @@ const I18N = {
     'footer.tagline': 'Faindz · Interior Intelligence',
     'footer.imprint': 'Impressum',
     'footer.privacy': 'Datenschutz',
-    'footer.disclosure': 'Mit „Partner“ markierte Shop-Links sind Affiliate-Links (Werbung). Kaufst du darüber ein, erhalten wir ggf. eine Provision. Für dich bleibt der Preis gleich.',
+    'footer.disclosure': 'Einige Shop-Links sind Affiliate-Links (Werbung). Kaufst du darüber ein, erhalten wir ggf. eine Provision. Für dich bleibt der Preis gleich.',
     // Header
     'header.libraryLabel': 'Meine Bibliothek',
     'header.settingsLabel': 'Einstellungen',
@@ -7901,7 +7901,6 @@ function buildShopActions(p, opts = {}) {
   const b = SHOPS[best];
   // Awin shops are affiliate links: mark them as "Partner" (advertising)
   const isPartner = key => !!SHOPS[key].awinMid;
-  const badge = key => isPartner(key) ? `<span class="shop-badge">${escapeHtml(t('shop.partner'))}</span>` : '';
   const linkAttrs = key => `href="${escapeHtml(shopUrl(key, p.name))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${key}"${isPartner(key) ? ` title="${escapeHtml(t('shop.partnerHint'))}"` : ''}`;
 
   // Split "Bei {market} ansehen" around the shop name so the
@@ -7913,7 +7912,6 @@ function buildShopActions(p, opts = {}) {
     <a class="shop-main" ${linkAttrs(best)}>
       <span class="shop-dot" style="--brand:${b.color}"></span>
       <span class="shop-main-label"><span class="shop-main-pre">${escapeHtml(pre)}</span><span class="shop-main-name"><span class="shop-name-long">${escapeHtml(b.name)}</span><span class="shop-name-short">${escapeHtml(b.short || b.name)}</span></span><span class="shop-main-post">${escapeHtml(post)}</span></span>
-      ${badge(best)}
       ${SHOP_ICON_OUT}
     </a>`;
 
@@ -7927,7 +7925,6 @@ function buildShopActions(p, opts = {}) {
     <a class="shop-row" ${linkAttrs(key)}>
       <span class="shop-mono" style="--brand:${SHOPS[key].color}">${escapeHtml(SHOPS[key].name.charAt(0).toUpperCase())}</span>
       <span class="shop-row-name"><span class="shop-name-long">${escapeHtml(SHOPS[key].name)}</span><span class="shop-name-short">${escapeHtml(SHOPS[key].short || SHOPS[key].name)}</span></span>
-      ${badge(key)}
       ${SHOP_ICON_OUT}
     </a>`).join('');
 
