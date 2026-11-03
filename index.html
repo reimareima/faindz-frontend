@@ -7579,9 +7579,10 @@ const SHOPS = {
   bassetti:   { name: 'Bassetti',      color: '#B83B5E', awinMid: 99313,  active: false, search: null },
   teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: false, search: null },
   dublino:    { name: 'Dublino',       color: '#A0785A', awinMid: 50865,  active: false, search: null },
-  // Approved 03.11.2026
+  // Approved 03.11.2026. Höffner's search gets fuzzy with long queries,
+  // so only the first 3 words are sent.
   hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: true,
-                search: q => `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q)}` },
+                search: q => `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q.trim().split(/\s+/).slice(0, 3).join(' '))}` },
   vidaxl:     { name: 'vidaXL',        color: '#C8102E', awinMid: 57681,  active: false, search: null },
   rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: false, search: null },
   sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
@@ -7591,6 +7592,9 @@ const SHOPS = {
 // All matching routes are collected; `unless` keeps e.g. a
 // "Schreibtischlampe" out of the furniture route.
 const LAMP_RE = /lampe|leuchte|licht|lamp|lighting|beleuchtung/;
+// Floors, walls and fittings: no furniture shop sells these well,
+// even when the AI files them under MÖBEL.
+const NOT_FURNITURE_RE = /boden|vinyl|laminat|parkett|fliese|tapete|wandfarbe|paneel|leiste|sockel|floor|wallpaper|paint/;
 const SHOP_ROUTES = [
   { match: /teppich|läufer|fußmatte|\brugs?\b/,                                   shops: ['rugvista', 'teppichde'] },
   { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams', 'hoeffner'] },
@@ -7598,7 +7602,7 @@ const SHOP_ROUTES = [
                                                                                     shops: ['bassetti'] },
   { match: /(kinder|tier|einhorn|nachtlicht|katze|hund)/, needs: LAMP_RE,          shops: ['happylamps'] },
   { match: /tisch|stuhl|regal|schrank|kommode|sideboard|\bbett\b|bettgestell|hocker|\bbank\b|vitrine|konsole|möbel|furniture|seating|storage|aufbewahrung|sitzmöbel/,
-    unless: LAMP_RE,                                                                shops: ['naduvi', 'dublino', 'hoeffner', 'vidaxl'] },
+    unless: { test: t => LAMP_RE.test(t) || NOT_FURNITURE_RE.test(t) },             shops: ['naduvi', 'dublino', 'hoeffner', 'vidaxl'] },
   { match: /vase|deko|skulptur|figur|kerze|spiegel|\bbild|poster|kunst|wandbild|\bart\b|decor|übertopf|blumentopf|tablett|schale|keramik/,
     unless: LAMP_RE,                                                                shops: ['naduvi', 'etsy'] },
 ];
