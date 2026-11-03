@@ -7579,12 +7579,10 @@ const SHOPS = {
   bassetti:   { name: 'Bassetti',      color: '#B83B5E', awinMid: 99313,  active: false, search: null },
   teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: false, search: null },
   dublino:    { name: 'Dublino',       color: '#A0785A', awinMid: 50865,  active: false, search: null },
-  // Approved 03.11.2026. Only the product type (first word) is sent:
-  // for a single word Höffner redirects to the matching category page
-  // (Teppich -> /teppiche, Chefsessel -> /chefsessel), which beats its
-  // fuzzy free-text search by far.
+  // Approved 03.11.2026. Links go to Höffner category pages with a colour
+  // filter where possible (/sessel__gruen), see hoeffnerUrl() below.
   hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: true,
-                search: q => `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q.trim().split(/\s+/)[0])}` },
+                search: q => hoeffnerUrl(q) },
   vidaxl:     { name: 'vidaXL',        color: '#C8102E', awinMid: 57681,  active: false, search: null },
   rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: false, search: null },
   sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
@@ -7610,6 +7608,99 @@ const SHOP_ROUTES = [
   { match: LAMP_RE, unless: /streifen|strip|lichterkette|glühbirne|leuchtmittel/,  shops: ['hoeffner'] },
 ];
 const SHOP_FALLBACK = ['amazon', 'otto'];
+
+// ─── HÖFFNER LINKS ──────────────────────────────────────────────
+// Höffner's free-text search is fuzzy ("Chefsessel braun" brings TV
+// armchairs), but its category pages are clean and accept a colour
+// in the URL: /teppiche__beige, /sessel__gruen. Unknown colours fall
+// back to the plain category on Höffner's side. Material can't be set
+// via URL. No category match -> search with the first 3 words.
+// Order matters: more specific entries first.
+const HOEFFNER_CATEGORIES = [
+  [/stehlampe|stehleuchte|bogenlampe|bogenleuchte/, 'stehleuchten'],
+  [/tischlampe|tischleuchte/,                       'tischleuchten'],
+  [/pendel|hängelampe|hängeleuchte/,                'haengeleuchten'],
+  [/deckenlampe|deckenleuchte/,                     'deckenleuchten'],
+  [/wandlampe|wandleuchte/,                         'wandleuchten'],
+  [/bettwäsche/,                                    'bettwaesche'],
+  [/kissen/,                                        'kissen'],
+  [/decke|plaid|überwurf/,                          'dekokissen-decken'],
+  [/vorhang|vorhänge|gardine/,                      'vorhaenge'],
+  [/handtuch|handtücher/,                           'handtuecher'],
+  [/läufer/,                                        'laeufer'],
+  [/teppich/,                                       'teppiche'],
+  [/chefsessel/,                                    'chefsessel'],
+  [/bürostuhl|schreibtischstuhl|drehstuhl/,         'buerostuehle'],
+  [/ohrensessel/,                                   'ohrensessel'],
+  [/ecksofa|eckcouch|wohnlandschaft/,               'ecksofas'],
+  [/sofa|couch(?!tisch)/,                           'sofas'],
+  [/sessel/,                                        'sessel'],
+  [/boxspring/,                                     'boxspringbetten'],
+  [/polsterbett/,                                   'polsterbetten'],
+  [/nachttisch/,                                    'nachttische'],
+  [/couchtisch|sofatisch/,                          'couchtische'],
+  [/beistelltisch/,                                 'beistelltische'],
+  [/konsole/,                                       'konsolentische'],
+  [/schreibtisch/,                                  'schreibtische'],
+  [/esstisch|tisch/,                                'esstische'],
+  [/esszimmerstuhl/,                                'esszimmerstuehle'],
+  [/stuhl|stühle/,                                  'stuehle'],
+  [/hocker/,                                        'hocker'],
+  [/bank\b|bänke/,                                  'baenke'],
+  [/bücherregal/,                                   'buecherregale'],
+  [/regal/,                                         'regale'],
+  [/kleiderschrank/,                                'kleiderschraenke'],
+  [/schuhschrank/,                                  'schuhschraenke'],
+  [/vitrine/,                                       'vitrinen'],
+  [/sideboard/,                                     'sideboards'],
+  [/lowboard|tv-board|tv-möbel/,                    'lowboards'],
+  [/kommode/,                                       'kommoden'],
+  [/schrank|schränke/,                              'schraenke'],
+  [/garderobe/,                                     'garderoben'],
+  [/bett\b|bettgestell|betten/,                     'betten'],
+  [/vase/,                                          'vasen-schalen'],
+  [/spiegel/,                                       'spiegel'],
+  [/bild|poster|kunstdruck/,                        'bilder'],
+  [/tablett/,                                       'tabletts'],
+  [/^uhr|wanduhr/,                                  'uhren'],
+];
+// Colour word stem -> Höffner colour slug (only slugs Höffner knows)
+const HOEFFNER_COLOURS = [
+  [/^(weiß|weiss)/,                     'weiss'],
+  [/^schwarz/,                          'schwarz'],
+  [/^(grau|anthrazit)/,                 'grau'],
+  [/^(braun|cognac|nussbaum|walnuss)/,  'braun'],
+  [/^creme/,                            'creme'],
+  [/^(beige|taupe|sand)/,               'beige'],
+  [/^(blau|petrol|navy)/,               'blau'],
+  [/^(grün|gruen|salbei|oliv)/,         'gruen'],
+  [/^(rot|bordeaux)(e|er|es|en)?$/,     'rot'],
+  [/^(gelb|senf|ocker)/,                'gelb'],
+  [/^(orange|terrakotta|terracotta)/,   'orange'],
+  [/^(rosa|altrosa)/,                   'rosa'],
+  [/^pink/,                             'pink'],
+  [/^(lila|violett)/,                   'lila'],
+  [/^(gold|messing)/,                   'gold'],
+  [/^(silber|chrom)/,                   'silber'],
+];
+
+function hoeffnerUrl(q) {
+  const words = q.trim().toLowerCase().split(/\s+/);
+  const find = text => (HOEFFNER_CATEGORIES.find(([re]) => re.test(text)) || [])[1];
+  // The product type is usually the first word; only if that doesn't
+  // match look at the whole name (e.g. "Großer Spiegel rund").
+  const slug = find(words[0]) || find(words.join(' '));
+  if (!slug) {
+    return `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q.trim().split(/\s+/).slice(0, 3).join(' '))}`;
+  }
+  let colour = null;
+  for (const w of words) {
+    const hit = HOEFFNER_COLOURS.find(([re]) => re.test(w));
+    if (hit) { colour = hit[1]; break; }
+  }
+  return `https://www.hoeffner.de/${slug}${colour ? '__' + colour : ''}`;
+}
+
 const SHOP_MAX = 4;
 
 function isShopUsable(key) {
