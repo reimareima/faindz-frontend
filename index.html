@@ -7926,8 +7926,6 @@ function isShopUsable(key) {
 function getShopsForProduct(p) {
   const text = `${p.category || ''} ${p.name || ''}`.toLowerCase();
   const picked = [];
-  // Höffner first whenever it has a matching category (only affiliate shop so far)
-  if (hoeffnerSlug(p.name)) picked.push('hoeffner');
   for (const r of SHOP_ROUTES) {
     if (!r.match.test(text)) continue;
     if (r.needs && !r.needs.test(text)) continue;
@@ -7935,7 +7933,15 @@ function getShopsForProduct(p) {
     picked.push(...r.shops);
   }
   picked.push(...SHOP_FALLBACK);
-  return [...new Set(picked)].filter(isShopUsable).slice(0, SHOP_MAX);
+  const shops = [...new Set(picked)].filter(isShopUsable);
+  // Höffner leads only when the feed found the exact product (see
+  // HoeffnerMatch). Otherwise the shop with the better search (Amazon)
+  // stays the main button and Höffner sits in the dropdown.
+  if (hoeffnerSlug(p.name) && isShopUsable('hoeffner')) {
+    if (HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
+    else shops.splice(1, 0, 'hoeffner');
+  }
+  return shops.slice(0, SHOP_MAX);
 }
 
 function shopUrl(key, query) {
@@ -8076,7 +8082,12 @@ function attachHoeffnerMatch(card, p) {
     const best = r && r.sure && r.results && r.results[0];
     if (!best || !card.isConnected) return;
 
-    // Every Höffner link on this card now opens the product itself
+    // Höffner becomes the main button and every Höffner link opens the product
+    const actions = card.querySelector('.shop-actions');
+    if (actions) {
+      const fresh = buildShopActions(p, { variant: 'card' });
+      if (fresh) actions.outerHTML = fresh;
+    }
     card.querySelectorAll('a[data-shop="hoeffner"]').forEach(a => { a.href = best.link; });
 
     const meta = card.querySelector('.product-meta');
