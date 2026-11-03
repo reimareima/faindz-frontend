@@ -7595,113 +7595,242 @@ const LAMP_RE = /lampe|leuchte|licht|lamp|lighting|beleuchtung/;
 // Floors, walls and fittings: no furniture shop sells these well,
 // even when the AI files them under MÖBEL.
 const NOT_FURNITURE_RE = /boden|vinyl|laminat|parkett|fliese|tapete|wandfarbe|paneel|leiste|sockel|floor|wallpaper|paint/;
-// Plants (real or artificial) aren't Höffner's thing -> Amazon/OTTO.
-// "Kunstpflanze" would otherwise hit the deco route via "kunst".
-const PLANT_RE = /pflanze|baum|monstera|olive|ficus|palme|kaktus|eukalyptus|farn|bonsai/;
+const PLANT_RE = /pflanze|baum|monstera|olive|ficus|palme|kaktus|eukalyptus|farn|bonsai|blume|strauß|zweig|gras\b|pampas/;
+
+// Routes for the other shops. Höffner is not in here: it is added in
+// getShopsForProduct() whenever HOEFFNER_CATEGORIES has a match.
 const SHOP_ROUTES = [
-  { match: /korb|körbe/,                                                            shops: ['hoeffner'] },
-  { match: /teppich|läufer|fußmatte|\brugs?\b/,                                   shops: ['rugvista', 'teppichde', 'hoeffner'] },
-  { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams', 'hoeffner'] },
+  { match: /teppich|läufer|fußmatte|\brugs?\b/,                                   shops: ['rugvista', 'teppichde'] },
+  { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams'] },
   { match: /bettwäsche|kissen|plaid|\w*decke\b|überwurf|handtuch|\bbezug|bedding|cushion|pillow|throw/,
-                                                                                    shops: ['bassetti', 'hoeffner'] },
+                                                                                    shops: ['bassetti'] },
   { match: /(kinder|tier|einhorn|nachtlicht|katze|hund)/, needs: LAMP_RE,          shops: ['happylamps'] },
   { match: /tisch|stuhl|regal|schrank|kommode|sideboard|\bbett\b|bettgestell|hocker|\bbank\b|vitrine|konsole|möbel|furniture|seating|storage|aufbewahrung|sitzmöbel/,
-    unless: { test: t => LAMP_RE.test(t) || NOT_FURNITURE_RE.test(t) },             shops: ['naduvi', 'dublino', 'hoeffner', 'vidaxl'] },
+    unless: { test: t => LAMP_RE.test(t) || NOT_FURNITURE_RE.test(t) },             shops: ['naduvi', 'dublino', 'vidaxl'] },
   { match: /vase|deko|skulptur|figur|kerze|spiegel|\bbild|poster|kunst|wandbild|\bart\b|decor|übertopf|blumentopf|tablett|schale|keramik/,
-    unless: { test: t => LAMP_RE.test(t) || PLANT_RE.test(t) },                     shops: ['naduvi', 'hoeffner', 'etsy'] },
-  { match: LAMP_RE, unless: /streifen|strip|lichterkette|glühbirne|leuchtmittel/,  shops: ['hoeffner'] },
+    unless: { test: t => LAMP_RE.test(t) || PLANT_RE.test(t) },                     shops: ['naduvi', 'etsy'] },
 ];
 const SHOP_FALLBACK = ['amazon', 'otto'];
 
-// ─── HÖFFNER LINKS ──────────────────────────────────────────────
-// Höffner's free-text search is fuzzy ("Chefsessel braun" brings TV
-// armchairs), but its category pages are clean and accept a colour
-// in the URL: /teppiche__beige, /sessel__gruen. Unknown colours fall
-// back to the plain category on Höffner's side. Material can't be set
-// via URL. No category match -> search with the first 3 words.
-// Order matters: more specific entries first.
+// ─── HÖFFNER ─────────────────────────────────────────────────────
+// Built from Höffner's full category tree (checked 03.11.2026, every
+// slug below exists). Höffner's free-text search is fuzzy ("Chefsessel
+// braun" brings TV armchairs), its category pages are clean and take a
+// colour in the URL: /teppiche__beige. A colour the category doesn't
+// have falls back to the plain category on Höffner's side. Material
+// can't be set via URL.
+//
+// Höffner is offered only when a category matches, so products it
+// doesn't really carry (plants, flooring, LED strips) go to Amazon/OTTO.
+// Order matters: specific entries before generic ones.
 const HOEFFNER_CATEGORIES = [
-  [/stehlampe|stehleuchte|bogenlampe|bogenleuchte/, 'stehleuchten'],
+  // Lighting
+  [/nachttischlampe|nachttischleuchte/,             'nachttischlampen'],
+  [/schreibtischlampe|schreibtischleuchte|arbeitsleuchte|leselampe/, 'schreibtischlampen'],
+  [/bogenlampe|bogenleuchte/,                       'bogenlampen'],
+  [/deckenfluter/,                                  'deckenfluter'],
+  [/stehlampe|stehleuchte/,                         'stehleuchten'],
   [/tischlampe|tischleuchte/,                       'tischleuchten'],
   [/pendel|hängelampe|hängeleuchte/,                'haengeleuchten'],
-  [/deckenlampe|deckenleuchte/,                     'deckenleuchten'],
+  [/deckenlampe|deckenleuchte|deckenlicht/,         'deckenleuchten'],
   [/wandlampe|wandleuchte/,                         'wandleuchten'],
-  [/bettwäsche/,                                    'bettwaesche'],
-  [/wäschekorb/,                                    'waesche-aufbewahrung'],
-  [/korb|körbe/,                                    'koerbe'],
-  [/kissen/,                                        'kissen'],
-  [/decke|plaid|überwurf/,                          'dekokissen-decken'],
-  [/vorhang|vorhänge|gardine/,                      'vorhaenge'],
-  [/handtuch|handtücher/,                           'handtuecher'],
+  [/strahler|spot/,                                 'strahler-spots'],
+  [/akkuleuchte|akkulampe|akku-/,                   'akkuleuchten'],
+  [/kinderlampe|kinderleuchte|nachtlicht/,          'kinderleuchten'],
+  [/^(lampe|leuchte)$/,                             'lampen'],
+  // Textiles
+  [/kinderbettwäsche/,                              'kinderbettwaesche'],
+  [/bettwäsche|bettbezug/,                          'bettwaesche'],
+  [/kissenbezug|kissenhülle/,                       'kissenhuellen'],
+  [/stuhlkissen|sitzkissen|sitzauflage/,            'stuhlkissen'],
+  [/kissen/,                                        'dekokissen'],
+  [/tischläufer/,                                   'tischlaeufer'],
+  [/tischdecke/,                                    'tischdecken'],
+  [/tagesdecke|bettüberwurf/,                       'tagesdecken'],
+  [/bettdecke|steppdecke|daunendecke/,              'bettdecken'],
+  [/decke|plaid|überwurf/,                          'kuscheldecken'],
+  [/gardinenstange|vorhangstange/,                  'gardinenstangen'],
+  [/plissee/,                                       'plissees'],
+  [/vorhang|vorhänge|gardine|schlaufenschal|ösenschal/, 'vorhaenge'],
+  [/platzset|tischset/,                             'platzsets'],
+  [/badematte|badvorleger|badteppich/,              'badematten'],
+  [/handtuch|handtücher|badetuch/,                  'handtuecher'],
+  // Rugs
+  [/schaffell|lammfell/,                            'lammfelle'],
+  [/fell/,                                          'felle'],
+  [/fußmatte|türmatte|schmutzfang/,                 'matten'],
   [/läufer/,                                        'laeufer'],
+  [/kinderteppich|spielteppich/,                    'kinderteppiche'],
+  [/outdoor.*teppich|teppich.*(outdoor|balkon|terrasse)|außenteppich|balkonteppich/, 'outdoor-teppiche'],
+  [/kelim/,                                         'kelim-teppiche'],
+  [/(orient|perser).*teppich/,                      'orientteppiche'],
+  [/vintage.*teppich|teppich.*vintage/,             'vintage-teppiche'],
+  [/(hochflor|shaggy).*teppich|teppich.*(hochflor|shaggy)|flokati/, 'hochflor-teppiche'],
+  [/kurzflor.*teppich|teppich.*kurzflor/,           'kurzflor-teppiche'],
+  [/(jute|sisal|seegras|wolle).*teppich|teppich.*(jute|sisal|seegras)|naturteppich/, 'naturteppiche'],
   [/teppich/,                                       'teppiche'],
+  // Seating
   [/chefsessel/,                                    'chefsessel'],
-  [/bürostuhl|schreibtischstuhl|drehstuhl/,         'buerostuehle'],
+  [/gamingstuhl|gaming-stuhl/,                      'gamingstuehle'],
+  [/bürostuhl|schreibtischstuhl|drehstuhl|bürosessel/, 'buerostuehle'],
+  [/sitzsack/,                                      'sitzsaecke'],
+  [/rattansessel|korbsessel/,                       'rattansessel'],
   [/ohrensessel/,                                   'ohrensessel'],
-  [/ecksofa|eckcouch|wohnlandschaft/,               'ecksofas'],
+  [/relaxsessel/,                                   'relaxsessel'],
+  [/fernsehsessel|tv-sessel/,                       'fernsehsessel'],
+  [/schlafsessel/,                                  'schlafsessel'],
+  [/drehsessel/,                                    'drehsessel'],
+  [/cocktailsessel|loungesessel/,                   'cocktailsessel'],
+  [/ledersessel/,                                   'ledersessel'],
+  [/recamiere|récamière|récamiere|ottomane|chaiselongue/, 'ottomanen'],
+  [/relaxliege/,                                    'relaxliegen'],
+  [/schlafsofa|schlafcouch|bettsofa/,               'schlafsofas'],
+  [/wohnlandschaft|u-sofa|big-sofa|bigsofa/,        'wohnlandschaften'],
+  [/ecksofa|eckcouch|ecksofas/,                     'ecksofas'],
+  [/ledersofa|ledercouch/,                          'ledersofas'],
+  [/2-sitzer|zweisitzer/,                           '2-sitzer'],
+  [/3-sitzer|dreisitzer/,                           '3-sitzer'],
   [/sofa|couch(?!tisch)/,                           'sofas'],
   [/sessel/,                                        'sessel'],
+  [/barhocker|tresenhocker/,                        'barhocker'],
+  [/polsterhocker|fußhocker|pouf/,                  'polsterhocker'],
+  [/hocker/,                                        'hocker'],
+  [/sitzbank|bank\b|bänke/,                         'baenke'],
+  [/freischwinger/,                                 'freischwinger'],
+  [/klappstuhl/,                                    'klappstuehle'],
+  [/küchenstuhl/,                                   'kuechenstuehle'],
+  [/polsterstuhl/,                                  'polsterstuehle'],
+  [/esszimmerstuhl|esstischstuhl|armlehnstuhl/,     'esszimmerstuehle'],
+  [/stuhl|stühle/,                                  'stuehle'],
+  // Beds
+  [/hochbett|etagenbett/,                           'hochbetten'],
+  [/kinderbett/,                                    'kinderbetten'],
   [/boxspring/,                                     'boxspringbetten'],
   [/polsterbett/,                                   'polsterbetten'],
-  [/nachttisch/,                                    'nachttische'],
-  [/couchtisch|sofatisch/,                          'couchtische'],
-  [/beistelltisch/,                                 'beistelltische'],
-  [/konsole/,                                       'konsolentische'],
+  [/metallbett/,                                    'metallbetten'],
+  [/massivholzbett|holzbett/,                       'massivholzbetten'],
+  [/gästebett/,                                     'gaestebetten'],
+  [/bettgestell|bettrahmen/,                        'bettgestelle'],
+  [/doppelbett/,                                    'doppelbetten'],
+  [/einzelbett/,                                    'einzelbetten'],
+  // Tables
+  [/nachttisch|nachtkonsole|nachtschrank/,          'nachttische'],
+  [/schminktisch|frisiertisch|frisierkommode/,      'schminktische'],
+  [/eckschreibtisch/,                               'eckschreibtische'],
+  [/kinderschreibtisch/,                            'kinderschreibtische'],
   [/schreibtisch/,                                  'schreibtische'],
-  [/esstisch|tisch/,                                'esstische'],
-  [/esszimmerstuhl/,                                'esszimmerstuehle'],
-  [/stuhl|stühle/,                                  'stuehle'],
-  [/hocker/,                                        'hocker'],
-  [/bank\b|bänke/,                                  'baenke'],
-  [/bücherregal/,                                   'buecherregale'],
-  [/regal/,                                         'regale'],
+  [/couchtisch|sofatisch|wohnzimmertisch/,          'couchtische'],
+  [/beistelltisch|satztisch/,                       'beistelltische'],
+  [/konsole|konsolentisch|wandtisch/,               'konsolentische'],
+  [/bartisch|stehtisch/,                            'bartische'],
+  [/servierwagen|rollwagen|teewagen/,               'servierwagen'],
+  [/esstisch|küchentisch|esszimmertisch/,           'esstische'],
+  [/tisch/,                                         'tische'],
+  // Storage
   [/kleiderschrank/,                                'kleiderschraenke'],
-  [/schuhschrank/,                                  'schuhschraenke'],
+  [/schuhschrank|schuhregal/,                       'schuhschraenke'],
+  [/dielenschrank/,                                 'dielenschraenke'],
+  [/spiegelschrank/,                                'badezimmer-spiegelschraenke'],
+  [/waschbeckenunterschrank|waschtischunterschrank/, 'waschbeckenunterschraenke'],
+  [/badregal/,                                      'badregale'],
+  [/hochschrank/,                                   'bad-hochschraenke'],
+  [/hängeschrank/,                                  'haengeschraenke'],
   [/vitrine/,                                       'vitrinen'],
+  [/highboard/,                                     'highboards'],
   [/sideboard/,                                     'sideboards'],
-  [/lowboard|tv-board|tv-möbel/,                    'lowboards'],
+  [/lowboard|tv-board|tv-möbel|tv-schrank|tv-bank|fernsehschrank/, 'tv-lowboards'],
+  [/buffet/,                                        'buffets'],
+  [/sekretär/,                                      'sekretaere'],
+  [/wohnwand/,                                      'wohnwaende'],
   [/kommode/,                                       'kommoden'],
-  [/schrank|schränke/,                              'schraenke'],
+  [/weinregal/,                                     'weinregale'],
+  [/wandboard/,                                     'wandboards'],
+  [/wandregal|hängeregal|schweberegal/,             'wandregale'],
+  [/bücherregal/,                                   'buecherregale'],
+  [/kinderregal/,                                   'kinderregale'],
+  [/raumteiler|paravent/,                           'raumteiler'],
+  [/standregal|regal/,                              'regale'],
+  [/kleiderstange|garderobenständer|kleiderständer/, 'kleiderstangen'],
   [/garderobe/,                                     'garderoben'],
-  [/bett\b|bettgestell|betten/,                     'betten'],
-  [/vase/,                                          'vasen-schalen'],
+  [/truhe|kiste/,                                   'truhen-kisten'],
+  [/schrank|schränke/,                              'schraenke'],
+  [/wäschekorb|wäschesammler/,                      'waesche-aufbewahrung'],
+  [/korb|körbe/,                                    'koerbe'],
+  [/aufbewahrungsbox|box\b|boxen/,                  'aufbewahrungsboxen'],
+  // Beds, last so "Bettwäsche", "Bettbank" etc. are caught above
+  [/bett\b|betten/,                                 'betten'],
+  // Decor
+  [/standspiegel|ganzkörperspiegel/,                'standspiegel'],
+  [/wandspiegel/,                                   'wandspiegel'],
   [/spiegel/,                                       'spiegel'],
-  [/bild|poster|kunstdruck/,                        'bilder'],
+  [/bilderrahmen/,                                  'bilderrahmen'],
+  [/bild|poster|kunstdruck|leinwand/,               'bilder'],
+  [/wanduhr|uhr\b/,                                 'uhren'],
+  [/vase/,                                          'vasen-schalen'],
+  [/übertopf|blumentopf|pflanztopf|pflanzkübel/,    'uebertoepfe'],
+  [/schale|schüssel/,                               'dekoschalen'],
   [/tablett/,                                       'tabletts'],
-  [/^uhr|wanduhr/,                                  'uhren'],
+  [/laterne|windlicht/,                             'laternen'],
+  [/kerzenständer|kerzenhalter|kerzenleuchter/,     'kerzenstaender'],
+  [/teelicht/,                                      'teelichthalter'],
+  [/kerze/,                                         'kerzen-teelichter'],
+  [/figur|skulptur|deko/,                           'dekoartikel'],
 ];
-// Colour word stem -> Höffner colour slug (only slugs Höffner knows)
+// Never Höffner, even when a word above would match (e.g. "Teppichboden",
+// "Olivenbaum im Topf", "LED Streifen"). Applies to the whole name
+// unless the first word itself names a Höffner category.
+const HOEFFNER_EXCLUDE_RE = /vinyl|laminat|parkett|fliese|tapete|wandfarbe|teppichboden|bodenbelag|sockelleiste|led-?streifen|led strip|lichterkette|glühbirne|leuchtmittel|smart plug|steckdose|kabel/;
+
+// Colour word -> Höffner colour slug (only slugs Höffner accepts)
 const HOEFFNER_COLOURS = [
-  [/^(weiß|weiss)/,                     'weiss'],
-  [/^schwarz/,                          'schwarz'],
-  [/^(grau|anthrazit)/,                 'grau'],
-  [/^(braun|cognac|nussbaum|walnuss)/,  'braun'],
-  [/^creme/,                            'creme'],
-  [/^(beige|taupe|sand)/,               'beige'],
-  [/^(blau|petrol|navy)/,               'blau'],
-  [/^(grün|gruen|salbei|oliv)/,         'gruen'],
-  [/^(rot|bordeaux)(e|er|es|en)?$/,     'rot'],
-  [/^(gelb|senf|ocker)/,                'gelb'],
-  [/^(orange|terrakotta|terracotta)/,   'orange'],
-  [/^(rosa|altrosa)/,                   'rosa'],
-  [/^pink/,                             'pink'],
-  [/^(lila|violett)/,                   'lila'],
-  [/^(gold|messing)/,                   'gold'],
-  [/^(silber|chrom)/,                   'silber'],
+  [/^hellgrau/,                                     'hellgrau'],
+  [/^dunkelgrau/,                                   'dunkelgrau'],
+  [/^hellbraun/,                                    'hellbraun'],
+  [/^dunkelbraun/,                                  'dunkelbraun'],
+  [/^(weiß|weiss|schneeweiß)/,                      'weiss'],
+  [/^(off-?white|ecru|elfenbein|creme|cremeweiß)/,  'creme'],
+  [/^schwarz/,                                      'schwarz'],
+  [/^(grau|anthrazit|steingrau)/,                   'grau'],
+  [/^(braun|cognac|nussbaum|walnuss|schoko|mokka|karamell)/, 'braun'],
+  [/^(beige|taupe|sand|champagner|hafer|greige)/,   'beige'],
+  [/^(petrol)/,                                     'petrol'],
+  [/^(türkis|tuerkis|mint)/,                        'tuerkis'],
+  [/^(blau|navy|marine|dunkelblau|hellblau)/,       'blau'],
+  [/^(grün|gruen|salbei|oliv|tannengrün|smaragd)/,  'gruen'],
+  [/^(rot|bordeaux|weinrot)(e|er|es|en|em)?$/,      'rot'],
+  [/^(gelb|senf|ocker|curry)/,                      'gelb'],
+  [/^(orange|terrakotta|terracotta)|^rost(rot|farben|braun)?$/, 'orange'],
+  [/^(rosa|altrosa|rosé|rose)$|^(rosa|altrosa)/,    'rosa'],
+  [/^pink/,                                         'pink'],
+  [/^(lila|violett|aubergine|lavendel|flieder)/,    'lila'],
+  [/^(kupfer)/,                                     'kupfer'],
+  [/^(gold|messing)/,                               'gold'],
+  [/^(silber|chrom)/,                               'silber'],
+  [/^(klar|glasklar)$/,                             'klar'],
 ];
 
-function hoeffnerUrl(q) {
-  const words = q.trim().toLowerCase().split(/\s+/);
+function hoeffnerSlug(name) {
+  const words = (name || '').trim().toLowerCase().split(/\s+/);
   const find = text => (HOEFFNER_CATEGORIES.find(([re]) => re.test(text)) || [])[1];
-  // The product type is usually the first word; only if that doesn't
-  // match look at the whole name (e.g. "Großer Spiegel rund").
-  const slug = find(words[0]) || find(words.join(' '));
+  // The product type is usually the first word; trust it if it matches
+  // (unless it's a filler word like "Deko" in "Deko Schale Holz").
+  const first = /^(deko|set|design|moderne?[rs]?)$/.test(words[0]) ? null : find(words[0]);
+  if (first && !HOEFFNER_EXCLUDE_RE.test(words[0])) return first;
+  const all = words.join(' ');
+  if (HOEFFNER_EXCLUDE_RE.test(all) || PLANT_RE.test(all)) return null;
+  return find(all) || null;
+}
+
+function hoeffnerUrl(q) {
+  const slug = hoeffnerSlug(q);
   if (!slug) {
     return `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q.trim().split(/\s+/).slice(0, 3).join(' '))}`;
   }
   let colour = null;
-  for (const w of words) {
-    const hit = HOEFFNER_COLOURS.find(([re]) => re.test(w));
+  for (const w of q.trim().toLowerCase().split(/[\s-]+/)) {
+    // "dunkelgrün" -> "grün" (Höffner only has hell/dunkel for grau, braun)
+    const hit = HOEFFNER_COLOURS.find(([re]) => re.test(w))
+             || HOEFFNER_COLOURS.find(([re]) => re.test(w.replace(/^(dunkel|hell|tief|zart|pastell|knall)/, '')));
     if (hit) { colour = hit[1]; break; }
   }
   return `https://www.hoeffner.de/${slug}${colour ? '__' + colour : ''}`;
@@ -7717,6 +7846,8 @@ function isShopUsable(key) {
 function getShopsForProduct(p) {
   const text = `${p.category || ''} ${p.name || ''}`.toLowerCase();
   const picked = [];
+  // Höffner first whenever it has a matching category (only affiliate shop so far)
+  if (hoeffnerSlug(p.name)) picked.push('hoeffner');
   for (const r of SHOP_ROUTES) {
     if (!r.match.test(text)) continue;
     if (r.needs && !r.needs.test(text)) continue;
