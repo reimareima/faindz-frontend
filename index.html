@@ -7564,6 +7564,7 @@ if (logoWrap) {
 //   2. set `active: true`
 // The link is then wrapped in an Awin deeplink automatically.
 const AWIN_PUBLISHER_ID = '2903059';
+const COLOUR_RE = /^(schwarz|weiß|weiss|grau|anthrazit|braun|beige|creme|cognac|taupe|natur|blau|grün|gruen|rot|gelb|senf|orange|rosa|pink|lila|petrol|türkis|gold|silber|messing|eiche|nussbaum|walnuss)/i;
 
 const SHOPS = {
   amazon:     { name: 'Amazon',      color: '#FF9900', active: true,
@@ -7580,9 +7581,16 @@ const SHOPS = {
   teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: false, search: null },
   dublino:    { name: 'Dublino',       color: '#A0785A', awinMid: 50865,  active: false, search: null },
   // Approved 03.11.2026. Höffner's search gets fuzzy with long queries,
-  // so only the first 3 words are sent.
+  // so only the first 3 words are sent, plus a colour word if one got cut off
+  // (Höffner's colour filter can't be set via URL, the word does the job).
   hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: true,
-                search: q => `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(q.trim().split(/\s+/).slice(0, 3).join(' '))}` },
+                search: q => {
+                  const words = q.trim().split(/\s+/);
+                  const short = words.slice(0, 3);
+                  const colour = words.slice(3).find(w => COLOUR_RE.test(w));
+                  if (colour && !short.some(w => COLOUR_RE.test(w))) short.push(colour);
+                  return `https://www.hoeffner.de/suche?anfrage=${encodeURIComponent(short.join(' '))}`;
+                } },
   vidaxl:     { name: 'vidaXL',        color: '#C8102E', awinMid: 57681,  active: false, search: null },
   rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: false, search: null },
   sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
