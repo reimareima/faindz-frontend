@@ -7595,7 +7595,11 @@ const LAMP_RE = /lampe|leuchte|licht|lamp|lighting|beleuchtung/;
 // Floors, walls and fittings: no furniture shop sells these well,
 // even when the AI files them under MÖBEL.
 const NOT_FURNITURE_RE = /boden|vinyl|laminat|parkett|fliese|tapete|wandfarbe|paneel|leiste|sockel|floor|wallpaper|paint/;
+// Plants (real or artificial) aren't Höffner's thing -> Amazon/OTTO.
+// "Kunstpflanze" would otherwise hit the deco route via "kunst".
+const PLANT_RE = /pflanze|baum|monstera|olive|ficus|palme|kaktus|eukalyptus|farn|bonsai/;
 const SHOP_ROUTES = [
+  { match: /korb|körbe/,                                                            shops: ['hoeffner'] },
   { match: /teppich|läufer|fußmatte|\brugs?\b/,                                   shops: ['rugvista', 'teppichde', 'hoeffner'] },
   { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams', 'hoeffner'] },
   { match: /bettwäsche|kissen|plaid|\w*decke\b|überwurf|handtuch|\bbezug|bedding|cushion|pillow|throw/,
@@ -7604,7 +7608,7 @@ const SHOP_ROUTES = [
   { match: /tisch|stuhl|regal|schrank|kommode|sideboard|\bbett\b|bettgestell|hocker|\bbank\b|vitrine|konsole|möbel|furniture|seating|storage|aufbewahrung|sitzmöbel/,
     unless: { test: t => LAMP_RE.test(t) || NOT_FURNITURE_RE.test(t) },             shops: ['naduvi', 'dublino', 'hoeffner', 'vidaxl'] },
   { match: /vase|deko|skulptur|figur|kerze|spiegel|\bbild|poster|kunst|wandbild|\bart\b|decor|übertopf|blumentopf|tablett|schale|keramik/,
-    unless: LAMP_RE,                                                                shops: ['naduvi', 'hoeffner', 'etsy'] },
+    unless: { test: t => LAMP_RE.test(t) || PLANT_RE.test(t) },                     shops: ['naduvi', 'hoeffner', 'etsy'] },
   { match: LAMP_RE, unless: /streifen|strip|lichterkette|glühbirne|leuchtmittel/,  shops: ['hoeffner'] },
 ];
 const SHOP_FALLBACK = ['amazon', 'otto'];
@@ -7623,6 +7627,8 @@ const HOEFFNER_CATEGORIES = [
   [/deckenlampe|deckenleuchte/,                     'deckenleuchten'],
   [/wandlampe|wandleuchte/,                         'wandleuchten'],
   [/bettwäsche/,                                    'bettwaesche'],
+  [/wäschekorb/,                                    'waesche-aufbewahrung'],
+  [/korb|körbe/,                                    'koerbe'],
   [/kissen/,                                        'kissen'],
   [/decke|plaid|überwurf/,                          'dekokissen-decken'],
   [/vorhang|vorhänge|gardine/,                      'vorhaenge'],
