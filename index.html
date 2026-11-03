@@ -7899,9 +7899,7 @@ function buildShopActions(p, opts = {}) {
   const variant = opts.variant || 'card';
   const [best, ...more] = shops;
   const b = SHOPS[best];
-  // Awin shops are affiliate links: mark them as "Partner" (advertising)
-  const isPartner = key => !!SHOPS[key].awinMid;
-  const linkAttrs = key => `href="${escapeHtml(shopUrl(key, p.name))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${key}"${isPartner(key) ? ` title="${escapeHtml(t('shop.partnerHint'))}"` : ''}`;
+  const linkAttrs = key => `href="${escapeHtml(shopUrl(key, p.name))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${key}"`;
 
   // Split "Bei {market} ansehen" around the shop name so the
   // prefix/suffix can be hidden on narrow cards.
