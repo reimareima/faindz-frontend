@@ -3318,7 +3318,7 @@
     font-weight: 600;
     letter-spacing: -0.01em;
   }
-  /* Real Höffner product found for this suggestion (see attachHoeffnerMatch) */
+  /* Real product (Höffner or teppich.de) found for this suggestion (see attachShopMatch) */
   .product-meta.has-match { display: block; padding-top: 12px; }
   .product-match {
     display: flex;
@@ -7657,7 +7657,10 @@ const SHOPS = {
   naduvi:     { name: 'NADUVI',        color: '#4F8A6E', awinMid: 25929,  active: false, search: null },
   happylamps: { name: 'Happy Lamps',   color: '#E8A200', awinMid: 29733,  active: false, search: null },
   bassetti:   { name: 'Bassetti',      color: '#B83B5E', awinMid: 99313,  active: false, search: null },
-  teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: false, search: null },
+  // Approved 11.11.2026 (12 % for content publishers). Rugs go here first:
+  // filtered category links (teppichUrl), real products via TeppichMatch.
+  teppichde:  { name: 'teppich.de',    color: '#B4442B', awinMid: 53143,  active: true,
+                search: q => teppichUrl(q) },
   dublino:    { name: 'Dublino',       color: '#A0785A', awinMid: 50865,  active: false, search: null },
   // Approved 03.11.2026. Links go to Höffner category pages with a colour
   // filter where possible (/sessel__gruen), see hoeffnerUrl() below.
@@ -7677,10 +7680,19 @@ const LAMP_RE = /lampe|leuchte|licht|lamp|lighting|beleuchtung/;
 const NOT_FURNITURE_RE = /boden|vinyl|laminat|parkett|fliese|tapete|wandfarbe|paneel|leiste|sockel|floor|wallpaper|paint/;
 const PLANT_RE = /pflanze|baum|monstera|olive|ficus|palme|kaktus|eukalyptus|farn|bonsai|blume|strauß|zweig|gras\b|pampas/;
 
+// Rugs: teppich.de leads (see getShopsForProduct). Table runners, fitted
+// carpet, door mats and real sheepskin aren't what teppich.de sells.
+const RUG_RE = /teppich|läufer|\brugs?\b|badematte|badvorleger|badteppich|vorleger|flokati|kelim|kilim/;
+const NOT_RUG_RE = /tischläufer|treppenläufer|teppichboden|auslegware|kunstrasen|fußmatte|fussmatte|türmatte|schmutzfang|schaffell|lammfell|kuhfell/;
+function isRug(p) {
+  const text = `${p.category || ''} ${p.name || ''} ${p.title || ''}`.toLowerCase();
+  return RUG_RE.test(text) && !NOT_RUG_RE.test(text);
+}
+
 // Routes for the other shops. Höffner is not in here: it is added in
 // getShopsForProduct() whenever HOEFFNER_CATEGORIES has a match.
 const SHOP_ROUTES = [
-  { match: /teppich|läufer|fußmatte|\brugs?\b/,                                   shops: ['rugvista', 'teppichde'] },
+  { match: RUG_RE, unless: { test: t => NOT_RUG_RE.test(t) },                      shops: ['teppichde', 'rugvista'] },
   { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams'] },
   { match: /bettwäsche|kissen|plaid|\w*decke\b|überwurf|handtuch|\bbezug|bedding|cushion|pillow|throw/,
                                                                                     shops: ['bassetti'] },
@@ -7916,6 +7928,43 @@ function hoeffnerUrl(q) {
   return `https://www.hoeffner.de/${slug}${colour ? '__' + colour : ''}`;
 }
 
+// ─── TEPPICH.DE ──────────────────────────────────────────────────
+// First link before the proxy answers: the right category page plus the
+// colour filter. Once TeppichMatch has the result, links switch to the
+// real product (sure match) or to a page filtered by colour, material,
+// shape, pile, style etc. that the proxy built from the feed.
+const TEPPICH_COLOURS = [
+  [/^(schwarz-?wei(ß|ss))/,                                      'dc6c67ba6321447298b00730272b6c3e'],
+  [/^(weiß|weiss)/,                                              'd9a6ed9a18f8422aa02d9a7d871aadbb'],
+  [/^(creme|elfenbein|off-?white|ecru|wollweiß)/,                'd69ddc69e99a41c396d2d5b3054a1586'],
+  [/^(beige|sand|natur|hafer|leinen|camel|taupe|greige)/,        'fedce6da51f1460ebde4a31244efa86d'],
+  [/^(grau|hellgrau|anthrazit|dunkelgrau|silber|charcoal)/,      '061a8b086b6f4a0d976297b74920f300'],
+  [/^schwarz/,                                                   'f67c8fb386f448439e516e94e89321a0'],
+  [/^(braun|cognac|mokka|schoko|karamell|walnuss|kaffee)/,       '044e54dc57b146a0ba2df281369165d5'],
+  [/^(blau|navy|marine|petrol|türkis|tuerkis|indigo)/,           '3fb0000f270e4a0c97baf6f08a86581a'],
+  [/^(grün|gruen|salbei|oliv|mint|smaragd|khaki)/,               'a014ee47c1594a648699659dfa1aed4e'],
+  [/^(gelb|senf|ocker|curry|gold)/,                              '50a0dcf30c204fd2a56001699676ec76'],
+  [/^(rot|bordeaux|weinrot|terrakotta|terracotta|rost|orange|kupfer)/, 'aa68b176289c44f0a93cc081fd241f27'],
+  [/^(rosa|altrosa|rosé|pink|puder)/,                            '3a3d25a0d66949b5bf8bcf60ac18e985'],
+  [/^(lila|violett|lavendel|flieder)/,                           'fe02b186e983438a9e12a88d915553d7'],
+  [/^(bunt|mehrfarbig)/,                                         '61afd70af7a34aaf930c256c79c5197d'],
+];
+function teppichUrl(q) {
+  const text = (q || '').toLowerCase();
+  const path = /badematte|badvorleger|badteppich|badezimmer/.test(text) ? 'badezimmer-teppiche'
+    : /kinderteppich|spielteppich|kinderzimmer/.test(text) ? 'kinderteppiche'
+    : /outdoor|balkon|terrasse|garten/.test(text) ? 'outdoor-teppiche'
+    : /läufer|flur/.test(text) ? 'teppich-laeufer'
+    : /\brund/.test(text) ? 'runde-teppiche'
+    : 'teppiche';
+  let colour = null;
+  for (const w of text.split(/[\s,/]+/)) {
+    const hit = TEPPICH_COLOURS.find(([re]) => re.test(w)) || TEPPICH_COLOURS.find(([re]) => re.test(w.replace(/^(dunkel|hell|zart|pastell)/, '')));
+    if (hit) { colour = hit[1]; break; }
+  }
+  return `https://www.teppich.de/${path}/${colour ? `?properties=${colour}` : ''}`;
+}
+
 const SHOP_MAX = 4;
 
 function isShopUsable(key) {
@@ -7934,21 +7983,40 @@ function getShopsForProduct(p) {
   }
   picked.push(...SHOP_FALLBACK);
   const shops = [...new Set(picked)].filter(isShopUsable);
-  // Höffner leads only when the feed found the exact product (see
-  // HoeffnerMatch). Otherwise the shop with the better search (Amazon)
-  // stays the main button and Höffner sits in the dropdown.
+  // Rugs always lead with teppich.de (product or filtered category);
+  // Höffner is the second option in the dropdown.
+  const rugLead = shops[0] === 'teppichde';
+  // Elsewhere Höffner leads only when the feed found the exact product
+  // (see HoeffnerMatch). Otherwise the shop with the better search
+  // (Amazon) stays the main button and Höffner sits in the dropdown.
   if (hoeffnerSlug(p.name) && isShopUsable('hoeffner')) {
-    if (HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
+    if (!rugLead && HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
     else shops.splice(1, 0, 'hoeffner');
   }
   return shops.slice(0, SHOP_MAX);
 }
 
-function shopUrl(key, query) {
+function awinWrap(key, target) {
   const s = SHOPS[key];
-  const target = s.search(query);
   if (!s.awinMid) return target;
   return `https://www.awin1.com/cread.php?awinmid=${s.awinMid}&awinaffid=${AWIN_PUBLISHER_ID}&ued=${encodeURIComponent(target)}`;
+}
+
+function shopUrl(key, query) {
+  return awinWrap(key, SHOPS[key].search(query));
+}
+
+// Best link for a shop: the matched product if the feed is sure, for
+// teppich.de otherwise its filtered category page, else the search link.
+function productShopUrl(key, p) {
+  if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
+  if (key === 'teppichde') {
+    const best = TeppichMatch.bestSync(p);
+    if (best) return best.link;
+    const url = TeppichMatch.urlSync(p);
+    return url ? awinWrap(key, url) : shopUrl(key, `${p.name || ''} ${p.title || ''}`);
+  }
+  return shopUrl(key, p.name);
 }
 
 const SHOP_ICON_OUT = `<svg class="shop-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>`;
@@ -7964,7 +8032,7 @@ function buildShopActions(p, opts = {}) {
   const variant = opts.variant || 'card';
   const [best, ...more] = shops;
   const b = SHOPS[best];
-  const hrefFor = key => (key === 'hoeffner' && HoeffnerMatch.bestSync(p)?.link) || shopUrl(key, p.name);
+  const hrefFor = key => productShopUrl(key, p);
   const linkAttrs = key => `href="${escapeHtml(hrefFor(key))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${key}"`;
 
   // Split "Bei {market} ansehen" around the shop name so the
@@ -8012,8 +8080,10 @@ function buildShopActions(p, opts = {}) {
 // real price, and every Höffner link goes straight to it. Otherwise
 // nothing changes: the category link from hoeffnerUrl() stays.
 // All cards rendered in the same tick are sent as ONE request.
-const HoeffnerMatch = (() => {
-  const cache = new Map();      // key -> { sure, results } | null
+// The same machinery serves teppich.de (shop: 'teppichde'), whose answer
+// also carries `url`: a teppich.de page filtered to what was asked.
+function makeProductMatch(shop) {
+  const cache = new Map();      // key -> { sure, url, results } | null
   const pending = new Map();    // key -> [resolve, ...]
   let queue = [];
   let timer = null;
@@ -8032,6 +8102,7 @@ const HoeffnerMatch = (() => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          shop,
           limit: 4,
           items: batch.map(({ p }) => ({ text: p.name || '', alt: productTitle(p), material: p.material || '', price: p.price_range || '' })),
         }),
@@ -8064,9 +8135,16 @@ const HoeffnerMatch = (() => {
     const r = cache.get(keyOf(p));
     return r && r.sure && r.results && r.results[0] ? r.results[0] : null;
   }
+  // Synchronous: the filtered shop page if already known (teppich.de)
+  function urlSync(p) {
+    const r = cache.get(keyOf(p));
+    return (r && r.url) || null;
+  }
 
-  return { get, bestSync };
-})();
+  return { get, bestSync, urlSync };
+}
+const HoeffnerMatch = makeProductMatch('hoeffner');
+const TeppichMatch = makeProductMatch('teppichde');
 
 function formatEuro(v) {
   const n = Number(v) || 0;
@@ -8075,35 +8153,63 @@ function formatEuro(v) {
   }).format(n);
 }
 
-// Fill a rendered card with its Höffner match once it arrives
-function attachHoeffnerMatch(card, p) {
-  if (!card || !getShopsForProduct(p).includes('hoeffner')) return;
+// Rebuild a card's shop buttons once a match has changed what they link to
+function refreshShopActions(card, p) {
+  const actions = card.querySelector('.shop-actions');
+  if (!actions) return;
+  const fresh = buildShopActions(p, { variant: 'card' });
+  if (fresh) actions.outerHTML = fresh;
+}
+
+// Show the real product (photo, title, price) in place of the price range
+function showProductMatch(card, best, shop) {
+  const meta = card.querySelector('.product-meta');
+  if (!meta) return;
+  const old = best.oldPrice ? `<s class="product-match-old">${escapeHtml(formatEuro(best.oldPrice))}</s>` : '';
+  meta.classList.add('has-match');
+  meta.innerHTML = `
+    <a class="product-match" href="${escapeHtml(best.link)}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${shop}">
+      <span class="product-match-img"><img src="${escapeHtml(best.image)}" alt="" loading="lazy" decoding="async"></span>
+      <span class="product-match-body">
+        <span class="product-match-title">${escapeHtml(best.title)}</span>
+        <span class="product-match-price">${escapeHtml(formatEuro(best.price))}${old}</span>
+      </span>
+    </a>`;
+  const img = meta.querySelector('img');
+  img.addEventListener('error', () => meta.querySelector('.product-match-img').remove(), { once: true });
+}
+
+// Fill a rendered card with its feed matches once they arrive
+function attachShopMatch(card, p) {
+  if (!card) return;
+  const shops = getShopsForProduct(p);
+
+  // Rugs: teppich.de leads. A sure match shows that rug; otherwise its
+  // links go to the teppich.de page filtered to colour, material, shape …
+  if (shops[0] === 'teppichde') {
+    TeppichMatch.get(p).then(r => {
+      if (!r || !card.isConnected) return;
+      refreshShopActions(card, p);
+      const best = r.sure && r.results && r.results[0];
+      if (best) showProductMatch(card, best, 'teppichde');
+    });
+    // Höffner stays in the dropdown, with its product link if it has one
+    if (shops.includes('hoeffner')) {
+      HoeffnerMatch.get(p).then(r => {
+        if (r && r.sure && card.isConnected) refreshShopActions(card, p);
+      });
+    }
+    return;
+  }
+
+  if (!shops.includes('hoeffner')) return;
   HoeffnerMatch.get(p).then(r => {
     const best = r && r.sure && r.results && r.results[0];
     if (!best || !card.isConnected) return;
-
     // Höffner becomes the main button and every Höffner link opens the product
-    const actions = card.querySelector('.shop-actions');
-    if (actions) {
-      const fresh = buildShopActions(p, { variant: 'card' });
-      if (fresh) actions.outerHTML = fresh;
-    }
+    refreshShopActions(card, p);
     card.querySelectorAll('a[data-shop="hoeffner"]').forEach(a => { a.href = best.link; });
-
-    const meta = card.querySelector('.product-meta');
-    if (!meta) return;
-    const old = best.oldPrice ? `<s class="product-match-old">${escapeHtml(formatEuro(best.oldPrice))}</s>` : '';
-    meta.classList.add('has-match');
-    meta.innerHTML = `
-      <a class="product-match" href="${escapeHtml(best.link)}" target="_blank" rel="sponsored noopener noreferrer" data-shop="hoeffner">
-        <span class="product-match-img"><img src="${escapeHtml(best.image)}" alt="" loading="lazy" decoding="async"></span>
-        <span class="product-match-body">
-          <span class="product-match-title">${escapeHtml(best.title)}</span>
-          <span class="product-match-price">${escapeHtml(formatEuro(best.price))}${old}</span>
-        </span>
-      </a>`;
-    const img = meta.querySelector('img');
-    img.addEventListener('error', () => meta.querySelector('.product-match-img').remove(), { once: true });
+    showProductMatch(card, best, 'hoeffner');
   });
 }
 
@@ -9359,7 +9465,7 @@ function buildProductCard(p, i, opts = {}) {
       if (main) main.click();
     });
   }
-  attachHoeffnerMatch(card, p);
+  attachShopMatch(card, p);
   return card;
 }
 
