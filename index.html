@@ -7979,8 +7979,17 @@ function getShopsForProduct(p) {
   }
   picked.push(...SHOP_FALLBACK);
   const shops = [...new Set(picked)].filter(isShopUsable);
-  // Rugs always lead with teppich.de (product or filtered category);
-  // Höffner is the second option in the dropdown.
+  // Rugs lead with teppich.de (real rug, or its page filtered to everything
+  // asked). If teppich.de has neither (no green wool rugs, no kelims), the
+  // shop with the broader range leads and teppich.de moves to the dropdown.
+  if (shops[0] === 'teppichde') {
+    const r = TeppichMatch.resultSync(p);
+    if (r && !r.sure && r.complete === false && shops.length > 1) {
+      shops.splice(0, 1);
+      shops.splice(1, 0, 'teppichde');
+    }
+  }
+  // While teppich.de leads, Höffner is the second option in the dropdown.
   const rugLead = shops[0] === 'teppichde';
   // Elsewhere Höffner leads only when the feed found the exact product
   // (see HoeffnerMatch). Otherwise the shop with the better search
@@ -8136,8 +8145,10 @@ function makeProductMatch(shop) {
     const r = cache.get(keyOf(p));
     return (r && r.url) || null;
   }
+  // Synchronous: the whole answer, if already known
+  function resultSync(p) { return cache.get(keyOf(p)) || null; }
 
-  return { get, bestSync, urlSync };
+  return { get, bestSync, urlSync, resultSync };
 }
 const HoeffnerMatch = makeProductMatch('hoeffner');
 const TeppichMatch = makeProductMatch('teppichde');
@@ -8187,17 +8198,20 @@ function attachShopMatch(card, p) {
 
   // Rugs: teppich.de leads. A sure match shows that rug; otherwise its
   // links go to the teppich.de page filtered to colour, material, shape …
-  if (shops[0] === 'teppichde') {
+  if (shops.includes('teppichde') && isRug(p)) {
     TeppichMatch.get(p).then(r => {
       if (!r || !card.isConnected) return;
       refreshShopActions(card, p);
       const best = r.sure && r.results && r.results[0];
       if (best) showProductMatch(card, best, 'teppichde');
     });
-    // Höffner stays in the dropdown, with its product link if it has one
+    // Höffner: its product link in the dropdown; and if teppich.de doesn't
+    // have the rug but Höffner does, Höffner's rug is the one shown
     if (shops.includes('hoeffner')) {
-      HoeffnerMatch.get(p).then(r => {
-        if (r && r.sure && card.isConnected) refreshShopActions(card, p);
+      Promise.all([HoeffnerMatch.get(p), TeppichMatch.get(p)]).then(([h]) => {
+        if (!h || !h.sure || !card.isConnected) return;
+        refreshShopActions(card, p);
+        if (!TeppichMatch.bestSync(p) && getShopsForProduct(p)[0] === 'hoeffner') showProductMatch(card, h.results[0], 'hoeffner');
       });
     }
     return;
