@@ -8171,8 +8171,13 @@ function showProductMatch(card, best, shop) {
         <span class="product-match-price">${escapeHtml(formatEuro(best.price))}${old}</span>
       </span>
     </a>`;
+  // The shop's own picture first; if it doesn't load, Awin's copy; else no picture
   const img = meta.querySelector('img');
-  img.addEventListener('error', () => meta.querySelector('.product-match-img').remove(), { once: true });
+  img.addEventListener('error', function onErr() {
+    if (best.image2 && img.src !== best.image2) { img.src = best.image2; return; }
+    img.removeEventListener('error', onErr);
+    meta.querySelector('.product-match-img')?.remove();
+  });
 }
 
 // Fill a rendered card with its feed matches once they arrive
