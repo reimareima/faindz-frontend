@@ -201,6 +201,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 .shop-item .name { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; }
 .shop-item .mat { font-size: 15px; color: var(--muted); flex: 1; }
 .shop-item .pill { align-self: flex-start; margin-top: 8px; }
+/* link to the real product in a partner shop (looks like the app's shop button) */
+.pill-shop { color: #fff; background: var(--ink); }
+.pill-shop:hover { transform: translateY(-2px); background: #000; }
+.mz-footer .disclosure { flex-basis: 100%; font-size: 13px; line-height: 1.5; }
 
 /* Desktop: show every piece, wrap instead of hidden horizontal scroll */
 @media (min-width: 721px) {
