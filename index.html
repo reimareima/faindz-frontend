@@ -7649,7 +7649,7 @@ const SHOPS = {
   amazon:     { name: 'Amazon',      color: '#FF9900', active: true,
                 search: q => `https://www.amazon.de/s?k=${encodeURIComponent(q)}` },
   otto:       { name: 'OTTO',        color: '#D6011A', active: true,
-                search: q => `https://www.otto.de/suche/${encodeURIComponent(q)}/` },
+                search: q => `https://www.otto.de/suche/${encodeURIComponent(q.toLowerCase())}/` },
   etsy:       { name: 'Etsy',        color: '#F1641E', active: true,
                 search: q => `https://www.etsy.com/de/search?q=${encodeURIComponent(q)}` },
 
@@ -7875,10 +7875,6 @@ const HOEFFNER_EXCLUDE_RE = /vinyl|laminat|parkett|fliese|tapete|wandfarbe|teppi
 
 // Colour word -> Höffner colour slug (only slugs Höffner accepts)
 const HOEFFNER_COLOURS = [
-  [/^hellgrau/,                                     'hellgrau'],
-  [/^dunkelgrau/,                                   'dunkelgrau'],
-  [/^hellbraun/,                                    'hellbraun'],
-  [/^dunkelbraun/,                                  'dunkelbraun'],
   [/^(weiß|weiss|schneeweiß)/,                      'weiss'],
   [/^(off-?white|ecru|elfenbein|creme|cremeweiß)/,  'creme'],
   [/^schwarz/,                                      'schwarz'],
@@ -7920,7 +7916,7 @@ function hoeffnerUrl(q) {
   }
   let colour = null;
   for (const w of q.trim().toLowerCase().split(/[\s-]+/)) {
-    // "dunkelgrün" -> "grün" (Höffner only has hell/dunkel for grau, braun)
+    // "dunkelgrün" -> "grün", "hellgrau" -> "grau" (Höffner ignores hell/dunkel filters, checked 12.11.2026)
     const hit = HOEFFNER_COLOURS.find(([re]) => re.test(w))
              || HOEFFNER_COLOURS.find(([re]) => re.test(w.replace(/^(dunkel|hell|tief|zart|pastell|knall)/, '')));
     if (hit) { colour = hit[1]; break; }
