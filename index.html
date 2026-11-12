@@ -7683,7 +7683,7 @@ const PLANT_RE = /pflanze|baum|monstera|olive|ficus|palme|kaktus|eukalyptus|farn
 // Rugs: teppich.de leads (see getShopsForProduct). Table runners, fitted
 // carpet, door mats and real sheepskin aren't what teppich.de sells.
 const RUG_RE = /teppich|läufer|\brugs?\b|badematte|badvorleger|badteppich|vorleger|flokati|kelim|kilim/;
-const NOT_RUG_RE = /tischläufer|treppenläufer|teppichboden|auslegware|kunstrasen|fußmatte|fussmatte|türmatte|schmutzfang|schaffell|lammfell|kuhfell/;
+const NOT_RUG_RE = /wandteppich|wandbehang|makramee|tischläufer|treppenläufer|teppichboden|auslegware|kunstrasen|fußmatte|fussmatte|türmatte|schmutzfang|schaffell|lammfell|kuhfell/;
 function isRug(p) {
   const text = `${p.category || ''} ${p.name || ''} ${p.title || ''}`.toLowerCase();
   return RUG_RE.test(text) && !NOT_RUG_RE.test(text);
