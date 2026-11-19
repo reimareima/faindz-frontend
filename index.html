@@ -9660,7 +9660,26 @@ function renderInspoPreview(products) {
   inspoPreview.classList.add('show');
 }
 
+// Big pieces that are NOT in the product list must stay exactly as in the
+// photo. Otherwise the image model "freshens up" the sofa or bed and the
+// user sees a new piece with no card to shop it.
+const KEEP_IF_UNLISTED = [
+  [/sofa(?!kissen|tisch)|couch(?!tisch)|wohnlandschaft|husse/, 'sofa/couch'],
+  [/\bbett\b|bettgestell|boxspring|polsterbett|doppelbett|kopfteil/, 'bed and headboard'],
+  [/sessel/, 'armchairs'],
+  [/esstisch|küchentisch/, 'dining table'],
+  [/stuhl|stühle|bank\b/, 'chairs'],
+  [/schrank|kleiderschrank|kommode|sideboard|regal/, 'cabinets, wardrobes and shelves'],
+];
+function guardUnlistedFurniture(imagePrompt, products) {
+  const listed = (products || []).map(p => `${p.name || ''} ${p.title || ''}`.toLowerCase()).join(' | ');
+  const keep = KEEP_IF_UNLISTED.filter(([re]) => !re.test(listed)).map(([, label]) => label);
+  if (!keep.length || /Only the listed new products may be added/.test(imagePrompt)) return imagePrompt;
+  return `${imagePrompt}\n\nIMPORTANT: Only the listed new products may be added or replaced. Keep any existing ${keep.join(', ')} exactly as in the original photo — same shape, size, fabric, colour and position; do not replace, reupholster, recolour or add new ones.`;
+}
+
 async function generateVisualization(imagePrompt, products) {
+  imagePrompt = guardUnlistedFurniture(imagePrompt, products);
   const visualization = $('visualization');
   const vizBefore = $('vizBefore');
   const vizAfterContainer = $('vizAfterContainer');
@@ -10319,7 +10338,7 @@ WAS DU ÄNDERN MUSST (wenn der Zielstil es verlangt):
 - Beleuchtungsstimmung → warm vs. kühl, hell vs. gedämpft
 - Alle Lampen, Teppiche, Textilien, Throws, Kissen
 - Pflanzen + Pflanzgefäße
-- Polsterstoff/-farbe der Sofas — wenn der Zielstil das verlangt (Boho → Bouclé/Leinen, Industrial → Leder, etc.). Sofa-FORM bleibt.
+- Polsterstoff/-farbe der Sofas — wenn der Zielstil das verlangt (Boho → Bouclé/Leinen, Industrial → Leder, etc.). Sofa-FORM bleibt. Dann MUSS dafür ein Produkt in products stehen (Sofa im neuen Stoff oder passende Sofahusse) — alles, was im Bild neu aussieht, braucht eine Produktkarte.
 - Beistelltische, Hocker, kleine Möbel — alles veränderbar
 - Gesamte Deko-Welt
 
@@ -10362,7 +10381,7 @@ WHAT YOU MUST CHANGE (when the target style requires it):
 - Lighting mood → warm vs cool, bright vs dim
 - All lighting, rugs, textiles, throws, pillows
 - Plants + planters
-- Sofa upholstery fabric/color — when the target style demands (boho → bouclé/linen, industrial → leather, etc.). Sofa SHAPE stays.
+- Sofa upholstery fabric/color — when the target style demands (boho → bouclé/linen, industrial → leather, etc.). Sofa SHAPE stays. Then a product for it MUST be in products (the sofa in the new fabric or a matching sofa cover) — everything that looks new in the image needs a product card.
 - Side tables, ottomans, small furniture — all changeable
 - Entire decor world
 
