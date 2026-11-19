@@ -7667,7 +7667,10 @@ const SHOPS = {
   hoeffner:   { name: 'Möbel Höffner', short: 'Höffner', color: '#E2001A', awinMid: 11863,  active: true,
                 search: q => hoeffnerUrl(q) },
   vidaxl:     { name: 'vidaXL',        color: '#C8102E', awinMid: 57681,  active: false, search: null },
-  rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: false, search: null },
+  // Approved 18.11.2026 (8 %). ~14.700 rugs incl. wool, jute, kelim,
+  // Persian and Berber pieces; real products via RugvistaMatch.
+  rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: true,
+                search: q => rugvistaUrl(q) },
   sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
 };
 
@@ -7961,7 +7964,58 @@ function teppichUrl(q) {
   return `https://www.teppich.de/${path}/${colour ? `?properties=${colour}` : ''}`;
 }
 
+// ─── RUGVISTA ────────────────────────────────────────────────────
+// First link before the proxy answers: /c/teppiche/<colour>. Afterwards
+// RugvistaMatch gives the real rug or a page filtered by colour,
+// material, shape, pattern (built from the feed by the proxy).
+const RUGVISTA_COLOURS = [
+  [/^(weiß|weiss|creme|elfenbein|off-?white|ecru|wollweiß|naturweiß)/, 'weiss'],
+  [/^(beige|sand|natur|hafer|leinen|camel|taupe|greige)/,               'beige'],
+  [/^(grau|hellgrau|anthrazit|dunkelgrau|silber|charcoal)/,             'grau'],
+  [/^schwarz/,                                                          'schwarz'],
+  [/^(braun|cognac|mokka|schoko|karamell|walnuss|kaffee)/,              'braun'],
+  [/^(türkis|tuerkis|petrol)/,                                          'tuerkis'],
+  [/^(blau|navy|marine|indigo)/,                                        'blau'],
+  [/^(grün|gruen|salbei|oliv|mint|smaragd|khaki)/,                      'gruen'],
+  [/^(gelb|senf|ocker|curry|gold)/,                                     'gelb'],
+  [/^(terrakotta|terracotta|rost|orange|kupfer)/,                       'orange'],
+  [/^(rot|bordeaux|weinrot)/,                                           'rot'],
+  [/^(rosa|altrosa|rosé|pink|puder)/,                                   'rosa'],
+  [/^(lila|violett|lavendel|flieder)/,                                  'lila'],
+  [/^(bunt|mehrfarbig)/,                                                'mehrfarbig'],
+];
+function rugvistaUrl(q) {
+  const text = (q || '').toLowerCase();
+  if (/badematte|badvorleger|badteppich|badezimmer/.test(text)) return 'https://www.rugvista.de/c/badematten';
+  const parts = [];
+  if (/kinderteppich|spielteppich|kinderzimmer/.test(text)) parts.push('kinderzimmer');
+  for (const w of text.split(/[\s,/]+/)) {
+    const hit = RUGVISTA_COLOURS.find(([re]) => re.test(w)) || RUGVISTA_COLOURS.find(([re]) => re.test(w.replace(/^(dunkel|hell|zart|pastell)/, '')));
+    if (hit) { parts.push(hit[1]); break; }
+  }
+  if (/läufer|flur/.test(text)) parts.push('laeufer');
+  else if (/\brund/.test(text)) parts.push('rund');
+  return `https://www.rugvista.de/c/teppiche${parts.length ? '/' + parts.join('/') : ''}`;
+}
+
 const SHOP_MAX = 4;
+const RUG_SHOPS = ['teppichde', 'rugvista'];
+const RUG_MATCH = () => ({ teppichde: TeppichMatch, rugvista: RugvistaMatch });
+
+// Which rug shop leads, once the feeds have answered:
+//  1. a shop that has THE rug (sure match): teppich.de, then Rugvista
+//  2. a shop whose filtered page covers everything asked
+//  3. nobody: the general shop (Amazon) leads, rug shops in the dropdown
+// Before the answers arrive the order stays teppich.de, Rugvista.
+function rugLeader(p) {
+  const M = RUG_MATCH();
+  const res = RUG_SHOPS.map(k => [k, M[k].resultSync(p)]);
+  if (res.some(([, r]) => !r)) return { known: false, lead: null };
+  const sure = res.find(([k, r]) => isShopUsable(k) && r.sure);
+  if (sure) return { known: true, lead: sure[0], sure: true };
+  const complete = res.find(([k, r]) => isShopUsable(k) && r.complete !== false && r.url);
+  return { known: true, lead: complete ? complete[0] : null, sure: false };
+}
 
 function isShopUsable(key) {
   const s = SHOPS[key];
@@ -7979,23 +8033,27 @@ function getShopsForProduct(p) {
   }
   picked.push(...SHOP_FALLBACK);
   const shops = [...new Set(picked)].filter(isShopUsable);
-  // Rugs lead with teppich.de (real rug, or its page filtered to everything
-  // asked). If teppich.de has neither (no green wool rugs, no kelims), the
-  // shop with the broader range leads and teppich.de moves to the dropdown.
-  if (shops[0] === 'teppichde') {
-    const r = TeppichMatch.resultSync(p);
-    if (r && !r.sure && r.complete === false && shops.length > 1) {
-      shops.splice(0, 1);
-      shops.splice(1, 0, 'teppichde');
-    }
+  // Rugs: see rugLeader(). All rug shops stay in the list either way;
+  // Höffner comes right after them, or first if only Höffner has the rug.
+  if (RUG_SHOPS.includes(shops[0])) {
+    const L = rugLeader(p);
+    const rugs = shops.filter(k => RUG_SHOPS.includes(k));
+    const rest = shops.filter(k => !RUG_SHOPS.includes(k));
+    const hOk = !!hoeffnerSlug(p.name) && isShopUsable('hoeffner');
+    const hSure = hOk && !!HoeffnerMatch.bestSync(p);
+    const h = hOk ? ['hoeffner'] : [];
+    if (L.lead) rugs.sort((x, y) => (y === L.lead) - (x === L.lead));
+    let order;
+    if (!L.known || L.sure || (L.lead && !hSure)) order = [...rugs, ...h, ...rest];
+    else if (hSure) order = ['hoeffner', ...rugs, ...rest];
+    else order = [...rest.slice(0, 1), ...rugs, ...h, ...rest.slice(1)];
+    return [...new Set(order)].slice(0, SHOP_MAX);
   }
-  // While teppich.de leads, Höffner is the second option in the dropdown.
-  const rugLead = shops[0] === 'teppichde';
   // Elsewhere Höffner leads only when the feed found the exact product
   // (see HoeffnerMatch). Otherwise the shop with the better search
   // (Amazon) stays the main button and Höffner sits in the dropdown.
   if (hoeffnerSlug(p.name) && isShopUsable('hoeffner')) {
-    if (!rugLead && HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
+    if (HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
     else shops.splice(1, 0, 'hoeffner');
   }
   return shops.slice(0, SHOP_MAX);
@@ -8015,10 +8073,11 @@ function shopUrl(key, query) {
 // teppich.de otherwise its filtered category page, else the search link.
 function productShopUrl(key, p) {
   if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
-  if (key === 'teppichde') {
-    const best = TeppichMatch.bestSync(p);
+  if (RUG_SHOPS.includes(key)) {
+    const M = RUG_MATCH()[key];
+    const best = M.bestSync(p);
     if (best) return best.link;
-    const url = TeppichMatch.urlSync(p);
+    const url = M.urlSync(p);
     return url ? awinWrap(key, url) : shopUrl(key, `${p.name || ''} ${p.title || ''}`);
   }
   return shopUrl(key, p.name);
@@ -8152,6 +8211,7 @@ function makeProductMatch(shop) {
 }
 const HoeffnerMatch = makeProductMatch('hoeffner');
 const TeppichMatch = makeProductMatch('teppichde');
+const RugvistaMatch = makeProductMatch('rugvista');
 
 function formatEuro(v) {
   const n = Number(v) || 0;
@@ -8196,24 +8256,18 @@ function attachShopMatch(card, p) {
   if (!card) return;
   const shops = getShopsForProduct(p);
 
-  // Rugs: teppich.de leads. A sure match shows that rug; otherwise its
-  // links go to the teppich.de page filtered to colour, material, shape …
-  if (shops.includes('teppichde') && isRug(p)) {
-    TeppichMatch.get(p).then(r => {
-      if (!r || !card.isConnected) return;
+  // Rugs: ask teppich.de, Rugvista (and Höffner) together. The shop that
+  // has THE rug leads and its rug is shown (see rugLeader); otherwise the
+  // links go to the shops' pages filtered to colour, material, shape …
+  if (shops.some(k => RUG_SHOPS.includes(k)) && isRug(p)) {
+    const withH = hoeffnerSlug(p.name) && isShopUsable('hoeffner');
+    Promise.all([TeppichMatch.get(p), RugvistaMatch.get(p), withH ? HoeffnerMatch.get(p) : null]).then(() => {
+      if (!card.isConnected) return;
       refreshShopActions(card, p);
-      const best = r.sure && r.results && r.results[0];
-      if (best) showProductMatch(card, best, 'teppichde');
+      const lead = getShopsForProduct(p)[0];
+      const best = lead === 'hoeffner' ? HoeffnerMatch.bestSync(p) : RUG_SHOPS.includes(lead) ? RUG_MATCH()[lead].bestSync(p) : null;
+      if (best) showProductMatch(card, best, lead);
     });
-    // Höffner: its product link in the dropdown; and if teppich.de doesn't
-    // have the rug but Höffner does, Höffner's rug is the one shown
-    if (shops.includes('hoeffner')) {
-      Promise.all([HoeffnerMatch.get(p), TeppichMatch.get(p)]).then(([h]) => {
-        if (!h || !h.sure || !card.isConnected) return;
-        refreshShopActions(card, p);
-        if (!TeppichMatch.bestSync(p) && getShopsForProduct(p)[0] === 'hoeffner') showProductMatch(card, h.results[0], 'hoeffner');
-      });
-    }
     return;
   }
 
