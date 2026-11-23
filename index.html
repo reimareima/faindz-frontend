@@ -3538,6 +3538,7 @@
     letter-spacing: 0.02em;
     color: var(--text-muted);
   }
+  .has-ad-top .shop-actions .shop-ad { display: none; }
   .product-match-note {
     font-size: 11px;
     font-weight: 400;
@@ -8379,13 +8380,16 @@ function showProductMatch(card, best, shop) {
   if (!meta) return;
   const old = best.oldPrice ? `<s class="product-match-old">${escapeHtml(formatEuro(best.oldPrice))}</s>` : '';
   meta.classList.add('has-match');
+  // One "Anzeige" for the whole block (product + shop buttons below)
+  card.classList.add('has-ad-top');
   meta.innerHTML = `
+    <span class="shop-ad">${escapeHtml(t('shop.ad'))}</span>
     <a class="product-match" href="${escapeHtml(best.link)}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${shop}">
       <span class="product-match-img"><img src="${escapeHtml(best.image)}" alt="" loading="lazy" decoding="async"></span>
       <span class="product-match-body">
         <span class="product-match-title">${escapeHtml(best.title)}</span>
         ${best.price ? `<span class="product-match-price">${escapeHtml(formatEuro(best.price))}*${old}</span>` : ''}
-        <span class="product-match-note">${escapeHtml(t('shop.ad'))}${best.price ? ` · *${escapeHtml(t('shop.priceNote'))}` : ''}</span>
+        ${best.price ? `<span class="product-match-note">*${escapeHtml(t('shop.priceNote'))}</span>` : ''}
       </span>
     </a>`;
   // The shop's own picture first; if it doesn't load, Awin's copy; else no picture
