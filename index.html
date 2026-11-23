@@ -8207,16 +8207,15 @@ function getShopsForProduct(p) {
     else order = [...rest.slice(0, 1), ...rugs, ...h, ...rest.slice(1)];
     return [...new Set(order)].slice(0, SHOP_MAX);
   }
-  // OTTO is the flagship partner: always the main button (with the real
-  // product when its feed has it, otherwise its search). Höffner leads
-  // only when it has the exact piece and OTTO doesn't.
-  const ottoSure = isShopUsable('otto') && !!OttoMatch.bestSync(p);
+  // OTTO is the main shop, the way Amazon was: its button opens the OTTO
+  // search for the piece (no single product, so nothing that doesn't fit).
+  // Höffner leads only when its feed has the exact piece.
   if (isShopUsable('otto')) {
     if (shops.includes('otto')) shops.splice(shops.indexOf('otto'), 1);
     shops.unshift('otto');
   }
   if (hoeffnerSlug(p.name) && isShopUsable('hoeffner')) {
-    if (HoeffnerMatch.bestSync(p) && !ottoSure) shops.unshift('hoeffner');
+    if (HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
     else shops.splice(1, 0, 'hoeffner');
   }
   // Casa Moro leads when the feed has the piece; otherwise it sits right
@@ -8248,7 +8247,7 @@ function shopUrl(key, query) {
 // teppich.de otherwise its filtered category page, else the search link.
 function productShopUrl(key, p) {
   if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
-  if (key === 'otto') return OttoMatch.bestSync(p)?.link || shopUrl(key, String(p.name || '').split(/\s+/).slice(0, 3).join(' '));
+  if (key === 'otto') return shopUrl(key, ottoQuery(p));
   if (key === 'happylamps') return happyLampsBest(p)?.link || shopUrl(key, p.name);
   if (key === 'casamoro') {
     const best = CasamoroMatch.bestSync(p);
@@ -8397,7 +8396,11 @@ const HoeffnerMatch = makeProductMatch('hoeffner');
 const TeppichMatch = makeProductMatch('teppichde');
 const RugvistaMatch = makeProductMatch('rugvista');
 const CasamoroMatch = makeProductMatch('casamoro');
-const OttoMatch = makeProductMatch('otto');
+// OTTO search: the first words of the search query ("Samtsofa 3-Sitzer
+// dunkelgrün"). OTTO's search finds less than Amazon's with long queries.
+function ottoQuery(p) {
+  return String(p.name || p.title || '').split(/\s+/).filter(Boolean).slice(0, 4).join(' ');
+}
 
 function formatEuro(v) {
   const n = Number(v) || 0;
@@ -8465,18 +8468,16 @@ function attachShopMatch(card, p) {
   const hl = shops[0] === 'happylamps' && happyLampsBest(p);
   if (hl) { showProductMatch(card, hl, 'happylamps'); return; }
 
-  // Casa Moro, Höffner and OTTO: ask the feeds; whichever has the exact
-  // piece leads (order in getShopsForProduct) and its product is shown.
+  // Casa Moro and Höffner: ask both feeds; whichever has the exact piece
+  // leads (Casa Moro first, see getShopsForProduct) and its product is shown.
   const wantC = shops.includes('casamoro');
   const wantH = shops.includes('hoeffner');
-  const wantO = shops.includes('otto');
-  if (!wantC && !wantH && !wantO) return;
-  Promise.all([wantC ? CasamoroMatch.get(p) : null, wantH ? HoeffnerMatch.get(p) : null, wantO ? OttoMatch.get(p) : null]).then(() => {
+  if (!wantC && !wantH) return;
+  Promise.all([wantC ? CasamoroMatch.get(p) : null, wantH ? HoeffnerMatch.get(p) : null]).then(() => {
     if (!card.isConnected) return;
     const lead = getShopsForProduct(p)[0];
     const best = lead === 'casamoro' ? CasamoroMatch.bestSync(p)
-               : lead === 'hoeffner' ? HoeffnerMatch.bestSync(p)
-               : lead === 'otto' ? OttoMatch.bestSync(p) : null;
+               : lead === 'hoeffner' ? HoeffnerMatch.bestSync(p) : null;
     // rebuild the buttons only when a link actually changed
     if (best || (wantC && CasamoroMatch.urlSync(p))) refreshShopActions(card, p);
     if (best) showProductMatch(card, best, lead);
