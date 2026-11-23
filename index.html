@@ -7655,7 +7655,11 @@ const SHOPS = {
 
   // Awin partners. Applied 30.10.2026, waiting for approval.
   naduvi:     { name: 'NADUVI',        color: '#4F8A6E', awinMid: 25929,  active: false, search: null },
-  happylamps: { name: 'Happy Lamps',   color: '#E8A200', awinMid: 29733,  active: false, search: null },
+  // Approved 23.11.2026. Only ~30 animal figure lamps, so it is offered
+  // for animal/kids lamps only and leads when the animal is one they make
+  // (see HAPPYLAMPS_PRODUCTS).
+  happylamps: { name: 'Happy Lamps',   color: '#E8A200', awinMid: 29733,  active: true,
+                search: () => 'https://happylamps.com/collections/all' },
   bassetti:   { name: 'Bassetti',      color: '#B83B5E', awinMid: 99313,  active: false, search: null },
   // Approved 11.11.2026 (12 % for content publishers). Rugs go here first:
   // filtered category links (teppichUrl), real products via TeppichMatch.
@@ -7699,7 +7703,6 @@ const SHOP_ROUTES = [
   { match: /sofa|couch|sessel|chaiselongue|recamiere|récamière/,                   shops: ['sofadreams'] },
   { match: /bettwäsche|kissen|plaid|\w*decke\b|überwurf|handtuch|\bbezug|bedding|cushion|pillow|throw/,
                                                                                     shops: ['bassetti'] },
-  { match: /(kinder|tier|einhorn|nachtlicht|katze|hund)/, needs: LAMP_RE,          shops: ['happylamps'] },
   { match: /tisch|stuhl|regal|schrank|kommode|sideboard|\bbett\b|bettgestell|hocker|\bbank\b|vitrine|konsole|möbel|furniture|seating|storage|aufbewahrung|sitzmöbel/,
     unless: { test: t => LAMP_RE.test(t) || NOT_FURNITURE_RE.test(t) },             shops: ['naduvi', 'dublino', 'vidaxl'] },
   { match: /vase|deko|skulptur|figur|kerze|spiegel|\bbild|poster|kunst|wandbild|\bart\b|decor|übertopf|blumentopf|tablett|schale|keramik/,
@@ -7998,6 +8001,61 @@ function rugvistaUrl(q) {
   return `https://www.rugvista.de/c/teppiche${parts.length ? '/' + parts.join('/') : ''}`;
 }
 
+// ─── HAPPY LAMPS ──────────────────────────────────────────────────
+// Small shop (checked against the Awin feed 23.11.2026): animal figure
+// lamps only. Hardcoded instead of a proxy feed. No prices here on
+// purpose: they run sales, the shop page shows the real price.
+// Order matters: specific animals before generic ones (Waschbär before Bär).
+const HL_IMG = 'https://cdn.shopify.com/s/files/1/0514/0581/5982/files/';
+const HAPPYLAMPS_PRODUCTS = [
+  // [animal, slug, title, picture, standing-lamp variant?]
+  [/einhorn|unicorn/,              'elsa-das-einhorn',   'Elsa – die Einhornlampe',            'HL_UPS_Elsa.jpg',
+                                   ['bonita-das-einhorn', 'Bonita – die Einhorn-Stehlampe',    'HL_UPS_Bonita.jpg']],
+  [/pudel/,                        'bello',              'Bello – die Pudel-Stehlampe',        'HL_UPS_Bello.jpg'],
+  [/dackel/,                       'waldi-der-dackel',   'Waldi – die Dackellampe',            'HL_UPS_Waldi_be23f255-9988-4d62-8485-eae4f82858b0.jpg'],
+  [/jagdhund|\bhund/,              'spike-der-jagdhund', 'Spike – die Hundelampe',             'HL_UPS_Spike.jpg'],
+  [/pferd|pony/,                   'elvis',              'Elvis – die Pferdelampe',            'HL_UPS_Elvis.jpg'],
+  [/waschbär|waschbaer/,           'ben-der-waschbar',   'Ben – die Waschbärlampe',            'HL_UPS_Ben.jpg'],
+  [/eisbär|eisbaer|polarbär/,      'paul',               'Paul – die Eisbärlampe',             'HL_UPS_Paul.jpg'],
+  [/\bbär|\bbaer|teddy/,           'charles-der-bar',    'Charles – die Bärenlampe',           'HL_UPS_Charles.jpg'],
+  [/schaf/,                        'wolle-das-schaf',    'Wolle – die Schaflampe',             'HL_UPS_Wolle.jpg'],
+  [/flamingo/,                     'mingo-der-flamingo', 'Mingo – die Flamingolampe',          'HL_UPS_Mingo.jpg'],
+  [/erdmännchen|erdmaennchen/,     'eddie',              'Eddie – die Erdmännchenlampe',       'HL_UPS_Eddie.jpg'],
+  [/elefant/,                      'bobby-der-elefant',  'Bobby – die Elefantenlampe',         'HL_UPS_Bobby.jpg'],
+  [/alpaka|\blama/,                'alma-das-alpaka',    'Alma – die Alpakalampe',             'HL_UPS_Alma.jpg'],
+  [/katze|kater|\bcat\b/,          'baby-luna',          'Baby Luna – die Katzenlampe',        'HL_UPS_Baby_Luna.jpg',
+                                   ['luna',               'Luna – die Katzen-Stehlampe',       'HL_UPS_Luna.jpg']],
+  [/giraffe/,                      'baby-raffi',         'Baby Raffi – die Giraffenlampe',     'HL_UPS_Baby_Raffi.jpg',
+                                   ['raffi',              'Raffi – die Giraffen-Stehlampe',    'HL_UPS_Raffi.jpg']],
+  [/\bmaus\b|\bmäuse/,             'maus',               'Die Maus – Lampe',                   'HL_UPS_Maus.jpg'],
+  [/drache|dragon/,                'black-dragon',       'Black Dragon – die Drachenlampe',    'HL_UPS_Black_Dragon.jpg'],
+  [/hase|häschen|kaninchen|bunny/, 'benny',              'Benny – die Hasenlampe',             'HL_UPS_Benny.jpg'],
+  [/capybara|wasserschwein/,       'otto',               'Otto – die Capybaralampe',           'HL_UPS_Otto.jpg'],
+  [/löwe|loewe|\blion/,            'leo',                'Leo – die Löwenlampe',               'HL_UPS_Leo.jpg'],
+];
+const ANIMAL_LAMP_RE = /tierlampe|tierleuchte|figurenlampe|figurleuchte|kinderlampe|kinderzimmer|nachtlicht/;
+
+function happyLampsText(p) {
+  return `${p.category || ''} ${p.name || ''} ${p.title || ''}`.toLowerCase();
+}
+// The Happy Lamps product this suggestion IS (a lamp shaped like that animal)
+function happyLampsBest(p) {
+  const text = happyLampsText(p);
+  if (!LAMP_RE.test(text)) return null;
+  const hit = HAPPYLAMPS_PRODUCTS.find(([re]) => re.test(text));
+  if (!hit) return null;
+  const [, slug, title, img] = hit[4] && /steh|floor/.test(text) ? [null, ...hit[4]] : hit;
+  return { link: awinWrap('happylamps', `https://happylamps.com/products/${slug}`), title, image: HL_IMG + img };
+}
+// Worth offering at all: an animal lamp, or a lamp for a kids' room
+function happyLampsFits(p) {
+  const text = happyLampsText(p);
+  if (happyLampsBest(p)) return true;
+  // they only make table and floor figures: no ceiling, wall or LED strip
+  return LAMP_RE.test(text) && ANIMAL_LAMP_RE.test(text)
+    && !/decke|hänge|haenge|pendel|wand|spot|strahler|streifen|strip|lichterkette/.test(text);
+}
+
 const SHOP_MAX = 4;
 const RUG_SHOPS = ['teppichde', 'rugvista'];
 const RUG_MATCH = () => ({ teppichde: TeppichMatch, rugvista: RugvistaMatch });
@@ -8056,6 +8114,12 @@ function getShopsForProduct(p) {
     if (HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
     else shops.splice(1, 0, 'hoeffner');
   }
+  // Happy Lamps leads only when it makes that very animal; for other
+  // kids' lamps it sits in the dropdown.
+  if (isShopUsable('happylamps') && happyLampsFits(p)) {
+    if (happyLampsBest(p)) shops.unshift('happylamps');
+    else shops.splice(1, 0, 'happylamps');
+  }
   return shops.slice(0, SHOP_MAX);
 }
 
@@ -8073,6 +8137,7 @@ function shopUrl(key, query) {
 // teppich.de otherwise its filtered category page, else the search link.
 function productShopUrl(key, p) {
   if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
+  if (key === 'happylamps') return happyLampsBest(p)?.link || shopUrl(key, p.name);
   if (RUG_SHOPS.includes(key)) {
     const M = RUG_MATCH()[key];
     const best = M.bestSync(p);
@@ -8239,7 +8304,7 @@ function showProductMatch(card, best, shop) {
       <span class="product-match-img"><img src="${escapeHtml(best.image)}" alt="" loading="lazy" decoding="async"></span>
       <span class="product-match-body">
         <span class="product-match-title">${escapeHtml(best.title)}</span>
-        <span class="product-match-price">${escapeHtml(formatEuro(best.price))}${old}</span>
+        ${best.price ? `<span class="product-match-price">${escapeHtml(formatEuro(best.price))}${old}</span>` : ''}
       </span>
     </a>`;
   // The shop's own picture first; if it doesn't load, Awin's copy; else no picture
@@ -8270,6 +8335,10 @@ function attachShopMatch(card, p) {
     });
     return;
   }
+
+  // Happy Lamps: known right away (hardcoded), no request needed
+  const hl = shops[0] === 'happylamps' && happyLampsBest(p);
+  if (hl) { showProductMatch(card, hl, 'happylamps'); return; }
 
   if (!shops.includes('hoeffner')) return;
   HoeffnerMatch.get(p).then(r => {
