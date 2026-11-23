@@ -25,6 +25,7 @@
 .ps-style.big img { flex: 2 1 0; min-width: 0; aspect-ratio: 16 / 9; }
 .ps-style.big .txt { flex: 1 1 0; display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
 .ps-style.big .name { font-size: 46px; line-height: 1.05; padding: 0; }
+.ps-style.big.rev { flex-direction: row-reverse; }
 .ps-style.big .more { font-size: 15px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
 .ps-kicker { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: #c2185b; }
 
@@ -68,7 +69,7 @@
 @media (max-width: 720px) {
   .ps-wrap { padding: 0 20px; }
   .ps-styles { grid-template-columns: 1fr; gap: 36px; }
-  .ps-style.big { flex-direction: column; align-items: stretch; gap: 12px; }
+  .ps-style.big, .ps-style.big.rev { flex-direction: column; align-items: stretch; gap: 12px; }
   .ps-style.big img { aspect-ratio: 4 / 3; }
   .ps-style.big .name { font-size: 36px; }
   .ps-hero img { aspect-ratio: 4 / 3; }
