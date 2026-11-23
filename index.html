@@ -7765,7 +7765,7 @@ const SHOP_ROUTES = [
   { match: /vase|deko|skulptur|figur|kerze|spiegel|\bbild|poster|kunst|wandbild|\bart\b|decor|übertopf|blumentopf|tablett|schale|keramik/,
     unless: { test: t => LAMP_RE.test(t) || PLANT_RE.test(t) },                     shops: ['naduvi', 'etsy'] },
 ];
-const SHOP_FALLBACK = ['amazon', 'otto'];
+const SHOP_FALLBACK = ['otto', 'amazon'];
 
 // ─── HÖFFNER ─────────────────────────────────────────────────────
 // Built from Höffner's full category tree (checked 03.11.2026, every
