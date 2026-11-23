@@ -6328,7 +6328,7 @@ const I18N = {
     'results.priority.must': 'Essential',
     'results.priority.nice': 'Refined',
     'results.shopOn': 'Shop on {market}',
-    'shop.viewAt': 'View at {market}',
+    'shop.viewAt': 'Similar at {market}',
     'shop.ad': 'Ad',
     'shop.styleLink': 'More {style} pieces in our partner shop',
     'shop.priceNote': 'incl. VAT, plus shipping',
@@ -6559,7 +6559,7 @@ const I18N = {
     'results.priority.must': 'Essenziell',
     'results.priority.nice': 'Akzent',
     'results.shopOn': 'Bei {market} kaufen',
-    'shop.viewAt': 'Bei {market} ansehen',
+    'shop.viewAt': 'Ähnliche bei {market}',
     'shop.ad': 'Anzeige',
     'shop.styleLink': 'Mehr im Stil {style} ansehen',
     'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
@@ -7767,6 +7767,10 @@ const SHOP_ROUTES = [
 ];
 const SHOP_FALLBACK = ['otto', 'amazon'];
 
+// Asked from the AI for every product, always in German: what the piece
+// is in catalogue words. The shop links are built from it (shopQuery).
+const PRODUCT_ATTRS_FIELD = `"attrs": {"typ": "always German: the product type as a furniture store names it, as specific as visible, e.g. 'Chesterfield-Sofa', 'Bogenlampe', 'Couchtisch', 'Pendelleuchte', 'Wollteppich', 'Kissenhülle'", "farbe": "always German: ONE main colour, e.g. 'dunkelgrün', 'creme', 'schwarz'", "material": "always German: ONE main material, e.g. 'Samt', 'Eiche', 'Rattan', 'Messing', or empty", "form": "only if it defines the piece: 'rund', 'oval', 'geschwungen', otherwise empty"},`;
+
 // ─── HÖFFNER ─────────────────────────────────────────────────────
 // Built from Höffner's full category tree (checked 03.11.2026, every
 // slug below exists). Höffner's free-text search is fuzzy ("Chefsessel
@@ -8236,7 +8240,9 @@ function getShopsForProduct(p) {
 function awinWrap(key, target) {
   const s = SHOPS[key];
   if (!s.awinMid) return target;
-  return `https://www.awin1.com/cread.php?awinmid=${s.awinMid}&awinaffid=${AWIN_PUBLISHER_ID}&ued=${encodeURIComponent(target)}`;
+  // clickref "app": Awin reports then show which clicks came from the app
+  // (Partnershop links carry "shop", magazine links "magazin")
+  return `https://www.awin1.com/cread.php?awinmid=${s.awinMid}&awinaffid=${AWIN_PUBLISHER_ID}&clickref=app&ued=${encodeURIComponent(target)}`;
 }
 
 function shopUrl(key, query) {
@@ -8246,8 +8252,9 @@ function shopUrl(key, query) {
 // Best link for a shop: the matched product if the feed is sure, for
 // teppich.de otherwise its filtered category page, else the search link.
 function productShopUrl(key, p) {
-  if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
-  if (key === 'otto') return shopUrl(key, ottoQuery(p));
+  // Höffner: its filtered category page, found from type + colour first
+  if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, `${shopQuery(p)} ${p.name || ''}`);
+  if (key === 'otto') return shopUrl(key, shopQuery(p));
   if (key === 'happylamps') return happyLampsBest(p)?.link || shopUrl(key, p.name);
   if (key === 'casamoro') {
     const best = CasamoroMatch.bestSync(p);
@@ -8329,6 +8336,7 @@ function buildShopActions(p, opts = {}) {
 // All cards rendered in the same tick are sent as ONE request.
 // The same machinery serves teppich.de (shop: 'teppichde'), whose answer
 // also carries `url`: a teppich.de page filtered to what was asked.
+const SHOW_EXACT_PRODUCTS = false;
 function makeProductMatch(shop) {
   const cache = new Map();      // key -> { sure, url, results } | null
   const pending = new Map();    // key -> [resolve, ...]
@@ -8377,8 +8385,12 @@ function makeProductMatch(shop) {
     });
   }
 
-  // Synchronous: the sure top product if already known
+  // Synchronous: the sure top product if already known.
+  // Off for now (SHOW_EXACT_PRODUCTS): a product found by words alone can
+  // look nothing like the piece in the design. Links go to the shop's
+  // search or filtered category page instead, until a picture check is in.
   function bestSync(p) {
+    if (!SHOW_EXACT_PRODUCTS) return null;
     const r = cache.get(keyOf(p));
     return r && r.sure && r.results && r.results[0] ? r.results[0] : null;
   }
@@ -8396,9 +8408,27 @@ const HoeffnerMatch = makeProductMatch('hoeffner');
 const TeppichMatch = makeProductMatch('teppichde');
 const RugvistaMatch = makeProductMatch('rugvista');
 const CasamoroMatch = makeProductMatch('casamoro');
-// OTTO search: the first words of the search query ("Samtsofa 3-Sitzer
-// dunkelgrün"). OTTO's search finds less than Amazon's with long queries.
-function ottoQuery(p) {
+// Short search for shops whose search is weaker than Amazon's (OTTO,
+// Höffner): type, material, colour from the AI's attrs, e.g.
+// "Chesterfield-Sofa Samt dunkelgrün". Without attrs (older looks): the
+// first four words of the Amazon query.
+function shopQuery(p) {
+  const a = p && p.attrs && typeof p.attrs === 'object' ? p.attrs : null;
+  const clean = v => String(v || '').trim().replace(/[^\p{L}\p{N}\s-]/gu, '');
+  if (a && clean(a.typ)) {
+    const typ = clean(a.typ);
+    const lowTyp = typ.toLowerCase();
+    const words = [];
+    const form = clean(a.form).toLowerCase();
+    if (/^(rund|runde|oval|ovale)$/.test(form)) words.push(form.startsWith('rund') ? 'rund' : 'oval');
+    words.push(typ);
+    const mat = clean(a.material);
+    // "Wollteppich" already says wool, "Rattanlampe" rattan
+    if (mat && !lowTyp.includes(mat.toLowerCase().slice(0, 4))) words.push(mat);
+    const col = clean(a.farbe);
+    if (col) words.push(col);
+    return words.join(' ').split(/\s+/).slice(0, 5).join(' ');
+  }
   return String(p.name || p.title || '').split(/\s+/).filter(Boolean).slice(0, 4).join(' ');
 }
 
@@ -8913,6 +8943,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
       "category": "${currentLang === 'de' ? 'MÖBEL/BELEUCHTUNG/etc — auf DEUTSCH' : 'FURNITURE/LIGHTING/etc — in ENGLISH'}",
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "A specific German Amazon search query for this item (always German for marketplace results). Be detailed enough to find similar pieces. Example: 'Stehlampe Bogenlampe Messing Marmorfuß' rather than 'Lampe'.",
+      ${PRODUCT_ATTRS_FIELD}
       "reason": "${currentLang === 'de' ? 'EIN klarer deutscher Satz (max 15 Wörter), was du im Bild siehst.' : 'ONE plain English sentence (max 15 words) describing what you see.'}",
       "price_range": "e.g. '60-150€' — realistic estimated range on Amazon DE for similar items",
       "priority": "must" if it's a defining piece of the look, "nice" if it's a smaller accent,
@@ -8985,6 +9016,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in diesem Format (keine Markdown-Zä
       "category": "z.B. BELEUCHTUNG, ERGONOMIE, DEKO, ORDNUNG, TECHNIK, TEXTIL",
       "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Konkreter Produktname als Suchbegriff für Amazon (Deutsch). Sei spezifisch genug für gute Suchergebnisse, z.B. 'Schreibtischlampe LED dimmbar Holz' statt nur 'Lampe'",
+      ${PRODUCT_ATTRS_FIELD}
       "reason": "1-2 Sätze warum dieses Produkt zum Raum passt und was es verbessert",
       "price_range": "z.B. '20-40€'",
       "priority": "must" oder "nice"
@@ -9190,6 +9222,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON.
 
       "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen beschreibenden Wörtern",
+      ${PRODUCT_ATTRS_FIELD}
 
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
 
@@ -9271,6 +9304,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
       "category": "e.g. LIGHTING, ERGONOMICS, DECOR, ORGANIZATION, TECH, TEXTILES",
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Concrete product name as a German Amazon search query (always German for marketplace results). Be specific enough for good search results, e.g. 'Schreibtischlampe LED dimmbar Holz' instead of just 'Lampe'",
+      ${PRODUCT_ATTRS_FIELD}
       "reason": "1-2 sentences on why this product fits the room and what it improves",
       "price_range": "e.g. '20-40€'",
       "priority": "must" or "nice"
@@ -9476,6 +9510,7 @@ Respond ONLY with valid JSON.
 
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Mass-market-friendly Amazon search phrase with 3–5 simple descriptive words",
+      ${PRODUCT_ATTRS_FIELD}
 
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
 
@@ -10207,6 +10242,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON, keine Markdown-Zäune, kein Vorab-T
       "category": "z.B. MÖBEL, BELEUCHTUNG, DEKO, TEXTIL, WANDGESTALTUNG",
       "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Konkreter deutscher Suchbegriff für Amazon, spezifisch genug für gute Treffer",
+      ${PRODUCT_ATTRS_FIELD}
       "reason": "1 Satz: was hat sich verändert und warum passt das neue Item",
       "price_range": "z.B. '200-400€'",
       "priority": "must" oder "nice"
@@ -10226,6 +10262,7 @@ Respond ONLY with valid JSON, no markdown fences, no preamble:
       "category": "e.g. FURNITURE, LIGHTING, DECOR, TEXTILES, WALL DESIGN",
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Concrete German Amazon search query, specific enough for good hits",
+      ${PRODUCT_ATTRS_FIELD}
       "reason": "1 sentence: what changed and why it fits",
       "price_range": "e.g. '200-400€'",
       "priority": "must" or "nice"
@@ -10438,6 +10475,7 @@ const REIMAGINE_OUTPUT_SCHEMA_DE = `Antworte AUSSCHLIESSLICH mit gültigem JSON 
       "category": "BELEUCHTUNG | MÖBEL | TEXTIL | DEKO | KUNST | PFLANZEN | ORDNUNG | TECHNIK",
       "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
       "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen Wörtern (Deutsch)",
+      ${PRODUCT_ATTRS_FIELD}
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
       "reason": "1 Satz: was dieses Produkt für DIESEN Raum konkret verbessert",
       "price_range": "z.B. 60–150€",
@@ -10471,6 +10509,7 @@ const REIMAGINE_OUTPUT_SCHEMA_EN = `Respond ONLY with valid JSON in THIS structu
       "category": "LIGHTING | FURNITURE | TEXTILE | DECOR | ART | PLANTS | STORAGE | TECH",
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
       "name": "Mass-market-friendly Amazon search phrase with 3–5 simple words (in German for marketplace results)",
+      ${PRODUCT_ATTRS_FIELD}
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
       "reason": "One sentence: what this specifically improves about THIS room",
       "price_range": "e.g. €60–150",
