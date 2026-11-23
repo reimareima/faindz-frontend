@@ -8419,14 +8419,15 @@ function shopQuery(p) {
     const typ = clean(a.typ);
     const lowTyp = typ.toLowerCase();
     const words = [];
+    words.push(typ);
     const form = clean(a.form).toLowerCase();
     if (/^(rund|runde|oval|ovale)$/.test(form)) words.push(form.startsWith('rund') ? 'rund' : 'oval');
-    words.push(typ);
     const mat = clean(a.material);
     // "Wollteppich" already says wool, "Rattanlampe" rattan
     if (mat && !lowTyp.includes(mat.toLowerCase().slice(0, 4))) words.push(mat);
+    // "natur" / "holz" as a colour only blurs the search
     const col = clean(a.farbe);
-    if (col) words.push(col);
+    if (col && !/^(natur|naturfarben|holz|holzfarben|transparent|bunt|mehrfarbig)$/i.test(col)) words.push(col);
     return words.join(' ').split(/\s+/).slice(0, 5).join(' ');
   }
   return String(p.name || p.title || '').split(/\s+/).filter(Boolean).slice(0, 4).join(' ');
