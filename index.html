@@ -8207,6 +8207,12 @@ function getShopsForProduct(p) {
     else order = [...rest.slice(0, 1), ...rugs, ...h, ...rest.slice(1)];
     return [...new Set(order)].slice(0, SHOP_MAX);
   }
+  // OTTO leads when its feed has the exact product (Höffner and Casa Moro,
+  // added in front below, still win when they have it too).
+  if (shops.includes('otto') && OttoMatch.bestSync(p)) {
+    shops.splice(shops.indexOf('otto'), 1);
+    shops.unshift('otto');
+  }
   // Elsewhere Höffner leads only when the feed found the exact product
   // (see HoeffnerMatch). Otherwise the shop with the better search
   // (Amazon) stays the main button and Höffner sits in the dropdown.
@@ -8243,6 +8249,7 @@ function shopUrl(key, query) {
 // teppich.de otherwise its filtered category page, else the search link.
 function productShopUrl(key, p) {
   if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
+  if (key === 'otto') return OttoMatch.bestSync(p)?.link || shopUrl(key, p.name);
   if (key === 'happylamps') return happyLampsBest(p)?.link || shopUrl(key, p.name);
   if (key === 'casamoro') {
     const best = CasamoroMatch.bestSync(p);
@@ -8391,6 +8398,7 @@ const HoeffnerMatch = makeProductMatch('hoeffner');
 const TeppichMatch = makeProductMatch('teppichde');
 const RugvistaMatch = makeProductMatch('rugvista');
 const CasamoroMatch = makeProductMatch('casamoro');
+const OttoMatch = makeProductMatch('otto');
 
 function formatEuro(v) {
   const n = Number(v) || 0;
@@ -8458,16 +8466,18 @@ function attachShopMatch(card, p) {
   const hl = shops[0] === 'happylamps' && happyLampsBest(p);
   if (hl) { showProductMatch(card, hl, 'happylamps'); return; }
 
-  // Casa Moro and Höffner: ask both feeds; whichever has the exact piece
-  // leads (Casa Moro first, see getShopsForProduct) and its product is shown.
+  // Casa Moro, Höffner and OTTO: ask the feeds; whichever has the exact
+  // piece leads (order in getShopsForProduct) and its product is shown.
   const wantC = shops.includes('casamoro');
   const wantH = shops.includes('hoeffner');
-  if (!wantC && !wantH) return;
-  Promise.all([wantC ? CasamoroMatch.get(p) : null, wantH ? HoeffnerMatch.get(p) : null]).then(() => {
+  const wantO = shops.includes('otto');
+  if (!wantC && !wantH && !wantO) return;
+  Promise.all([wantC ? CasamoroMatch.get(p) : null, wantH ? HoeffnerMatch.get(p) : null, wantO ? OttoMatch.get(p) : null]).then(() => {
     if (!card.isConnected) return;
     const lead = getShopsForProduct(p)[0];
     const best = lead === 'casamoro' ? CasamoroMatch.bestSync(p)
-               : lead === 'hoeffner' ? HoeffnerMatch.bestSync(p) : null;
+               : lead === 'hoeffner' ? HoeffnerMatch.bestSync(p)
+               : lead === 'otto' ? OttoMatch.bestSync(p) : null;
     // rebuild the buttons only when a link actually changed
     if (best || (wantC && CasamoroMatch.urlSync(p))) refreshShopActions(card, p);
     if (best) showProductMatch(card, best, lead);
