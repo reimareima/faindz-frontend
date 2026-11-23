@@ -3367,6 +3367,25 @@
     color: var(--text-subtle);
   }
   @keyframes match-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  /* Shop products that LOOK like the piece in the design (picture check, see findSimilar) */
+  .similar { margin: -4px 0 14px; animation: match-in 0.45s var(--ease-out) both; }
+  .similar-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .similar-label { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.01em; }
+  .similar-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .similar-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; color: var(--text); text-decoration: none; }
+  .similar-img { display: block; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #fff; border: 1px solid var(--border); transition: border-color 0.2s; }
+  .similar-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .similar-item:hover .similar-img { border-color: #e91e63; }
+  .similar-price { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+  .similar-shop { font-size: 11px; color: var(--text-subtle); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .similar-note { margin-top: 6px; font-size: 11px; color: var(--text-subtle); }
+  .similar-head .shop-ad { margin: 0; }
+  .has-similar .shop-actions .shop-ad { display: none; }
+  @media (max-width: 720px) {
+    .similar-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    .similar-item:nth-child(3) { display: none; }
+    .similar-price { font-size: 12px; }
+  }
   @media (max-width: 720px) {
     .product-meta.has-match { padding-top: 8px !important; }
     .product-match { gap: 8px; margin: 0 -4px; padding: 4px; border-radius: 10px; }
@@ -6329,6 +6348,7 @@ const I18N = {
     'results.priority.nice': 'Refined',
     'results.shopOn': 'Shop on {market}',
     'shop.viewAt': 'Similar at {market}',
+    'shop.similar': 'Similar in shops',
     'shop.ad': 'Ad',
     'shop.styleLink': 'More {style} pieces in our partner shop',
     'shop.priceNote': 'incl. VAT, plus shipping',
@@ -6560,6 +6580,7 @@ const I18N = {
     'results.priority.nice': 'Akzent',
     'results.shopOn': 'Bei {market} kaufen',
     'shop.viewAt': 'Ähnliche bei {market}',
+    'shop.similar': 'Ähnlich im Shop',
     'shop.ad': 'Anzeige',
     'shop.styleLink': 'Mehr im Stil {style} ansehen',
     'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
@@ -8475,6 +8496,84 @@ function showProductMatch(card, best, shop) {
   });
 }
 
+// ─── SIMILAR PRODUCTS (picture check) ─────────────────────────────
+// Once the design image is there, the proxy compares each suggestion's
+// shop candidates (from the feeds) with the piece in the image (Gemini)
+// and returns only products that really look alike. They appear as a
+// small row of photos in the card. Nothing found: nothing shown, the
+// search buttons stay as they are.
+function similarShops(p) {
+  if (isRug(p)) return ['teppichde', 'rugvista', 'otto'].filter(isShopUsable);
+  const list = ['otto'];
+  if (hoeffnerSlug(p.name)) list.push('hoeffner');
+  if (isShopUsable('casamoro') && casamoroFits(p)) list.push('casamoro');
+  return list.filter(isShopUsable);
+}
+
+async function designToJpeg(src, max = 768) {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = src;
+  await img.decode();
+  const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement('canvas');
+  c.width = Math.round(img.naturalWidth * s);
+  c.height = Math.round(img.naturalHeight * s);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.82).split(',')[1];
+}
+
+let similarRun = 0;
+async function findSimilar(imageUrl, products) {
+  if (!imageUrl || !Array.isArray(products) || !products.length) return;
+  const run = ++similarRun;
+  let image;
+  try { image = await designToJpeg(imageUrl); } catch (e) { return; }
+  const items = products.map(p => ({
+    title: productTitle(p), text: p.name || '', material: p.material || (p.attrs && p.attrs.material) || '',
+    price: p.price_range || '', reason: p.reason || '', shops: similarShops(p),
+  }));
+  let data = null;
+  try {
+    const res = await fetch(`${PROXY_BASE}/similar`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image, items: items.slice(0, 8) }),
+    });
+    if (res.ok) data = await res.json();
+  } catch (e) { /* proxy unreachable: nothing to show */ }
+  if (!data || !Array.isArray(data.results) || run !== similarRun) return;
+  data.results.forEach((r, i) => {
+    if (!r || !r.matches || !r.matches.length) return;
+    const card = document.getElementById(`product-card-${i}`);
+    if (card && card.isConnected) showSimilar(card, r.matches);
+  });
+}
+
+function showSimilar(card, matches) {
+  card.querySelector('.similar')?.remove();
+  const withRef = l => l + (l.includes('?') ? '&' : '?') + 'clickref=app-aehnlich';
+  const items = matches.slice(0, 3).map(m => `
+      <a class="similar-item" href="${escapeHtml(withRef(m.link))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${escapeHtml(m.shop)}" title="${escapeHtml(m.title)}">
+        <span class="similar-img"><img src="${escapeHtml(m.image)}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async"></span>
+        ${m.price ? `<span class="similar-price">${escapeHtml(formatEuro(m.price))}*</span>` : ''}
+        <span class="similar-shop">${escapeHtml((SHOPS[m.shop] && (SHOPS[m.shop].short || SHOPS[m.shop].name)) || m.shop)}</span>
+      </a>`).join('');
+  const box = document.createElement('div');
+  box.className = 'similar';
+  box.innerHTML = `
+    <div class="similar-head"><span class="similar-label">${escapeHtml(t('shop.similar'))}</span><span class="shop-ad">${escapeHtml(t('shop.ad'))}</span></div>
+    <div class="similar-row">${items}</div>
+    <div class="similar-note">*${escapeHtml(t('shop.priceNote'))}</div>`;
+  box.querySelectorAll('img').forEach((img, k) => img.addEventListener('error', () => {
+    const m = matches[k];
+    if (m && m.image2 && img.src !== m.image2) img.src = m.image2;
+    else img.closest('.similar-item')?.remove();
+  }));
+  const actions = card.querySelector('.shop-actions');
+  if (actions) actions.before(box); else card.append(box);
+  card.classList.add('has-similar');
+}
+
 // Fill a rendered card with its feed matches once they arrive
 function attachShopMatch(card, p) {
   if (!card) return;
@@ -10034,6 +10133,7 @@ async function generateVisualization(imagePrompt, products) {
     });
     activeVersionIndex = 0;
     editsUsed = 0; // Reset edit counter for the new generation
+    findSimilar(imageUrl, products);
     renderThumbnails();
     updateEditUI();
     // Persist the initial vision so reloads keep the user's progress
