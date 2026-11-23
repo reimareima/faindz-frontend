@@ -3386,6 +3386,8 @@
     .similar-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
     .similar-item:nth-child(3) { display: none; }
     .similar-price { font-size: 12px; }
+    .similar-label { font-size: 11px; }
+    .similar-head { gap: 6px; }
   }
   @media (max-width: 720px) {
     .product-meta.has-match { padding-top: 8px !important; }
@@ -7267,8 +7269,12 @@ setAppState('empty');
 // Quota: localStorage caps ~5MB. We strip nothing on save — if quota
 // fails we just skip persisting (no crash, no data loss in memory).
 const SESSION_STORAGE_KEY = 'faindz.session.v1';
+const SESSION_RESTORE_ENABLED = false;
 
 function saveSessionSnapshot() {
+  // Auto-restore is off (see below), so writing 1–2 MB of images into
+  // localStorage after every step only costs time. Kept as a no-op.
+  if (!SESSION_RESTORE_ENABLED) return;
   try {
     if (!state.imageBase64) {
       // Nothing meaningful to save yet
