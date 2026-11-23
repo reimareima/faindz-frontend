@@ -7676,6 +7676,11 @@ const SHOPS = {
   rugvista:   { name: 'Rugvista',      color: '#3D6FB0', awinMid: 63806,  active: true,
                 search: q => rugvistaUrl(q) },
   sofadreams: { name: 'Sofa Dreams',   color: '#B08D57', awinMid: 127271, active: false, search: null },
+  // Approved 23.11.2026. Oriental / Moroccan / boho pieces only, so it is
+  // offered just for those (casamoroFits) and leads when the feed has the
+  // product (CasamoroMatch, proxy shop 'casamoro').
+  casamoro:   { name: 'Casa Moro',     color: '#B5562B', awinMid: 31431,  active: true,
+                search: q => casamoroUrl(q) },
 };
 
 // Specialists per product type. Order inside `shops` = preference.
@@ -8056,6 +8061,49 @@ function happyLampsFits(p) {
     && !/decke|hänge|haenge|pendel|wand|spot|strahler|streifen|strip|lichterkette/.test(text);
 }
 
+// ─── CASA MORO ───────────────────────────────────────────────────
+// Product type -> Casa Moro category page (checked 23.11.2026). Same
+// types and style words as casamoro-match.js in the proxy.
+const CASAMORO_TYPES = [
+  [/laterne|windlicht/,                                                     'laternen'],
+  [/hängelampe|haengelampe|hängeleuchte|pendelleuchte|pendellampe|deckenlampe|deckenleuchte/, 'deckenleuchten'],
+  [/wandlampe|wandleuchte/,                                                 'wandlampen'],
+  [/stehlampe|stehleuchte/,                                                 'stehlampen'],
+  [/tischlampe|tischleuchte|nachttischlampe/,                               'tischlampen'],
+  [/pouf|puff\b|sitzkissen|bodenkissen|sitzwürfel/,                         'ledersitzkissen_poufs'],
+  [/kissen/,                                                                'sofakissen'],
+  [/mosaik\w*tisch|mosaiktisch/,                                            'mosaiktische-aus-marokko'],
+  [/beistelltisch|teetisch|tabletttisch|satztisch/,                         'beistelltische'],
+  [/couchtisch/,                                                            'couchtische'],
+  [/kommode|sideboard|schrank|truhe/,                                       'schraenke-kommoden'],
+  [/wäschekorb|waeschekorb|wäschetruhe/,                                    'waeschekoerbe'],
+  [/korb|körbe/,                                                            'koerbe-und-boxen'],
+  [/blumentopf|übertopf|pflanztopf|pflanzkübel|pflanzenständer/,            'blumentoepfe-regale'],
+  [/tablett(?!tisch)/,                                                      'teetische-tabletts'],
+  [/hocker|sitzbank|\bbank\b/,                                              'orient-hocker-sitzbaenke'],
+  [/stuhl|sessel/,                                                          'stuehle'],
+  [/waschbecken|aufsatzbecken/,                                             'orientalische-waschbecken'],
+  [/fliese|zellige/,                                                        'orientalische-fliesen'],
+  [/kerzenhalter|kerzenständer|teelicht/,                                   'kerzenlichter'],
+];
+const CASAMORO_STYLE_RE = /kamelhocker|orient|marokk|maroc|maurisch|arabisch|boho|ethno|berber|zellige|mosaik|kasbah|riad|indisch|punktloch|lochmuster|filigran|ornament|messing|kupfer|tadelakt|mangoholz|rattan|jute|seegras|patchwork|kelim/;
+
+function casamoroText(p) {
+  return `${p.name || ''} ${p.title || ''}`.toLowerCase();
+}
+function casamoroType(text) {
+  return CASAMORO_TYPES.find(([re]) => re.test(text)) || null;
+}
+// Offered only for oriental / boho pieces of a type Casa Moro sells
+function casamoroFits(p) {
+  const text = casamoroText(p);
+  return !!casamoroType(text) && CASAMORO_STYLE_RE.test(`${text} ${(p.material || '').toLowerCase()}`);
+}
+function casamoroUrl(q) {
+  const hit = casamoroType((q || '').toLowerCase());
+  return `https://casa-moro.de/collections/${hit ? hit[1] : 'orient'}`;
+}
+
 const SHOP_MAX = 4;
 const RUG_SHOPS = ['teppichde', 'rugvista'];
 const RUG_MATCH = () => ({ teppichde: TeppichMatch, rugvista: RugvistaMatch });
@@ -8114,6 +8162,12 @@ function getShopsForProduct(p) {
     if (HoeffnerMatch.bestSync(p)) shops.unshift('hoeffner');
     else shops.splice(1, 0, 'hoeffner');
   }
+  // Casa Moro leads when the feed has the piece; otherwise it sits right
+  // behind the main button, linking to the matching category.
+  if (isShopUsable('casamoro') && casamoroFits(p)) {
+    if (CasamoroMatch.bestSync(p)) shops.unshift('casamoro');
+    else shops.splice(1, 0, 'casamoro');
+  }
   // Happy Lamps leads only when it makes that very animal; for other
   // kids' lamps it sits in the dropdown.
   if (isShopUsable('happylamps') && happyLampsFits(p)) {
@@ -8138,6 +8192,12 @@ function shopUrl(key, query) {
 function productShopUrl(key, p) {
   if (key === 'hoeffner') return HoeffnerMatch.bestSync(p)?.link || shopUrl(key, p.name);
   if (key === 'happylamps') return happyLampsBest(p)?.link || shopUrl(key, p.name);
+  if (key === 'casamoro') {
+    const best = CasamoroMatch.bestSync(p);
+    if (best) return best.link;
+    const url = CasamoroMatch.urlSync(p);
+    return url ? awinWrap(key, url) : shopUrl(key, `${p.name || ''} ${p.title || ''}`);
+  }
   if (RUG_SHOPS.includes(key)) {
     const M = RUG_MATCH()[key];
     const best = M.bestSync(p);
@@ -8277,6 +8337,7 @@ function makeProductMatch(shop) {
 const HoeffnerMatch = makeProductMatch('hoeffner');
 const TeppichMatch = makeProductMatch('teppichde');
 const RugvistaMatch = makeProductMatch('rugvista');
+const CasamoroMatch = makeProductMatch('casamoro');
 
 function formatEuro(v) {
   const n = Number(v) || 0;
@@ -8340,14 +8401,19 @@ function attachShopMatch(card, p) {
   const hl = shops[0] === 'happylamps' && happyLampsBest(p);
   if (hl) { showProductMatch(card, hl, 'happylamps'); return; }
 
-  if (!shops.includes('hoeffner')) return;
-  HoeffnerMatch.get(p).then(r => {
-    const best = r && r.sure && r.results && r.results[0];
-    if (!best || !card.isConnected) return;
-    // Höffner becomes the main button and every Höffner link opens the product
-    refreshShopActions(card, p);
-    card.querySelectorAll('a[data-shop="hoeffner"]').forEach(a => { a.href = best.link; });
-    showProductMatch(card, best, 'hoeffner');
+  // Casa Moro and Höffner: ask both feeds; whichever has the exact piece
+  // leads (Casa Moro first, see getShopsForProduct) and its product is shown.
+  const wantC = shops.includes('casamoro');
+  const wantH = shops.includes('hoeffner');
+  if (!wantC && !wantH) return;
+  Promise.all([wantC ? CasamoroMatch.get(p) : null, wantH ? HoeffnerMatch.get(p) : null]).then(() => {
+    if (!card.isConnected) return;
+    const lead = getShopsForProduct(p)[0];
+    const best = lead === 'casamoro' ? CasamoroMatch.bestSync(p)
+               : lead === 'hoeffner' ? HoeffnerMatch.bestSync(p) : null;
+    // rebuild the buttons only when a link actually changed
+    if (best || (wantC && CasamoroMatch.urlSync(p))) refreshShopActions(card, p);
+    if (best) showProductMatch(card, best, lead);
   });
 }
 
