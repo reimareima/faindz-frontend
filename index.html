@@ -8779,8 +8779,10 @@ function repositionModeIndicator() {
 }
 
 // Apply mode after layout is ready (for indicator positioning)
+// (load can fire late, after the user has already picked a mode and started:
+// keep the mode that is set by then, else a late load wiped the results)
 window.addEventListener('load', () => {
-  setMode(savedMode);
+  setMode(document.body.getAttribute('data-mode') || savedMode);
   repositionModeIndicator();
 });
 // Also try immediately in case load already fired
