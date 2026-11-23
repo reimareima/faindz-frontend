@@ -8530,7 +8530,8 @@ async function findSimilar(imageUrl, products) {
   let image;
   try { image = await designToJpeg(imageUrl); } catch (e) { return; }
   const items = products.map(p => ({
-    title: productTitle(p), text: p.name || '', material: p.material || (p.attrs && p.attrs.material) || '',
+    // the AI's catalogue words first ("Chesterfield-Sofa Samt dunkelgrün"): better candidates
+    title: productTitle(p), text: p.attrs && p.attrs.typ ? `${shopQuery(p)} ${p.name || ''}` : (p.name || ''), material: p.material || (p.attrs && p.attrs.material) || '',
     price: p.price_range || '', reason: p.reason || '', shops: similarShops(p),
   }));
   let data = null;
