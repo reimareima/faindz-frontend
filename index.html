@@ -2731,8 +2731,9 @@
 
   .viz-img {
     width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
+    height: auto;
+    max-height: 78vh;
+    object-fit: contain;
     border-radius: var(--radius-md);
     background: var(--bg-elevated);
     border: 1px solid var(--border);
@@ -7385,6 +7386,8 @@ function restoreSessionSnapshot() {
         if (results) results.classList.add('show');
       }
 
+      if (active && active.imageUrl && currentLookData && currentLookData.products) findSimilar(active.imageUrl, currentLookData.products);
+
       // 7. Render thumbnails strip + edit UI
       if (typeof renderThumbnails === 'function') renderThumbnails();
       if (typeof updateEditUI === 'function') updateEditUI();
@@ -8523,12 +8526,19 @@ async function designToJpeg(src, max = 768) {
   return c.toDataURL('image/jpeg', 0.82).split(',')[1];
 }
 
+// offset: index of products[0] among the cards (edits append cards)
 let similarRun = 0;
-async function findSimilar(imageUrl, products) {
+async function findSimilar(imageUrl, products, offset = 0) {
   if (!imageUrl || !Array.isArray(products) || !products.length) return;
-  const run = ++similarRun;
+  const run = offset ? similarRun : ++similarRun;
   let image;
   try { image = await designToJpeg(imageUrl); } catch (e) { return; }
+  // the proxy takes 8 per request
+  for (let k = 8; k < products.length; k += 8) findSimilarPart(image, products.slice(k, k + 8), offset + k, run);
+  return findSimilarPart(image, products.slice(0, 8), offset, run);
+}
+
+async function findSimilarPart(image, products, offset, run) {
   const items = products.map(p => ({
     // the AI's catalogue words first ("Chesterfield-Sofa Samt dunkelgrün"): better candidates
     title: productTitle(p), text: p.attrs && p.attrs.typ ? `${shopQuery(p)} ${p.name || ''}` : (p.name || ''), material: p.material || (p.attrs && p.attrs.material) || '',
@@ -8538,14 +8548,14 @@ async function findSimilar(imageUrl, products) {
   try {
     const res = await fetch(`${PROXY_BASE}/similar`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image, items: items.slice(0, 8) }),
+      body: JSON.stringify({ image, items }),
     });
     if (res.ok) data = await res.json();
   } catch (e) { /* proxy unreachable: nothing to show */ }
   if (!data || !Array.isArray(data.results) || run !== similarRun) return;
   data.results.forEach((r, i) => {
     if (!r || !r.matches || !r.matches.length) return;
-    const card = document.getElementById(`product-card-${i}`);
+    const card = document.getElementById(`product-card-${offset + i}`);
     if (card && card.isConnected) showSimilar(card, r.matches);
   });
 }
@@ -10012,6 +10022,11 @@ function renderResults(data, options = {}) {
   if (!options.skipViz && !isShopMode && data.image_prompt) {
     generateVisualization(data.image_prompt, data.products);
   }
+  // Similar shop products: in Shop mode the pieces are in the uploaded
+  // photo; on a re-render (language switch) the design is already there
+  const vizAfterImg = document.getElementById('vizAfter');
+  if (isShopMode && preview && preview.src) findSimilar(preview.src, data.products);
+  else if (options.skipViz && vizAfterImg && vizAfterImg.src) findSimilar(vizAfterImg.src, data.products);
 }
 
 // ─── HOTSPOT MAP RENDERING (Shop Mode) ──────────────────
@@ -11209,6 +11224,7 @@ async function applyEdit(rawPrompt) {
         removeEditProductSkeletons(newVersion.label);
         if (newProducts.length > 0) {
           appendEditProducts(newProducts, newVersion.label);
+          findSimilar(newImageUrl, newProducts, currentLookData.products.length - newProducts.length);
           // Scroll the first new card gently into view so the user notices
           const firstNew = productsGrid.querySelector(
             `.product-card[data-from-version="${newVersion.label}"]`
@@ -11431,11 +11447,23 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
   });
 }
 
+// The supported output shape closest to the uploaded photo, so the
+// design keeps the photo's framing (before/after line up)
+function closestAspectRatio(w, h) {
+  if (!w || !h) return null;
+  const R = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'];
+  const r = w / h;
+  return R.reduce((best, a) => {
+    const [x, y] = a.split(':').map(Number);
+    return Math.abs(Math.log(x / y / r)) < Math.abs(Math.log(best[1] / r)) ? [a, x / y] : best;
+  }, ['1:1', 1])[0];
+}
+
 async function generateWithGemini(imagePrompt, products, geminiKey) {
   const mustHaves = (products || [])
     .filter(p => p.priority === 'must')
     .slice(0, 5)
-    .map(p => p.name);
+    .map(p => productTitle(p));
 
   // v6 prompt (Okt 2026): structured PRESERVE / CHANGE. The old version said
   // "only modify the smaller items", which contradicted style-shift mode
@@ -11474,7 +11502,11 @@ Result: a believable photo a real person could take in this home after redecorat
               { inline_data: { mime_type: state.imageMimeType, data: state.imageBase64 } }
             ]
           }],
-          generationConfig: { responseModalities: ['Image'] }
+          generationConfig: {
+            responseModalities: ['Image'],
+            ...(closestAspectRatio(preview.naturalWidth, preview.naturalHeight)
+              ? { imageConfig: { aspectRatio: closestAspectRatio(preview.naturalWidth, preview.naturalHeight) } } : {}),
+          }
         }
       })
     }
@@ -12174,6 +12206,7 @@ async function openSavedLook(lookId) {
       activeVersionIndex = visionVersions.length - 1;
       // editsUsed = number of versions BEYOND the initial V1
       editsUsed = Math.max(0, visionVersions.length - 1);
+      findSimilar(latest.imageUrl, currentLookData.products);
       renderThumbnails();
       updateEditUI();
       updateSaveCloudBanner();
