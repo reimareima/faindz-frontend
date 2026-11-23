@@ -7669,7 +7669,8 @@ const AWIN_PUBLISHER_ID = '2903059';
 const SHOPS = {
   amazon:     { name: 'Amazon',      color: '#FF9900', active: true,
                 search: q => `https://www.amazon.de/s?k=${encodeURIComponent(q)}` },
-  otto:       { name: 'OTTO',        color: '#D6011A', active: true,
+  // Awin partner since 23.11.2026 (12 % on Living for content sites)
+  otto:       { name: 'OTTO',        color: '#D6011A', awinMid: 14336, active: true,
                 search: q => `https://www.otto.de/suche/${encodeURIComponent(q.toLowerCase())}/` },
   etsy:       { name: 'Etsy',        color: '#F1641E', active: true,
                 search: q => `https://www.etsy.com/de/search?q=${encodeURIComponent(q)}` },
