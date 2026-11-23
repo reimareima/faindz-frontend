@@ -3529,6 +3529,20 @@
     position: relative;
     margin-top: 16px;
   }
+  /* Affiliate links must be marked as ads right at the link (UWG § 5a Abs. 4) */
+  .shop-ad {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+  .product-match-note {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
   .shop-split {
     display: flex;
     gap: 6px;
@@ -6285,6 +6299,8 @@ const I18N = {
     'results.priority.nice': 'Refined',
     'results.shopOn': 'Shop on {market}',
     'shop.viewAt': 'View at {market}',
+    'shop.ad': 'Ad',
+    'shop.priceNote': 'incl. VAT, plus shipping',
     'shop.alsoAt': 'Also available at',
     'shop.more': 'More shops',
     'shop.partner': 'Partner',
@@ -6513,6 +6529,8 @@ const I18N = {
     'results.priority.nice': 'Akzent',
     'results.shopOn': 'Bei {market} kaufen',
     'shop.viewAt': 'Bei {market} ansehen',
+    'shop.ad': 'Anzeige',
+    'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
     'shop.alsoAt': 'Auch erhältlich bei',
     'shop.more': 'Weitere Shops',
     'shop.partner': 'Partner',
@@ -8237,7 +8255,7 @@ function buildShopActions(p, opts = {}) {
     </a>`;
 
   if (!more.length) {
-    return `<div class="shop-actions shop-actions--${variant} is-single"><div class="shop-split">${main}</div></div>`;
+    return `<div class="shop-actions shop-actions--${variant} is-single"><span class="shop-ad">${escapeHtml(t('shop.ad'))}</span><div class="shop-split">${main}</div></div>`;
   }
 
   const panelId = `shopPanel${++shopPanelSeq}`;
@@ -8258,6 +8276,7 @@ function buildShopActions(p, opts = {}) {
         <div class="shop-panel-label">${escapeHtml(t('shop.more'))}</div>
         ${rows}
       </div>
+      <span class="shop-ad">${escapeHtml(t('shop.ad'))}</span>
       <div class="shop-split">${main}${toggle}</div>
     </div>`;
 }
@@ -8365,7 +8384,8 @@ function showProductMatch(card, best, shop) {
       <span class="product-match-img"><img src="${escapeHtml(best.image)}" alt="" loading="lazy" decoding="async"></span>
       <span class="product-match-body">
         <span class="product-match-title">${escapeHtml(best.title)}</span>
-        ${best.price ? `<span class="product-match-price">${escapeHtml(formatEuro(best.price))}${old}</span>` : ''}
+        ${best.price ? `<span class="product-match-price">${escapeHtml(formatEuro(best.price))}*${old}</span>` : ''}
+        <span class="product-match-note">${escapeHtml(t('shop.ad'))}${best.price ? ` · *${escapeHtml(t('shop.priceNote'))}` : ''}</span>
       </span>
     </a>`;
   // The shop's own picture first; if it doesn't load, Awin's copy; else no picture
