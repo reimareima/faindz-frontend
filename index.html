@@ -8214,6 +8214,13 @@ function isShopUsable(key) {
   return !!(s && s.active && typeof s.search === 'function');
 }
 
+// OTTO is the main shop for everything (its range is close to Amazon's):
+// always the first button, rugs included
+function ottoFirst(list) {
+  if (!isShopUsable('otto')) return list;
+  return ['otto', ...list.filter(k => k !== 'otto')];
+}
+
 function getShopsForProduct(p) {
   const text = `${p.category || ''} ${p.name || ''}`.toLowerCase();
   const picked = [];
@@ -8239,7 +8246,7 @@ function getShopsForProduct(p) {
     if (!L.known || L.sure || (L.lead && !hSure)) order = [...rugs, ...h, ...rest];
     else if (hSure) order = ['hoeffner', ...rugs, ...rest];
     else order = [...rest.slice(0, 1), ...rugs, ...h, ...rest.slice(1)];
-    return [...new Set(order)].slice(0, SHOP_MAX);
+    return ottoFirst([...new Set(order)]).slice(0, SHOP_MAX);
   }
   // OTTO is the main shop, the way Amazon was: its button opens the OTTO
   // search for the piece (no single product, so nothing that doesn't fit).
@@ -8264,7 +8271,7 @@ function getShopsForProduct(p) {
     if (happyLampsBest(p)) shops.unshift('happylamps');
     else shops.splice(1, 0, 'happylamps');
   }
-  return shops.slice(0, SHOP_MAX);
+  return ottoFirst(shops).slice(0, SHOP_MAX);
 }
 
 function awinWrap(key, target) {
