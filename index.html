@@ -8520,10 +8520,16 @@ function similarShops(p) {
 }
 
 async function designToJpeg(src, max = 768) {
+  // onload, not img.decode(): decode() can hang while the tab is in the
+  // background (people switch tabs while the design renders)
   const img = new Image();
   img.crossOrigin = 'anonymous';
-  img.src = src;
-  await img.decode();
+  await new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('image load timeout')), 15000);
+    img.onload = () => { clearTimeout(t); resolve(); };
+    img.onerror = () => { clearTimeout(t); reject(new Error('image load failed')); };
+    img.src = src;
+  });
   const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
   const c = document.createElement('canvas');
   c.width = Math.round(img.naturalWidth * s);
