@@ -7799,7 +7799,7 @@ const SHOP_FALLBACK = ['otto', 'amazon'];
 
 // Asked from the AI for every product, always in German: what the piece
 // is in catalogue words. The shop links are built from it (shopQuery).
-const PRODUCT_ATTRS_FIELD = `"attrs": {"typ": "always German: the product type as a furniture store names it, as specific as visible, e.g. 'Chesterfield-Sofa', 'Bogenlampe', 'Couchtisch', 'Pendelleuchte', 'Wollteppich', 'Kissenhülle'", "farbe": "always German: ONE main colour, e.g. 'dunkelgrün', 'creme', 'schwarz'", "material": "always German: ONE main material, e.g. 'Samt', 'Eiche', 'Rattan', 'Messing', or empty", "form": "only if it defines the piece: 'rund', 'oval', 'geschwungen', otherwise empty"},`;
+const PRODUCT_ATTRS_FIELD = `"attrs": {"typ": "always German: the product type as a furniture store names it, as specific as visible, e.g. 'Chesterfield-Sofa', 'Bogenlampe', 'Couchtisch', 'Pendelleuchte', 'Wollteppich', 'Kissenhülle'. PLANTS are ALWAYS suggested as artificial plants (shops sell those, not living ones): typ 'Kunstpflanze', and title and name say it too, e.g. title 'Kunst-Olivenbaum', name 'Kunstpflanze Olivenbaum 150 cm'; dried flowers and pampas grass stay as they are", "farbe": "always German: ONE main colour, e.g. 'dunkelgrün', 'creme', 'schwarz'", "material": "always German: ONE main material, e.g. 'Samt', 'Eiche', 'Rattan', 'Messing', or empty", "form": "only if it defines the piece: 'rund', 'oval', 'geschwungen', otherwise empty"},`;
 
 // ─── HÖFFNER ─────────────────────────────────────────────────────
 // Built from Höffner's full category tree (checked 03.11.2026, every
