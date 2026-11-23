@@ -3523,6 +3523,26 @@
     font-weight: 600;
   }
 
+  /* ─── LINK TO THE PARTNERSHOP STYLE PAGE ────────────── */
+  .shop-style-link {
+    display: flex;
+    align-items: center;
+    gap: 6px 18px;
+    flex-wrap: wrap;
+    margin: 32px 0 8px;
+    padding: 22px 4px;
+    border-top: 1px solid var(--border, rgba(0,0,0,0.1));
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.1));
+    color: var(--text);
+    text-decoration: none;
+  }
+  .shop-style-link[hidden] { display: none; }
+  .ssl-kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #c2185b; }
+  .ssl-text { flex: 1 1 260px; font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-weight: 400; letter-spacing: -0.01em; }
+  .shop-style-link svg { transition: transform 0.25s ease; }
+  .shop-style-link:hover { color: #c2185b; }
+  .shop-style-link:hover svg { transform: translateX(4px); }
+
   /* ─── SHOP ACTIONS (best shop + more shops) ───────────── */
   .product-card.is-shoppable { cursor: pointer; }
   .shop-actions {
@@ -5079,6 +5099,13 @@
 
     <div class="products-grid" id="productsGrid"></div>
 
+    <!-- Link to the matching Partnershop style page (see updateShopStyleLink) -->
+    <a class="shop-style-link" id="shopStyleLink" href="/shop/" hidden>
+      <span class="ssl-kicker">Partnershop</span>
+      <span class="ssl-text" id="shopStyleLinkText"></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </a>
+
     <!-- Save-Look CTA removed — Auto-Save handles persistence for signed-in users -->
   </section>
 
@@ -6303,6 +6330,7 @@ const I18N = {
     'results.shopOn': 'Shop on {market}',
     'shop.viewAt': 'View at {market}',
     'shop.ad': 'Ad',
+    'shop.styleLink': 'More {style} pieces in our partner shop',
     'shop.priceNote': 'incl. VAT, plus shipping',
     'shop.alsoAt': 'Also available at',
     'shop.more': 'More shops',
@@ -6533,6 +6561,7 @@ const I18N = {
     'results.shopOn': 'Bei {market} kaufen',
     'shop.viewAt': 'Bei {market} ansehen',
     'shop.ad': 'Anzeige',
+    'shop.styleLink': 'Mehr im Stil {style} ansehen',
     'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
     'shop.alsoAt': 'Auch erhältlich bei',
     'shop.more': 'Weitere Shops',
@@ -6922,6 +6951,7 @@ async function handleFile(e) {
     // Clear any previous results when a new image is uploaded
     results.classList.remove('show');
     productsGrid.innerHTML = '';
+    { const ssl = document.getElementById('shopStyleLink'); if (ssl) ssl.hidden = true; }
     const visualization = document.getElementById('visualization');
     if (visualization) visualization.classList.remove('show');
     const hsm = document.getElementById('inspoPreview');
@@ -8518,6 +8548,7 @@ function setMode(newMode) {
 
       if (results) results.classList.remove('show');
       if (productsGrid) productsGrid.innerHTML = '';
+      { const ssl = document.getElementById('shopStyleLink'); if (ssl) ssl.hidden = true; }
       const viz = document.getElementById('visualization');
       if (viz) viz.classList.remove('show');
       const hsm = document.getElementById('inspoPreview');
@@ -9700,6 +9731,37 @@ function buildProductCard(p, i, opts = {}) {
   return card;
 }
 
+// ─── PARTNERSHOP STYLE LINK ──────────────────────────────────────
+// Under the results: a link to the Partnershop page of the style the user
+// asked for (the style chips fill the prompt field). Only styles that have
+// a page; Boho goes to "Natürlich und grün" (rattan, jute, plants).
+const SHOP_STYLE_PAGES = [
+  { re: /orient|marokk|maroc|morocc|maurisch|arabisch|riad|kasbah|berber|kelim/, slug: 'orientalisch', name: 'Orientalisch' },
+  { re: /japandi|wabi.?sabi/,                                                    slug: 'japandi',      name: 'Japandi' },
+  { re: /boho|natürlich|natuerlich|natural|botani|urban jungle|jute|rattan/,     slug: 'natuerlich',   name: 'Natürlich und grün' },
+];
+function updateShopStyleLink(data) {
+  const el = document.getElementById('shopStyleLink');
+  if (!el) return;
+  const prompt = ((document.getElementById('promptInput') || {}).value || '').toLowerCase();
+  let hit = SHOP_STYLE_PAGES.find(s => s.re.test(prompt));
+  // No style asked for: only a clearly oriental product list counts
+  if (!hit && data && Array.isArray(data.products)) {
+    const names = data.products.map(p => `${p.name || ''} ${p.title || ''}`.toLowerCase());
+    if (names.filter(n => SHOP_STYLE_PAGES[0].re.test(n)).length >= 2) hit = SHOP_STYLE_PAGES[0];
+  }
+  if (!hit) { el.hidden = true; return; }
+  el.href = `/shop/${hit.slug}/`;
+  const [pre, post = ''] = t('shop.styleLink', { style: '\u0001' }).split('\u0001');
+  const text = document.getElementById('shopStyleLinkText');
+  text.textContent = '';
+  text.append(pre);
+  const b = document.createElement('em');
+  b.textContent = hit.name;
+  text.append(b, post);
+  el.hidden = false;
+}
+
 // renderResults(data, options)
 //   options.skipViz — if true, do NOT auto-trigger generateVisualization.
 //   Used when re-rendering for language change (we don't want a new API call).
@@ -9720,6 +9782,7 @@ function renderResults(data, options = {}) {
     const card = buildProductCard(p, i, { tag, region, fromVersion: null });
     productsGrid.appendChild(card);
   });
+  updateShopStyleLink(data);
 
   // Wire heart-button handlers (after all cards are in DOM)
   productsGrid.querySelectorAll('.heart-btn').forEach(btn => {
