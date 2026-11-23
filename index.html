@@ -8452,6 +8452,10 @@ const CasamoroMatch = makeProductMatch('casamoro');
 function shopQuery(p) {
   const a = p && p.attrs && typeof p.attrs === 'object' ? p.attrs : null;
   const clean = v => String(v || '').trim().replace(/[^\p{L}\p{N}\s-]/gu, '');
+  // artificial plants: the plant's kind is in the name ("Kunstpflanze Olivenbaum 150 cm")
+  if (a && /^kunst(pflanze|baum|blume)/i.test(clean(a.typ)) && /^kunst/i.test(String(p.name || ''))) {
+    return String(p.name).split(/\s+/).filter(w => !/\d/.test(w)).slice(0, 3).join(' ');
+  }
   if (a && clean(a.typ)) {
     const typ = clean(a.typ);
     const lowTyp = typ.toLowerCase();
