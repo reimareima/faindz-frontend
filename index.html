@@ -2238,6 +2238,15 @@
   }
 
   /* Raum lesen: what faindz spotted, shown while generating */
+  /* Step 1 after upload: only "Lass faindz den Raum lesen" */
+  body.needs-read[data-mode="reimagine"] #promptSection .prompt-label,
+  body.needs-read[data-mode="reimagine"] #promptInput,
+  body.needs-read[data-mode="reimagine"] .style-picks,
+  body.needs-read[data-mode="reimagine"] #analyzeBtn { display: none !important; }
+  .room-scan-panel { margin: 4px 0 18px; text-align: left; }
+  .room-scan-panel .room-scan-row { cursor: pointer; opacity: 1; animation: none; }
+  .room-scan-panel .room-scan-row:hover .room-scan-tag { filter: brightness(.95); }
+  .room-scan-hint { font-size: 12px; color: var(--text-subtle); margin-top: 6px; }
   .room-scan { margin: 18px auto 0; max-width: 440px; text-align: left; display: none; }
   .room-scan.show { display: block; animation: scanIn .5s ease both; }
   .room-scan-title { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 8px; }
@@ -4970,6 +4979,7 @@
 
     <!-- Style Suggestions: AI-generated direction cards (rendered on demand) -->
     <div class="style-cards-section chips-reimagine" id="styleCardsSection">
+      <div class="room-scan-panel" id="roomScanPanel"></div>
       <div class="style-cards-grid" id="styleCardsGrid">
         <!-- Cards rendered here dynamically -->
       </div>
@@ -6348,7 +6358,7 @@ const I18N = {
     'cta.working.reimagine': 'Reimagining',
     'cta.working.shop': 'Searching',
     // Loading messages
-    'loading.reimagine.0': 'Reading your room',
+    'loading.reimagine.0': 'Reading style cues',
     'loading.reimagine.1': 'Composing the vision',
     'loading.reimagine.2': 'Curating pieces',
     'loading.reimagine.3': 'Refining the look',
@@ -6580,7 +6590,7 @@ const I18N = {
     'cta.working.reimagine': 'Gestalte neu',
     'cta.working.shop': 'Suche',
     // Loading messages
-    'loading.reimagine.0': 'Lese deinen Raum',
+    'loading.reimagine.0': 'Lese den Stil',
     'loading.reimagine.1': 'Entwickle die Vision',
     'loading.reimagine.2': 'Wähle die Möbel aus',
     'loading.reimagine.3': 'Verfeinere den Look',
@@ -7014,6 +7024,10 @@ async function handleFile(e) {
       styleGrid.innerHTML = '';
     }
     if (ideasWrap) ideasWrap.classList.remove('is-hidden');
+    // Raum lesen: new photo → read it first, prompt comes after
+    state.roomScan = null;
+    { const rsp = document.getElementById('roomScanPanel'); if (rsp) rsp.innerHTML = ''; }
+    document.body.classList.add('needs-read');
     // Reset edit/version state
     visionVersions.length = 0;
     activeVersionIndex = 0;
@@ -7074,6 +7088,23 @@ async function generateStyleSuggestions() {
 
   // Hide the trigger button — cards take its place
   if (triggerWrap) triggerWrap.classList.add('is-hidden');
+
+  // Raum lesen: run the room scan alongside the style ideas. The prompt
+  // field and the generate button appear once faindz has read the room.
+  const scanPanel = document.getElementById('roomScanPanel');
+  if (scanPanel) scanPanel.innerHTML = '';
+  state.roomScan = null;
+  const scanImage = state.imageBase64;
+  scanRoom(state.imageBase64, state.imageMimeType || 'image/jpeg', '', undefined)
+    .then(scan => {
+      if (state.imageBase64 !== scanImage) return; // photo changed meanwhile
+      state.roomScan = scan;
+      renderRoomScanPanel();
+    })
+    .catch(err => console.warn('[scan] room read failed:', err))
+    .finally(() => {
+      if (state.imageBase64 === scanImage) document.body.classList.remove('needs-read');
+    });
 
   // Cancel any in-flight request from a previous upload
   if (styleSuggestionsController) {
@@ -7192,6 +7223,7 @@ Exactly 6 directions. Make them genuinely distinct (not 6 variations of the same
       if (sect) sect.classList.remove('has-content');
       if (grid) grid.innerHTML = '';
       if (wrap) wrap.classList.remove('is-hidden');
+      document.body.classList.remove('needs-read');
       // Surface the failure inline near the trigger
       showError(t('styleCards.failed'), { retry: false });
     }
@@ -9054,6 +9086,7 @@ async function analyzeRoom() {
   const userPrompt = promptInput.value.trim();
   const currentMode = document.body.getAttribute('data-mode') || 'reimagine';
   currentAnalyzeMode = currentMode;
+  let detectedIntentForScan = 'enhance';
 
   // Mode-aware system prompt
   let systemPrompt;
@@ -9153,8 +9186,13 @@ User's optional focus: "${userPrompt || 'Find everything in this image'}"${curre
     // The intent classifier (Sonnet 4.5 + vision) decides. Adds ~1-2s
     // latency but eliminates the "everything is mediocre" failure mode.
     let detectedIntent = 'enhance';
-    state.roomScan = null;
-    try {
+    if (state.roomScan) {
+      // The room was already read via "Lass faindz den Raum lesen":
+      // only the user's wish still needs classifying.
+      try {
+        detectedIntent = await classifyGenerateIntent(state.imageBase64, state.imageMimeType || 'image/jpeg', userPrompt, myController.signal);
+      } catch (e) { detectedIntent = 'enhance'; }
+    } else try {
       // faindz reads the room first (objects, light, what fits the wish)
       const scan = await scanRoom(
         state.imageBase64,
@@ -9182,6 +9220,7 @@ User's optional focus: "${userPrompt || 'Find everything in this image'}"${curre
         detectedIntent = 'enhance';
       }
     }
+    detectedIntentForScan = detectedIntent;
     // If a newer analyze was kicked off, abandon this one
     if (myController !== currentAnalyzeController) return;
 
@@ -9765,7 +9804,7 @@ Prioritize products with maximum visual impact relative to price and effort.`;
   }
 
   if (currentMode !== 'shop' && state.roomScan) {
-    userMessage += scanContextForStylist(state.roomScan);
+    userMessage += scanContextForStylist(state.roomScan, detectedIntentForScan);
   }
 
   try {
@@ -11061,10 +11100,58 @@ function renderRoomScan(scan) {
   box.classList.add('show');
 }
 
+// Interactive version under "Lass faindz den Raum lesen": tap a row to
+// switch between "bleibt" and the suggested change.
+function renderRoomScanPanel() {
+  const box = document.getElementById('roomScanPanel');
+  const scan = state.roomScan;
+  if (!box) return;
+  if (!scan) { box.innerHTML = ''; return; }
+  const de = currentLang === 'de';
+  const label = {
+    keep: de ? 'bleibt' : 'keep',
+    restyle: de ? 'wird aufgewertet' : 'upgrade',
+    replace: de ? 'wird ersetzt' : 'replace',
+    add: de ? 'kommt dazu' : 'add'
+  };
+  const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const rows = (scan.items || []).map((i, n) => {
+    if (!label[i.verdict]) return '';
+    const shown = i.verdict === 'add' && i.locked ? 'keep' : i.verdict;
+    const text = i.verdict === 'add' && i.locked ? (de ? 'nicht hinzufügen: ' : 'skip: ') + i.item : i.item;
+    return `<div class="room-scan-row" data-scan-idx="${n}"><span class="room-scan-tag ${esc(shown)}">${i.verdict === 'add' && i.locked ? (de ? 'weglassen' : 'skip') : label[i.verdict]}</span><span>${esc(text)}</span></div>`;
+  }).join('');
+  box.innerHTML = `<div class="room-scan-title">${de ? 'faindz hat deinen Raum gelesen' : 'faindz read your room'}${scan.room_type ? ' · ' + esc(scan.room_type) : ''}</div>${rows}<div class="room-scan-hint">${de ? 'Tippe auf ein Teil, um es zu behalten oder doch zu ändern. Dann Stil wählen oder eigenen Wunsch eingeben.' : 'Tap a piece to keep it or change it. Then pick a style or type your own wish.'}</div>`;
+  box.querySelectorAll('.room-scan-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const it = state.roomScan.items[+row.dataset.scanIdx];
+      if (!it) return;
+      if (it.verdict === 'add') { it.locked = !it.locked; }
+      else if (it.verdict === 'keep' && it._orig) { it.verdict = it._orig; it._orig = null; it.locked = false; }
+      else if (it.verdict === 'keep') { it.verdict = 'restyle'; it._orig = null; it.locked = false; it.userWants = true; }
+      else { it._orig = it.verdict; it.verdict = 'keep'; it.locked = true; }
+      renderRoomScanPanel();
+    });
+  });
+}
+
 // Context block for the stylist prompt
-function scanContextForStylist(scan) {
+function scanContextForStylist(scan, intent) {
   if (!scan) return '';
-  const lines = (scan.items || []).map(i => `- ${i.item} (${i.where}): ${String(i.verdict).toUpperCase()}${i.note ? ' – ' + i.note : ''}`).join('\n');
+  if (intent === 'targeted_edit') {
+    // Only the named change; the room read is just orientation here.
+    const locked = (scan.items || []).filter(i => i.locked).map(i => i.item);
+    return `
+
+ROOM READ (for orientation only): ${scan.room_type || ''}. Architecture (never changes): ${scan.architecture || ''}. Light: ${scan.light || ''}.
+Change ONLY what the user asked for. Do not add, replace or restyle anything else.${locked.length ? ' Never touch: ' + locked.join(', ') + '.' : ''}`;
+  }
+  const lines = (scan.items || [])
+    .filter(i => !(i.verdict === 'add' && i.locked))
+    .map(i => `- ${i.item} (${i.where}): ${String(i.verdict).toUpperCase()}${i.locked ? ' (LOCKED BY USER, do not touch)' : ''}${i.userWants ? ' (USER WANTS THIS CHANGED)' : ''}${i.note ? ' – ' + i.note : ''}`).join('\n');
+  const styleLine = intent === 'style_shift'
+    ? '\n- The verdicts were made before the user chose a style. For the chosen style, also change KEEP pieces that clearly do not fit it, except pieces LOCKED BY USER.'
+    : '';
   const min = { light: '1-2', medium: '4-6', strong: '6-8' }[scan.change_level] || '4-6';
   return `
 
@@ -11085,6 +11172,7 @@ HOW TO USE THE ROOM READ:
 - If the user named one specific thing (targeted edit), change ONLY that thing. The room read is then only for orientation, do not add or replace anything else.
 - Address the weak spots.
 - The image_prompt must contain ${min} clearly visible changes, so before and after are obviously different at first glance.
+- Pieces LOCKED BY USER must stay exactly as they are, whatever the style.${styleLine}
 - Never move walls, windows, doors, radiators or the floor; built-in wardrobes and fitted furniture stay exactly as they are (same colour); large furniture stays in its position and orientation.`;
 }
 
