@@ -5215,6 +5215,7 @@
       <button class="lang-toggle-btn" data-lang="de" type="button">DE</button>
     </div>
     <div class="footer-disclosure" data-i18n="footer.disclosure">Einige Shop-Links sind Affiliate-Links (Werbung). Kaufst du darüber ein, erhalten wir ggf. eine Provision. Für dich bleibt der Preis gleich.</div>
+    <div class="footer-disclosure" id="amazonDisclosure" hidden>Als Amazon-Partner verdiene ich an qualifizierten Verkäufen.</div>
   </footer>
 
 </div>
@@ -6796,8 +6797,16 @@ function applyTranslations() {
 // URL the user clicks), so embedding it client-side is safe — there's no
 // secret involved.
 const AFFILIATE_DEFAULTS = {
-  affiliateTag: '',  // no affiliate program active (old Amazon account closed Okt 2026)
+  // Amazon PartnerNet tracking ID (e.g. 'faindz-21'). Empty = Amazon links
+  // carry no tag and earn nothing. Set it here once the new application has
+  // its ID: every Amazon link then gets &tag=..., and the Amazon disclosure
+  // line appears in the footer (required by the PartnerNet terms).
+  affiliateTag: '',
 };
+if (AFFILIATE_DEFAULTS.affiliateTag) {
+  const d = document.getElementById('amazonDisclosure');
+  if (d) d.hidden = false;
+}
 
 // Helper: read setting value from DOM (if settings open) or localStorage,
 // falling back to the hardcoded default. Order:
@@ -7730,7 +7739,7 @@ const AWIN_PUBLISHER_ID = '2903059';
 
 const SHOPS = {
   amazon:     { name: 'Amazon',      color: '#FF9900', active: true,
-                search: q => `https://www.amazon.de/s?k=${encodeURIComponent(q)}` },
+                search: q => `https://www.amazon.de/s?k=${encodeURIComponent(q)}` + (AFFILIATE_DEFAULTS.affiliateTag ? `&tag=${encodeURIComponent(AFFILIATE_DEFAULTS.affiliateTag)}` : '') },
   // Awin partner since 23.11.2026 (12 % on Living for content sites)
   otto:       { name: 'OTTO',        color: '#D6011A', awinMid: 14336, active: true,
                 search: q => `https://www.otto.de/suche/${encodeURIComponent(q.toLowerCase())}/` },
