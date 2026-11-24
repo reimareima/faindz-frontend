@@ -10981,6 +10981,7 @@ INTENT:
 - style + object together → style_shift
 
 ITEMS: list the 4-10 most visible furniture pieces, lamps, textiles, rug, curtains, wall art, plants. Be concrete about colour and material.
+BUILT-INS ARE ARCHITECTURE: built-in wardrobes and closets, fitted kitchens, wall panelling, sliding doors, fireplaces, stairs, beams and anything fixed to the walls are part of "architecture" and always KEEP. Never restyle or replace them, even if their colour is loud.
 VERDICT, judged against the wish:
 - keep: ONLY if the piece already looks premium AND fits one calm, cohesive palette (architecture, good floors, a good TV are typical keeps)
 - restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe, and for loud or mismatched bedding/cushions)
@@ -11084,20 +11085,21 @@ HOW TO USE THE ROOM READ:
 - If the user named one specific thing (targeted edit), change ONLY that thing. The room read is then only for orientation, do not add or replace anything else.
 - Address the weak spots.
 - The image_prompt must contain ${min} clearly visible changes, so before and after are obviously different at first glance.
-- Never move walls, windows, doors, radiators or the floor; large furniture stays in its position.`;
+- Never move walls, windows, doors, radiators or the floor; built-in wardrobes and fitted furniture stay exactly as they are (same colour); large furniture stays in its position and orientation.`;
 }
 
 // Context block for the image model
 function scanContextForImage(scan) {
   if (!scan) return '';
   const strength = {
-    light: 'Apply only the requested change, but make it clearly visible.',
-    medium: 'The redesign must be clearly visible at first glance. Do not return an image that looks almost identical to the input.',
-    strong: 'This is a bold makeover. The new look must be unmistakable at first glance while the architecture stays identical. Do not return an image that looks almost identical to the input.'
+    light: 'Apply only the requested change.',
+    medium: 'Carry out every listed change fully and visibly, but only by restyling furniture, textiles, lighting and decor.',
+    strong: 'Carry out every listed change fully and boldly, but only by restyling furniture, textiles, lighting, decor and, if listed, wall colour.'
   }[scan.change_level] || '';
   return `
 ROOM CONTEXT (read from the input photo): ${scan.room_type || ''}. Architecture: ${scan.architecture || ''}. Light: ${scan.light || ''}.
 INTENSITY: ${strength}
+GEOMETRY LOCK: this is the same room photographed from the same spot. Keep the exact lens and field of view (also if it is a wide-angle phone photo), every window and door with its exact size, shape and position, all built-in furniture and fitted wardrobes in their exact colour, and the position and orientation of the bed, sofa and tables. Never invent new windows, walls or built-ins.
 `;
 }
 
