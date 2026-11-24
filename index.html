@@ -10134,6 +10134,7 @@ function renderResults(data, options = {}) {
 
   if (!options.skipViz && !isShopMode && data.image_prompt) {
     generateVisualization(data.image_prompt, data.products);
+    try { refreshEditChips(data.products); } catch (e) { console.warn('[chips]', e); }
   }
   // Similar shop products: in Shop mode the pieces are in the uploaded
   // photo; on a re-render (language switch) the design is already there
@@ -11758,10 +11759,13 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
     });
   }
 
-  chips.forEach(chip => {
-    chip.addEventListener('click', () => {
+  const chipsWrap = document.getElementById('vizEditChips');
+  if (chipsWrap) chipsWrap.addEventListener('click', (ev) => {
+    const chip = ev.target.closest('.edit-chip');
+    if (!chip) return;
+    {
       const promptKey = chip.dataset.editKey;
-      const promptText = promptKey ? t(promptKey) : (chip.textContent || '').trim();
+      const promptText = chip.dataset.editPrompt || (promptKey ? t(promptKey) : (chip.textContent || '').trim());
       if (input) {
         input.value = promptText;
       }
@@ -11770,7 +11774,7 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
       chip.classList.add('is-active');
       // Don't auto-submit — user can still tweak the prompt
       if (input) input.focus();
-    });
+    }
   });
 }
 
@@ -11784,6 +11788,37 @@ function closestAspectRatio(w, h) {
     const [x, y] = a.split(':').map(Number);
     return Math.abs(Math.log(x / y / r)) < Math.abs(Math.log(best[1] / r)) ? [a, x / y] : best;
   }, ['1:1', 1])[0];
+}
+
+// Edit chips that fit THIS room: the fixed "Sofa-Farbe ändern" chip made
+// no sense in a bedroom. The first chips now name pieces from the
+// current look; the generic ones (plants, light, style, less) stay.
+function refreshEditChips(products) {
+  const wrap = document.getElementById('vizEditChips');
+  if (!wrap) return;
+  wrap.querySelectorAll('.edit-chip[data-dynamic]').forEach(c => c.remove());
+  const sofaChip = wrap.querySelector('[data-edit-key="edit.chip.sofaColorPrompt"]');
+  const de = currentLang === 'de';
+  const picks = (products || [])
+    .slice()
+    .sort((a, b) => (a.role === 'hero' ? -1 : 0) - (b.role === 'hero' ? -1 : 0))
+    .filter(p => productTitle(p))
+    .slice(0, 2);
+  if (!picks.length) { if (sofaChip) sofaChip.hidden = false; return; }
+  if (sofaChip) sofaChip.hidden = true;
+  const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  picks.reverse().forEach(p => {
+    const title = productTitle(p);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'edit-chip';
+    btn.dataset.dynamic = '1';
+    btn.textContent = de ? `${title} anders` : `Different ${title}`;
+    btn.dataset.editPrompt = de
+      ? `Ersetze nur ${title} durch eine andere passende Variante (andere Form oder Farbe). Alles andere bleibt genau gleich.`
+      : `Replace only the ${title} with a different fitting variant (other shape or colour). Everything else stays exactly the same.`;
+    wrap.insertBefore(btn, wrap.firstChild);
+  });
 }
 
 async function generateWithGemini(imagePrompt, products, geminiKey) {
