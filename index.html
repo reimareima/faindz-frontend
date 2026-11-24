@@ -4813,6 +4813,7 @@
     .settings { padding: 24px; }
   }
 </style>
+<script src="/src.js?v=20261124"></script>
 </head>
 <body>
 
@@ -8290,7 +8291,8 @@ function awinWrap(key, target) {
   if (!s.awinMid) return target;
   // clickref "app": Awin reports then show which clicks came from the app
   // (Partnershop links carry "shop", magazine links "magazin")
-  return `https://www.awin1.com/cread.php?awinmid=${s.awinMid}&awinaffid=${AWIN_PUBLISHER_ID}&clickref=app&ued=${encodeURIComponent(target)}`;
+  const src2 = window.faindzSrc ? `&clickref2=${encodeURIComponent(window.faindzSrc)}` : '';
+  return `https://www.awin1.com/cread.php?awinmid=${s.awinMid}&awinaffid=${AWIN_PUBLISHER_ID}&clickref=app${src2}&ued=${encodeURIComponent(target)}`;
 }
 
 function shopUrl(key, query) {
