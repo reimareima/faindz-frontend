@@ -11030,7 +11030,8 @@ VERDICT, judged against the wish:
 - style_shift: be decisive, every visible piece that does not clearly speak the target style is restyle or replace
 - enhance: be a demanding editorial stylist, not a polite guest. Colourful, patterned or random textiles that fight the palette are restyle. At least half of the listed items are restyle or replace.
 
-ONLY for enhance and style_shift (NEVER for targeted_edit): ALSO add to "items" what is MISSING and would lift the room the most (e.g. "no curtains", "no rug", "only one cold ceiling light", "bare walls"), with verdict "add" and "where" = where it should go. Add 1-3 of these.
+ONLY for enhance and style_shift (NEVER for targeted_edit): ALSO add to "items" what is MISSING and would lift the room the most (e.g. "no curtains", "no rug", "only one cold ceiling light", "bare walls"), with verdict "add" and "where" = where it should go. Add 1-3 of these. For "add", "item" names the THING to add, never the gap: "großes Bild an der Wand links", not "leere Wandfläche".
+Do not list architecture (walls, floor, ceiling, radiators, windows, doors, built-ins) in "items", it belongs in "architecture".
 
 CHANGE_LEVEL: targeted_edit → light. enhance → medium (strong if the room is bare, messy or clearly dated). style_shift → strong.`;
   const response = await fetch(ANTHROPIC_URL, {
@@ -11118,6 +11119,8 @@ function renderRoomScanPanel() {
   const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const rows = (scan.items || []).map((i, n) => {
     if (!label[i.verdict]) return '';
+    // Only what faindz wants to change, plus what the user chose to keep
+    if (i.verdict === 'keep' && !i.locked && !i._orig) return '';
     const shown = i.verdict === 'add' && i.locked ? 'keep' : i.verdict;
     const text = i.verdict === 'add' && i.locked ? (de ? 'nicht hinzufügen: ' : 'skip: ') + i.item : i.item;
     return `<div class="room-scan-row" data-scan-idx="${n}"><span class="room-scan-tag ${esc(shown)}">${i.verdict === 'add' && i.locked ? (de ? 'weglassen' : 'skip') : label[i.verdict]}</span><span>${esc(text)}</span></div>`;
