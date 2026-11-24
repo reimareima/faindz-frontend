@@ -4710,12 +4710,11 @@
   /* Before the room is read, this is the only step: make it the main CTA */
   .read-intro { display: none; }
   body.needs-read[data-state="uploaded"][data-mode="reimagine"] .read-intro { display: block; margin-top: 8px; }
-  .read-intro-kicker { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #e91e63; margin-bottom: 10px; }
-  .read-intro-title { font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 10px; color: var(--text); }
-  .read-intro-sub { font-size: 15.5px; line-height: 1.55; color: var(--text-muted, #6b6b6b); margin: 0 0 22px; }
-  .read-intro-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-  .read-intro-list li { display: flex; gap: 12px; align-items: center; padding: 14px 16px; background: var(--bg-card); border: 1px solid rgba(0,0,0,.06); border-radius: 16px; font-size: 14.5px; line-height: 1.4; color: var(--text); }
-  .ri-ico { font-size: 18px; width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 12px; background: rgba(233,30,99,.08); }
+  .read-intro-title { font-family: 'Fraunces', Georgia, serif; font-size: 34px; line-height: 1.15; font-weight: 400; letter-spacing: -0.02em; margin: 0 0 12px; color: var(--text); }
+  .read-intro-sub { font-size: 16px; line-height: 1.55; color: var(--text-muted, #6b6b6b); margin: 0; max-width: 34em; }
+  @media (min-width: 1024px) {
+    body.needs-read[data-state="uploaded"][data-mode="reimagine"] #promptSection { align-self: center; }
+  }
   body.needs-read[data-state="uploaded"] .ideas-trigger-wrap { margin-top: 24px; }
   body.needs-read[data-state="uploaded"] .ideas-trigger-btn {
     width: 100%; justify-content: center; min-height: 60px; padding: 0 28px; gap: 10px;
@@ -4992,14 +4991,8 @@
 
     <!-- Read-first intro: only visible before the room is read -->
     <div class="read-intro chips-reimagine">
-      <div class="read-intro-kicker" data-i18n="readIntro.kicker">Schritt 1 von 2</div>
-      <h3 class="read-intro-title" data-i18n="readIntro.title">Erst schaut Faindz sich deinen Raum an</h3>
-      <p class="read-intro-sub" data-i18n="readIntro.sub">In ein paar Sekunden weißt du, was bleibt, was besser geht und was fehlt. Danach sagst du, wohin es gehen soll.</p>
-      <ul class="read-intro-list">
-        <li><span class="ri-ico">📐</span><span data-i18n="readIntro.l1">Fenster, Wände und Einbauten bleiben, wie sie sind</span></li>
-        <li><span class="ri-ico">🛋️</span><span data-i18n="readIntro.l2">Jedes Möbelstück wird eingeschätzt: behalten, aufwerten oder ersetzen</span></li>
-        <li><span class="ri-ico">💡</span><span data-i18n="readIntro.l3">Ideen für Licht, Farbe und Deko, die zu deinem Raum passen</span></li>
-      </ul>
+      <h3 class="read-intro-title" data-i18n="readIntro.title">Was steckt in deinem Raum?</h3>
+      <p class="read-intro-sub" data-i18n="readIntro.sub">Faindz schaut sich an, was bleiben kann und was fehlt. Danach sagst du, wohin es gehen soll.</p>
     </div>
 
     <!-- "Lass Faindz den Raum lesen" CTA (above the fixed style chips) — only shown in Reimagine mode -->
@@ -6320,12 +6313,8 @@ const I18N = {
     'styleCards.subheading': 'Faindz has a few directions in mind for your space',
     'styleCards.loading': 'Reading the room',
     'styleCards.failed': "Couldn't generate suggestions — write your own vision below",
-    "readIntro.kicker": "Step 1 of 2",
-    "readIntro.title": "First, Faindz takes a look at your room",
-    "readIntro.sub": "In a few seconds you'll know what stays, what can be better and what's missing. Then you tell it where to go.",
-    "readIntro.l1": "Windows, walls and built-ins stay exactly as they are",
-    "readIntro.l2": "Every piece gets a verdict: keep, upgrade or replace",
-    "readIntro.l3": "Ideas for light, colour and decor that fit your room",
+    "readIntro.title": "What's in your room?",
+    "readIntro.sub": "Faindz looks at what can stay and what's missing. Then you tell it where to go.",
     'styleCards.trigger': 'Let Faindz read the room',
     'styleCards.triggerLoading': 'Reading the room',
     // Edit / Refine feature
@@ -6558,12 +6547,8 @@ const I18N = {
     'styleCards.subheading': 'Faindz hat ein paar Richtungen für deinen Space im Kopf',
     'styleCards.loading': 'Liest den Raum',
     'styleCards.failed': 'Vorschläge konnten nicht erstellt werden — schreib unten deine eigene Vision',
-    "readIntro.kicker": "Schritt 1 von 2",
-    "readIntro.title": "Erst schaut Faindz sich deinen Raum an",
-    "readIntro.sub": "In ein paar Sekunden weißt du, was bleibt, was besser geht und was fehlt. Danach sagst du, wohin es gehen soll.",
-    "readIntro.l1": "Fenster, Wände und Einbauten bleiben, wie sie sind",
-    "readIntro.l2": "Jedes Möbelstück wird eingeschätzt: behalten, aufwerten oder ersetzen",
-    "readIntro.l3": "Ideen für Licht, Farbe und Deko, die zu deinem Raum passen",
+    "readIntro.title": "Was steckt in deinem Raum?",
+    "readIntro.sub": "Faindz schaut sich an, was bleiben kann und was fehlt. Danach sagst du, wohin es gehen soll.",
     'styleCards.trigger': 'Lass Faindz den Raum lesen',
     'styleCards.triggerLoading': 'Faindz liest den Raum',
     // Edit / Refine feature
