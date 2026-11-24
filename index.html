@@ -10989,7 +10989,7 @@ VERDICT, judged against the wish:
 - style_shift: be decisive, every visible piece that does not clearly speak the target style is restyle or replace
 - enhance: be a demanding editorial stylist, not a polite guest. Colourful, patterned or random textiles that fight the palette are restyle. At least half of the listed items are restyle or replace.
 
-ALSO add to "items" what is MISSING and would lift the room the most (e.g. "no curtains", "no rug", "only one cold ceiling light", "bare walls"), with verdict "add" and "where" = where it should go. Add 1-3 of these.
+ONLY for enhance and style_shift (NEVER for targeted_edit): ALSO add to "items" what is MISSING and would lift the room the most (e.g. "no curtains", "no rug", "only one cold ceiling light", "bare walls"), with verdict "add" and "where" = where it should go. Add 1-3 of these.
 
 CHANGE_LEVEL: targeted_edit → light. enhance → medium (strong if the room is bare, messy or clearly dated). style_shift → strong.`;
   const response = await fetch(ANTHROPIC_URL, {
@@ -11017,7 +11017,13 @@ CHANGE_LEVEL: targeted_edit → light. enhance → medium (strong if the room is
   const scan = JSON.parse(m ? m[0] : text);
   if (!['style_shift', 'targeted_edit', 'enhance'].includes(scan.intent)) scan.intent = 'enhance';
   if (!['light', 'medium', 'strong'].includes(scan.change_level)) scan.change_level = scan.intent === 'style_shift' ? 'strong' : scan.intent === 'targeted_edit' ? 'light' : 'medium';
-  scan.items = Array.isArray(scan.items) ? scan.items.slice(0, 10) : [];
+  scan.items = Array.isArray(scan.items) ? scan.items.slice(0, 12) : [];
+  // A targeted edit means: only what the user named. No extra "missing"
+  // pieces, and only the named object may change.
+  if (scan.intent === 'targeted_edit') {
+    scan.items = scan.items.filter(i => i.verdict !== 'add');
+    scan.change_level = 'light';
+  }
   scan.weak_spots = Array.isArray(scan.weak_spots) ? scan.weak_spots.slice(0, 4) : [];
   return scan;
 }
@@ -11075,6 +11081,7 @@ HOW TO USE THE ROOM READ:
 - Every entry marked ADD is something missing: add it at the given position, with a product.
 - Wall colour, curtains and lighting mood may change too when it serves the wish (not for targeted edits).
 - Pieces marked KEEP stay exactly as they are.
+- If the user named one specific thing (targeted edit), change ONLY that thing. The room read is then only for orientation, do not add or replace anything else.
 - Address the weak spots.
 - The image_prompt must contain ${min} clearly visible changes, so before and after are obviously different at first glance.
 - Never move walls, windows, doors, radiators or the floor; large furniture stays in its position.`;
