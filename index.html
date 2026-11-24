@@ -10932,6 +10932,16 @@ IMPORTANT: The style_identified field should describe the EXISTING style of the 
 // of guessing. Falls back to the plain intent classifier on any error.
 async function scanRoom(imageBase64, mimeType, userPrompt, signal) {
   if (!ANTHROPIC_URL) return null;
+  try {
+    return await scanRoomOnce(imageBase64, mimeType, userPrompt, signal);
+  } catch (err) {
+    if (signal?.aborted) throw err;
+    console.warn('[scan] first attempt failed, retrying once:', err);
+    return await scanRoomOnce(imageBase64, mimeType, userPrompt, signal);
+  }
+}
+
+async function scanRoomOnce(imageBase64, mimeType, userPrompt, signal) {
   const systemPrompt = `You are the eyes of faindz, an interior design app. Read the room photo carefully BEFORE anything is designed, and judge it against the user's wish.
 
 Return ONLY valid JSON, no markdown:
@@ -10942,7 +10952,7 @@ Return ONLY valid JSON, no markdown:
   "light": "where daylight comes from, artificial light, mood, one short line",
   "current_style": "3-6 words",
   "items": [
-    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace", "note": "max 8 words why" }
+    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace | add", "note": "max 8 words why" }
   ],
   "weak_spots": ["max 4 short points what makes the room look worse than it could"],
   "change_level": "light | medium | strong"
@@ -10958,12 +10968,14 @@ INTENT:
 
 ITEMS: list the 4-10 most visible furniture pieces, lamps, textiles, rug, curtains, wall art, plants. Be concrete about colour and material.
 VERDICT, judged against the wish:
-- keep: already fits and looks good
-- restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe)
-- replace: small or medium piece (lamp, rug, curtains, side table, chair, shelf, art, textiles, decor) that clashes with the wish, looks cheap, dated or worn
+- keep: ONLY if the piece already looks premium AND fits one calm, cohesive palette (architecture, good floors, a good TV are typical keeps)
+- restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe, and for loud or mismatched bedding/cushions)
+- replace: small or medium piece (lamp, rug, curtains, side table, chair, shelf, art, textiles, decor) that clashes with the wish, looks cheap, dated, worn, loud or random
 - targeted_edit: only the object the user names may be restyle/replace, everything else keep
-- style_shift: be decisive, most visible pieces that do not speak the target style are restyle or replace
-- enhance: replace what is cheap, dated, mismatched or missing in quality
+- style_shift: be decisive, every visible piece that does not clearly speak the target style is restyle or replace
+- enhance: be a demanding editorial stylist, not a polite guest. Colourful, patterned or random textiles that fight the palette are restyle. At least half of the listed items are restyle or replace.
+
+ALSO add to "items" what is MISSING and would lift the room the most (e.g. "no curtains", "no rug", "only one cold ceiling light", "bare walls"), with verdict "add" and "where" = where it should go. Add 1-3 of these.
 
 CHANGE_LEVEL: targeted_edit → light. enhance → medium (strong if the room is bare, messy or clearly dated). style_shift → strong.`;
   const response = await fetch(ANTHROPIC_URL, {
@@ -10972,7 +10984,7 @@ CHANGE_LEVEL: targeted_edit → light. enhance → medium (strong if the room is
     body: JSON.stringify({
       model: 'claude-haiku-5-5',
       thinking: { type: 'disabled' },
-      max_tokens: 1200,
+      max_tokens: 1400,
       system: systemPrompt,
       messages: [{
         role: 'user',
@@ -11022,6 +11034,8 @@ Change level: ${scan.change_level}
 
 HOW TO USE THE ROOM READ:
 - Every piece marked REPLACE must be swapped, every piece marked RESTYLE gets a new fabric/colour/finish. Each of them needs a product in products AND must be named in image_prompt by its current description (e.g. "replace the black metal floor lamp right of the sofa with ...").
+- Every entry marked ADD is something missing: add it at the given position, with a product.
+- Wall colour, curtains and lighting mood may change too when it serves the wish (not for targeted edits).
 - Pieces marked KEEP stay exactly as they are.
 - Address the weak spots.
 - The image_prompt must contain ${min} clearly visible changes, so before and after are obviously different at first glance.
