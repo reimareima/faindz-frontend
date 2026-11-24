@@ -2237,6 +2237,17 @@
     letter-spacing: -0.005em;
   }
 
+  /* Raum lesen: what faindz spotted, shown while generating */
+  .room-scan { margin: 18px auto 0; max-width: 440px; text-align: left; display: none; }
+  .room-scan.show { display: block; animation: scanIn .5s ease both; }
+  .room-scan-title { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 8px; }
+  .room-scan-row { display: flex; gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.45; padding: 5px 0; border-top: 1px solid rgba(0,0,0,.06); opacity: 0; animation: scanIn .4s ease forwards; }
+  .room-scan-tag { flex: 0 0 auto; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: rgba(0,0,0,.05); color: var(--text-subtle); }
+  .room-scan-tag.replace { background: rgba(233,30,99,.10); color: #c2185b; }
+  .room-scan-tag.restyle { background: rgba(255,152,0,.12); color: #b26a00; }
+  .room-scan-tag.add { background: rgba(76,175,80,.12); color: #2e7d32; }
+  @keyframes scanIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
   /* ─── INK LOADING ─────────────────────────────────────
      The "Faindz" wordmark is gradually inked, letter by letter,
      by a falling ink drop. After all 5 letters are inked, everything
@@ -5017,6 +5028,7 @@
           <span id="loadingText">Studying your space</span>
         </div>
         <div class="loading-subtext" data-i18n="loading.subtext">This usually takes a few seconds</div>
+        <div class="room-scan" id="roomScan"></div>
       </div>
     </div>
   </div>
@@ -6336,7 +6348,7 @@ const I18N = {
     'cta.working.reimagine': 'Reimagining',
     'cta.working.shop': 'Searching',
     // Loading messages
-    'loading.reimagine.0': 'Reading style cues',
+    'loading.reimagine.0': 'Reading your room',
     'loading.reimagine.1': 'Composing the vision',
     'loading.reimagine.2': 'Curating pieces',
     'loading.reimagine.3': 'Refining the look',
@@ -6568,7 +6580,7 @@ const I18N = {
     'cta.working.reimagine': 'Gestalte neu',
     'cta.working.shop': 'Suche',
     // Loading messages
-    'loading.reimagine.0': 'Lese den Stil',
+    'loading.reimagine.0': 'Lese deinen Raum',
     'loading.reimagine.1': 'Entwickle die Vision',
     'loading.reimagine.2': 'Wähle die Möbel aus',
     'loading.reimagine.3': 'Verfeinere den Look',
@@ -8993,6 +9005,7 @@ function startLoading() {
 
   const subEl = document.querySelector('.loading-subtext');
   if (subEl) subEl.textContent = t('loading.subtext');
+  renderRoomScan(null);
   const mode = document.body.getAttribute('data-mode') || 'reimagine';
   const msgs = getLoadingMessages(mode);
   let i = 0;
@@ -9152,7 +9165,8 @@ User's optional focus: "${userPrompt || 'Find everything in this image'}"${curre
       state.roomScan = scan;
       detectedIntent = scan.intent;
       const sub = document.querySelector('.loading-subtext');
-      if (sub && myController === currentAnalyzeController) sub.textContent = scanSummaryLine(scan);
+      if (sub && myController === currentAnalyzeController) sub.textContent = currentLang === 'de' ? 'Jetzt wird umgestaltet …' : 'Now redesigning …';
+      if (myController === currentAnalyzeController) renderRoomScan(scan);
       console.log('[reimagine] room scan:', scan);
     } catch (scanErr) {
       console.warn('[reimagine] room scan failed, falling back to intent classifier:', scanErr);
@@ -11014,6 +11028,30 @@ function scanSummaryLine(scan) {
   const bits = [scan.room_type, ...(scan.items || []).slice(0, 2).map(i => i.item)].filter(Boolean);
   const prefix = currentLang === 'de' ? 'Erkannt: ' : 'Spotted: ';
   return (prefix + bits.join(' · ')).slice(0, 140);
+}
+
+// Visible list on the loading screen: what faindz spotted and plans
+function renderRoomScan(scan) {
+  const box = document.getElementById('roomScan');
+  if (!box) return;
+  if (!scan) { box.classList.remove('show'); box.innerHTML = ''; return; }
+  const de = currentLang === 'de';
+  const label = {
+    keep: de ? 'bleibt' : 'keep',
+    restyle: de ? 'neu bezogen' : 'restyle',
+    replace: de ? 'wird ersetzt' : 'replace',
+    add: de ? 'fehlt' : 'missing'
+  };
+  const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const order = { replace: 0, restyle: 1, add: 2, keep: 3 };
+  const rows = (scan.items || [])
+    .filter(i => label[i.verdict])
+    .sort((a, b) => order[a.verdict] - order[b.verdict])
+    .slice(0, 6)
+    .map((i, n) => `<div class="room-scan-row" style="animation-delay:${0.15 + n * 0.35}s"><span class="room-scan-tag ${esc(i.verdict)}">${label[i.verdict]}</span><span>${esc(i.item)}</span></div>`)
+    .join('');
+  box.innerHTML = `<div class="room-scan-title">${de ? 'faindz hat deinen Raum gelesen' : 'faindz read your room'}${scan.room_type ? ' · ' + esc(scan.room_type) : ''}</div>${rows}`;
+  box.classList.add('show');
 }
 
 // Context block for the stylist prompt
