@@ -8991,6 +8991,8 @@ function startLoading() {
     }
   }, 450);
 
+  const subEl = document.querySelector('.loading-subtext');
+  if (subEl) subEl.textContent = t('loading.subtext');
   const mode = document.body.getAttribute('data-mode') || 'reimagine';
   const msgs = getLoadingMessages(mode);
   let i = 0;
@@ -9138,17 +9140,33 @@ User's optional focus: "${userPrompt || 'Find everything in this image'}"${curre
     // The intent classifier (Sonnet 4.5 + vision) decides. Adds ~1-2s
     // latency but eliminates the "everything is mediocre" failure mode.
     let detectedIntent = 'enhance';
+    state.roomScan = null;
     try {
-      detectedIntent = await classifyGenerateIntent(
+      // faindz reads the room first (objects, light, what fits the wish)
+      const scan = await scanRoom(
         state.imageBase64,
         state.imageMimeType || 'image/jpeg',
         userPrompt,
         myController.signal
       );
-      console.log(`[reimagine] intent classified as: ${detectedIntent} (user prompt: "${userPrompt}")`);
-    } catch (classifyErr) {
-      console.warn('[reimagine] intent classify failed, defaulting to enhance:', classifyErr);
-      detectedIntent = 'enhance';
+      state.roomScan = scan;
+      detectedIntent = scan.intent;
+      const sub = document.querySelector('.loading-subtext');
+      if (sub && myController === currentAnalyzeController) sub.textContent = scanSummaryLine(scan);
+      console.log('[reimagine] room scan:', scan);
+    } catch (scanErr) {
+      console.warn('[reimagine] room scan failed, falling back to intent classifier:', scanErr);
+      try {
+        detectedIntent = await classifyGenerateIntent(
+          state.imageBase64,
+          state.imageMimeType || 'image/jpeg',
+          userPrompt,
+          myController.signal
+        );
+      } catch (classifyErr) {
+        console.warn('[reimagine] intent classify failed, defaulting to enhance:', classifyErr);
+        detectedIntent = 'enhance';
+      }
     }
     // If a newer analyze was kicked off, abandon this one
     if (myController !== currentAnalyzeController) return;
@@ -9730,6 +9748,10 @@ Prioritize products with maximum visual impact relative to price and effort.`;
 
       userMessage = `User wish: "${userPrompt || 'Improve and furnish in general'}"\n\nPlease analyze my image and provide product recommendations.`;
     }
+  }
+
+  if (currentMode !== 'shop' && state.roomScan) {
+    userMessage += scanContextForStylist(state.roomScan);
   }
 
   try {
@@ -10902,6 +10924,124 @@ ${REIMAGINE_OUTPUT_SCHEMA_EN}
 IMPORTANT: The style_identified field should describe the EXISTING style of the room (it stays) plus mention the edit. Example: "Modern living room, sofa now in red".`;
 }
 
+// ── Raum lesen (Nov 2026) ─────────────────────────────────────────────
+// Before anything is generated, faindz reads the room once: what is
+// there, where, what fits the wish and what doesn't. The result decides
+// the intent AND is handed to the stylist prompt and to Gemini, so the
+// edit names real objects ("the grey corner sofa on the left") instead
+// of guessing. Falls back to the plain intent classifier on any error.
+async function scanRoom(imageBase64, mimeType, userPrompt, signal) {
+  if (!ANTHROPIC_URL) return null;
+  const systemPrompt = `You are the eyes of faindz, an interior design app. Read the room photo carefully BEFORE anything is designed, and judge it against the user's wish.
+
+Return ONLY valid JSON, no markdown:
+{
+  "intent": "style_shift | targeted_edit | enhance",
+  "room_type": "e.g. living room, bedroom, home office",
+  "architecture": "walls, ceiling, mouldings, windows, doors, radiators, floor material, in one short line",
+  "light": "where daylight comes from, artificial light, mood, one short line",
+  "current_style": "3-6 words",
+  "items": [
+    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace", "note": "max 8 words why" }
+  ],
+  "weak_spots": ["max 4 short points what makes the room look worse than it could"],
+  "change_level": "light | medium | strong"
+}
+
+Write room_type and items in the user's language (German if the wish is German or empty).
+
+INTENT:
+- style_shift: the wish names a style or aesthetic direction (boho, japandi, scandi, industrial, warmer with more wood, ...)
+- targeted_edit: the wish names ONE specific object or surface to change, add, remove or recolour
+- enhance: vague, empty or general wish ("schöner machen", "make it better")
+- style + object together → style_shift
+
+ITEMS: list the 4-10 most visible furniture pieces, lamps, textiles, rug, curtains, wall art, plants. Be concrete about colour and material.
+VERDICT, judged against the wish:
+- keep: already fits and looks good
+- restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe)
+- replace: small or medium piece (lamp, rug, curtains, side table, chair, shelf, art, textiles, decor) that clashes with the wish, looks cheap, dated or worn
+- targeted_edit: only the object the user names may be restyle/replace, everything else keep
+- style_shift: be decisive, most visible pieces that do not speak the target style are restyle or replace
+- enhance: replace what is cheap, dated, mismatched or missing in quality
+
+CHANGE_LEVEL: targeted_edit → light. enhance → medium (strong if the room is bare, messy or clearly dated). style_shift → strong.`;
+  const response = await fetch(ANTHROPIC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-haiku-5-5',
+      thinking: { type: 'disabled' },
+      max_tokens: 1200,
+      system: systemPrompt,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType || 'image/jpeg', data: imageBase64 } },
+          { type: 'text', text: `User's wish: "${userPrompt || '(none, just make it look better)'}"\n\nRead the room.` }
+        ]
+      }]
+    }),
+    signal,
+  });
+  if (!response.ok) throw new Error(`scan ${response.status}`);
+  const data = await response.json();
+  const text = (data.content || []).map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
+  const m = text.match(/\{[\s\S]*\}/);
+  const scan = JSON.parse(m ? m[0] : text);
+  if (!['style_shift', 'targeted_edit', 'enhance'].includes(scan.intent)) scan.intent = 'enhance';
+  if (!['light', 'medium', 'strong'].includes(scan.change_level)) scan.change_level = scan.intent === 'style_shift' ? 'strong' : scan.intent === 'targeted_edit' ? 'light' : 'medium';
+  scan.items = Array.isArray(scan.items) ? scan.items.slice(0, 10) : [];
+  scan.weak_spots = Array.isArray(scan.weak_spots) ? scan.weak_spots.slice(0, 4) : [];
+  return scan;
+}
+
+// Short human line for the loading screen: "Erkannt: Wohnzimmer · graues Ecksofa · ..."
+function scanSummaryLine(scan) {
+  if (!scan) return '';
+  const bits = [scan.room_type, ...(scan.items || []).slice(0, 2).map(i => i.item)].filter(Boolean);
+  const prefix = currentLang === 'de' ? 'Erkannt: ' : 'Spotted: ';
+  return (prefix + bits.join(' · ')).slice(0, 140);
+}
+
+// Context block for the stylist prompt
+function scanContextForStylist(scan) {
+  if (!scan) return '';
+  const lines = (scan.items || []).map(i => `- ${i.item} (${i.where}): ${String(i.verdict).toUpperCase()}${i.note ? ' – ' + i.note : ''}`).join('\n');
+  const min = { light: '1-2', medium: '4-6', strong: '6-8' }[scan.change_level] || '4-6';
+  return `
+
+ROOM READ (faindz analysed this photo before you):
+Room: ${scan.room_type || '?'} | Current style: ${scan.current_style || '?'}
+Architecture (never changes): ${scan.architecture || '?'}
+Light: ${scan.light || '?'}
+Existing pieces and verdict:
+${lines}
+Weak spots: ${(scan.weak_spots || []).join('; ')}
+Change level: ${scan.change_level}
+
+HOW TO USE THE ROOM READ:
+- Every piece marked REPLACE must be swapped, every piece marked RESTYLE gets a new fabric/colour/finish. Each of them needs a product in products AND must be named in image_prompt by its current description (e.g. "replace the black metal floor lamp right of the sofa with ...").
+- Pieces marked KEEP stay exactly as they are.
+- Address the weak spots.
+- The image_prompt must contain ${min} clearly visible changes, so before and after are obviously different at first glance.
+- Never move walls, windows, doors, radiators or the floor; large furniture stays in its position.`;
+}
+
+// Context block for the image model
+function scanContextForImage(scan) {
+  if (!scan) return '';
+  const strength = {
+    light: 'Apply only the requested change, but make it clearly visible.',
+    medium: 'The redesign must be clearly visible at first glance. Do not return an image that looks almost identical to the input.',
+    strong: 'This is a bold makeover. The new look must be unmistakable at first glance while the architecture stays identical. Do not return an image that looks almost identical to the input.'
+  }[scan.change_level] || '';
+  return `
+ROOM CONTEXT (read from the input photo): ${scan.room_type || ''}. Architecture: ${scan.architecture || ''}. Light: ${scan.light || ''}.
+INTENSITY: ${strength}
+`;
+}
+
 // Classify the user's INITIAL generate request into one of three intents,
 // so we can route to a specialized system prompt. Uses Sonnet 4.5 with
 // vision (it sees the room) so it can sanity-check the request against
@@ -11523,7 +11663,7 @@ PRESERVE EXACTLY (keep identical to the input photo):
 
 CHANGE (apply these instructions):
 ${imagePrompt}
-${itemsLine}
+${itemsLine}${scanContextForImage(state.roomScan)}
 Result: a believable photo a real person could take in this home after redecorating, not a 3D render. Natural colours, no added text, no people.`;
 
   const response = await fetch(
