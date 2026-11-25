@@ -11066,7 +11066,7 @@ Return ONLY valid JSON, no markdown:
   "light": "where daylight comes from, artificial light, mood, one short line",
   "current_style": "3-6 words",
   "items": [
-    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace | add", "note": "max 8 words why", "x": 0-100, "y": 0-100 }
+    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace | remove | add", "note": "max 8 words why", "x": 0-100, "y": 0-100 }
   ],
   "weak_spots": ["max 4 short points what makes the room look worse than it could"],
   "change_level": "light | medium | strong"
@@ -11087,7 +11087,8 @@ VERDICT, judged against the wish:
 - keep: ONLY if the piece already looks premium AND fits one calm, cohesive palette (architecture, good floors, a good TV are typical keeps)
 - restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe, and for loud or mismatched bedding/cushions)
 - replace: small or medium piece (lamp, rug, curtains, side table, chair, shelf, art, textiles, decor) that clashes with the wish, looks cheap, dated, worn, loud or random
-- targeted_edit: only the object the user names may be restyle/replace, everything else keep
+- remove: clutter or things that do not belong in a styled room and should simply be cleared away, not replaced: moving boxes, cleaning tools (vacuum, ironing board), laundry, drying racks, loose cables, packaging, office equipment lying around, piles of stuff
+- targeted_edit: only the object the user names may be restyle/replace/remove, everything else keep
 - style_shift: be decisive, every visible piece that does not clearly speak the target style is restyle or replace
 - enhance: be a demanding editorial stylist, not a polite guest. Colourful, patterned or random textiles that fight the palette are restyle. At least half of the listed items are restyle or replace.
 
@@ -11149,10 +11150,11 @@ function renderRoomScan(scan) {
     keep: de ? 'bleibt' : 'keep',
     restyle: de ? 'wird aufgewertet' : 'upgrade',
     replace: de ? 'wird ersetzt' : 'replace',
+    remove: de ? 'wird weggeräumt' : 'cleared away',
     add: de ? 'fehlt' : 'missing'
   };
   const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const order = { replace: 0, restyle: 1, add: 2, keep: 3 };
+  const order = { remove: 0, replace: 1, restyle: 2, add: 3, keep: 4 };
   const rows = (scan.items || [])
     .filter(i => label[i.verdict])
     .sort((a, b) => order[a.verdict] - order[b.verdict])
@@ -11229,10 +11231,10 @@ function renderRoomScanPanel() {
   const items = scan.items || [];
   items.forEach(i => { if (!i._base) i._base = i._orig || i.verdict; });
   const isOn = i => i._base === 'add' ? !i.locked : i.verdict !== 'keep';
-  const order = { replace: 0, restyle: 1, add: 2 };
+  const order = { remove: 0, replace: 1, restyle: 2, add: 3 };
   const list = items.map((i, n) => [i, n]).filter(([i]) => i._base in order).sort((a, b) => order[a[0]._base] - order[b[0]._base]);
   if (!list.length) { box.innerHTML = ''; if (layer) layer.innerHTML = ''; return; }
-  const verb = { replace: de ? 'Ersetzen' : 'Replace', restyle: de ? 'Neuer Look' : 'New look', add: de ? 'Neu' : 'Add' };
+  const verb = { remove: de ? 'Wegräumen' : 'Clear away', replace: de ? 'Ersetzen' : 'Replace', restyle: de ? 'Neuer Look' : 'New look', add: de ? 'Neu' : 'Add' };
   const stay = de ? 'Bleibt' : 'Stays';
   const skip = de ? 'Nicht nötig' : 'Skip';
   const num = k => String(k + 1).padStart(2, '0');
@@ -11312,6 +11314,7 @@ Change level: ${scan.change_level}
 
 HOW TO USE THE ROOM READ:
 - Every piece marked REPLACE must be swapped, every piece marked RESTYLE gets a new fabric/colour/finish. Each of them needs a product in products AND must be named in image_prompt by its current description (e.g. "replace the black metal floor lamp right of the sofa with ...").
+- Every piece marked REMOVE is cleared out of the room completely (tidied away, no product, nothing in its place unless an ADD item goes there). Name each one in image_prompt ("remove the stacked moving boxes on the left floor").
 - Every entry marked ADD is something missing: add it at the given position, with a product.
 - Wall colour, curtains and lighting mood may change too when it serves the wish (not for targeted edits).
 - Pieces marked KEEP stay exactly as they are.
