@@ -4897,6 +4897,10 @@
 .gis-close{position:absolute;top:12px;right:14px;border:0;background:none;font-size:26px;line-height:1;color:#766f68;cursor:pointer;padding:6px}
 .gis-close:hover{color:#1a1a1a}
 @keyframes gisFade{from{opacity:0}to{opacity:1}}
+
+/* Room read never shows on the empty home screen */
+body[data-state="empty"] .room-scan-panel,
+body[data-state="empty"] .scan-pins { display: none !important; }
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -7907,6 +7911,10 @@ if (logoWrap) {
     if (promptSec) promptSec.classList.remove('show');
     state.imageBase64 = null;
     state.imageMimeType = null;
+    // Clear the room read (legend + pins) so it doesn't linger on the home screen
+    state.roomScan = null;
+    if (typeof renderRoomScanPanel === 'function') renderRoomScanPanel();
+    document.body.classList.remove('needs-read');
     // CRITICAL: Reset the file input. Without this, selecting the same
     // file again does NOT fire 'change' (browser thinks nothing changed)
     // and the upload zone appears unresponsive.
