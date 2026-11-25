@@ -2245,14 +2245,32 @@
   body.needs-read[data-mode="reimagine"] #analyzeBtn { display: none !important; }
   .room-scan-panel { margin: 4px 0 22px; text-align: left; }
   .room-scan-panel:empty, body[data-mode="shop"] .room-scan-panel { display: none; }
-  .room-scan-panel { margin-top: 24px; }
-  .rs-title { font-family: 'Fraunces', Georgia, serif; font-size: 22px; line-height: 1.2; color: var(--text); margin-bottom: 12px; }
-  .rs-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .rs-chip { font: inherit; font-size: 13.5px; line-height: 1.2; padding: 9px 14px; border-radius: 999px; cursor: pointer;
-    background: var(--bg-card, #fff); color: var(--text); border: 1px solid rgba(0,0,0,.09); transition: all .15s; }
-  .rs-chip:hover { border-color: rgba(233,30,99,.4); }
-  .rs-chip.off { background: transparent; color: var(--text-subtle); text-decoration: line-through; border-style: dashed; }
-  .rs-hint { font-size: 12.5px; color: var(--text-subtle); margin-top: 10px; }
+  .room-scan-panel { margin-top: 26px; }
+  .rs-cap { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-subtle); padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,.12); }
+  .rs-legend { list-style: none; margin: 0; padding: 0; }
+  .rs-li { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; gap: 12px; padding: 12px 2px; border-bottom: 1px solid rgba(0,0,0,.07); cursor: pointer; transition: background .2s, opacity .2s; }
+  .rs-li.fresh { opacity: 0; animation: rsIn .5s ease forwards; animation-delay: var(--d); }
+  @keyframes rsIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .rs-li:hover, .rs-li.hl { background: rgba(233,30,99,.035); }
+  .rs-li:focus-visible { outline: 2px solid #e91e63; outline-offset: 2px; }
+  .rs-n { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 17px; color: #e91e63; }
+  .rs-li .rs-name { font-size: 15px; line-height: 1.4; color: var(--text); }
+  .rs-v { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text); white-space: nowrap; }
+  .rs-li.off .rs-n, .rs-li.off .rs-name { color: var(--text-subtle); }
+  .rs-li.off .rs-name { text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+  .rs-li.off .rs-v { color: var(--text-subtle); }
+  .rs-hint { font-size: 12.5px; color: var(--text-subtle); margin: 12px 2px 0; }
+  .scan-pins { position: absolute; pointer-events: none; z-index: 3; }
+  .scan-pin { pointer-events: auto; position: absolute; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; padding: 0; cursor: pointer; font: 600 12.5px/1 Inter, system-ui, sans-serif;
+    background: rgba(255,255,255,.96); color: #1a1a1a; border: 0; box-shadow: 0 0 0 5px rgba(255,255,255,.28), 0 6px 18px rgba(0,0,0,.28);
+    transition: transform .25s cubic-bezier(.2,.9,.3,1.3), background .2s, color .2s; }
+  .scan-pin.add { background: #e91e63; color: #fff; box-shadow: 0 0 0 5px rgba(233,30,99,.28), 0 6px 18px rgba(0,0,0,.28); }
+  .scan-pin.fresh { animation: pinIn .55s cubic-bezier(.2,.9,.3,1.3) both; animation-delay: var(--d); }
+  @keyframes pinIn { from { opacity: 0; transform: translate(-50%, -50%) scale(.3); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+  .scan-pin:hover, .scan-pin.hl { transform: translate(-50%, -50%) scale(1.18); }
+  .scan-pin.off { background: rgba(20,20,20,.35); color: rgba(255,255,255,.85); box-shadow: 0 0 0 1.5px rgba(255,255,255,.8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  body:not([data-state="uploaded"]) .scan-pins, body[data-mode="shop"] .scan-pins { display: none; }
   .room-scan { margin: 18px auto 0; max-width: 440px; text-align: left; display: none; }
   .room-scan.show { display: block; animation: scanIn .5s ease both; }
   .room-scan-title { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 8px; }
@@ -7063,7 +7081,7 @@ async function handleFile(e) {
     if (ideasWrap) ideasWrap.classList.remove('is-hidden');
     // Raum lesen: new photo → read it first, prompt comes after
     state.roomScan = null;
-    { const rsp = document.getElementById('roomScanPanel'); if (rsp) rsp.innerHTML = ''; }
+    renderRoomScanPanel();
     document.body.classList.add('needs-read');
     // Reset edit/version state
     visionVersions.length = 0;
@@ -7129,8 +7147,8 @@ async function generateStyleSuggestions() {
   // Raum lesen: run the room scan alongside the style ideas. The prompt
   // field and the generate button appear once faindz has read the room.
   const scanPanel = document.getElementById('roomScanPanel');
-  if (scanPanel) scanPanel.innerHTML = '';
   state.roomScan = null;
+  if (scanPanel) renderRoomScanPanel();
   const scanImage = state.imageBase64;
   scanRoom(state.imageBase64, state.imageMimeType || 'image/jpeg', '', undefined)
     .then(scan => {
@@ -11043,7 +11061,7 @@ Return ONLY valid JSON, no markdown:
   "light": "where daylight comes from, artificial light, mood, one short line",
   "current_style": "3-6 words",
   "items": [
-    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace | add", "note": "max 8 words why" }
+    { "item": "concrete name with colour + material, e.g. grey fabric corner sofa", "where": "position in the photo, e.g. left wall", "verdict": "keep | restyle | replace | add", "note": "max 8 words why", "x": 0-100, "y": 0-100 }
   ],
   "weak_spots": ["max 4 short points what makes the room look worse than it could"],
   "change_level": "light | medium | strong"
@@ -11057,6 +11075,7 @@ INTENT:
 - enhance: vague, empty or general wish ("schöner machen", "make it better")
 - style + object together → style_shift
 
+X/Y: for every item give the centre of that piece in the photo as percent of image width (x, 0 = left edge) and height (y, 0 = top edge). For "add" items give the spot where it would go. Be precise, these numbers place markers on the photo.
 ITEMS: list the 4-10 most visible furniture pieces, lamps, textiles, rug, curtains, wall art, plants. Be concrete about colour and material.
 BUILT-INS ARE ARCHITECTURE: built-in wardrobes and closets, fitted kitchens, wall panelling, sliding doors, fireplaces, stairs, beams and anything fixed to the walls are part of "architecture" and always KEEP. Never restyle or replace them, even if their colour is loud.
 VERDICT, judged against the wish:
@@ -11141,35 +11160,91 @@ function renderRoomScan(scan) {
 
 // Interactive version under "Lass faindz den Raum lesen": tap a row to
 // switch between "bleibt" and the suggested change.
+// Room read UI: numbered markers on the photo + an editorial legend under it
+function scanPinsLayer() {
+  const wrap = document.getElementById('previewWrap');
+  if (!wrap) return null;
+  let layer = document.getElementById('scanPins');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'scanPins'; layer.className = 'scan-pins';
+    wrap.appendChild(layer);
+  }
+  return layer;
+}
+function layoutScanPins() {
+  const layer = document.getElementById('scanPins');
+  const img = document.getElementById('preview');
+  const wrap = document.getElementById('previewWrap');
+  if (!layer || !img || !wrap || !img.naturalWidth) return;
+  // the photo is object-fit: contain, so find the area the picture really covers
+  const bw = img.clientWidth, bh = img.clientHeight;
+  const k = Math.min(bw / img.naturalWidth, bh / img.naturalHeight);
+  const cw = img.naturalWidth * k, ch = img.naturalHeight * k;
+  layer.style.left = (img.offsetLeft + (bw - cw) / 2) + 'px';
+  layer.style.top = (img.offsetTop + (bh - ch) / 2) + 'px';
+  layer.style.width = cw + 'px';
+  layer.style.height = ch + 'px';
+}
+window.addEventListener('resize', () => layoutScanPins());
+
 function renderRoomScanPanel() {
   const box = document.getElementById('roomScanPanel');
+  const layer = scanPinsLayer();
   const scan = state.roomScan;
   if (!box) return;
-  if (!scan) { box.innerHTML = ''; return; }
+  if (!scan) { box.innerHTML = ''; if (layer) layer.innerHTML = ''; return; }
   const de = currentLang === 'de';
   const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const items = scan.items || [];
   items.forEach(i => { if (!i._base) i._base = i._orig || i.verdict; });
   const isOn = i => i._base === 'add' ? !i.locked : i.verdict !== 'keep';
-  // Only what faindz wants to change; additions last, marked with +
   const order = { replace: 0, restyle: 1, add: 2 };
   const list = items.map((i, n) => [i, n]).filter(([i]) => i._base in order).sort((a, b) => order[a[0]._base] - order[b[0]._base]);
-  if (!list.length) { box.innerHTML = ''; return; }
-  const chips = list.map(([i, n]) =>
-    `<button type="button" class="rs-chip${isOn(i) ? '' : ' off'}" data-scan-idx="${n}" title="${esc(i.note)}" aria-pressed="${isOn(i)}">${i._base === 'add' ? '+ ' : ''}${esc(i.item)}</button>`).join('');
+  if (!list.length) { box.innerHTML = ''; if (layer) layer.innerHTML = ''; return; }
+  const verb = { replace: de ? 'Ersetzen' : 'Replace', restyle: de ? 'Neuer Look' : 'New look', add: de ? 'Neu' : 'Add' };
+  const stay = de ? 'Bleibt' : 'Stays';
+  const skip = de ? 'Nicht nötig' : 'Skip';
+  const num = k => String(k + 1).padStart(2, '0');
+  const fresh = !scan._shown; scan._shown = true;
+  const changes = list.filter(([i]) => isOn(i)).length;
+
   box.innerHTML = `
-    <div class="rs-title">${de ? 'Das würde Faindz ändern' : 'What Faindz would change'}</div>
-    <div class="rs-chips">${chips}</div>
-    <div class="rs-hint">${de ? 'Tippe an, was bleiben soll.' : 'Tap what should stay.'}</div>`;
-  box.querySelectorAll('.rs-chip').forEach(el => {
-    el.addEventListener('click', () => {
-      const it = state.roomScan.items[+el.dataset.scanIdx];
-      if (!it) return;
-      if (it._base === 'add') { it.locked = !it.locked; }
-      else if (it.verdict === 'keep') { it.verdict = it._base; it._orig = null; it.locked = false; }
-      else { it._orig = it.verdict; it.verdict = 'keep'; it.locked = true; }
-      renderRoomScanPanel();
-    });
+    <div class="rs-cap"><span>${de ? 'Gelesen von Faindz' : 'Read by Faindz'}</span><span>${changes} ${de ? (changes === 1 ? 'Änderung' : 'Änderungen') : (changes === 1 ? 'change' : 'changes')}</span></div>
+    <ol class="rs-legend">${list.map(([i, n], k) => `
+      <li class="rs-li${isOn(i) ? '' : ' off'}${fresh ? ' fresh' : ''}" data-scan-idx="${n}" role="button" tabindex="0" aria-pressed="${isOn(i)}" style="--d:${k * 60}ms" title="${esc(i.note)}">
+        <span class="rs-n">${num(k)}</span>
+        <span class="rs-name">${esc(i.item)}</span>
+        <span class="rs-v">${isOn(i) ? verb[i._base] : (i._base === 'add' ? skip : stay)}</span>
+      </li>`).join('')}</ol>
+    <p class="rs-hint">${de ? 'Tippe auf ein Teil, das so bleiben soll.' : 'Tap anything that should stay as it is.'}</p>`;
+
+  if (layer) {
+    layer.innerHTML = list.map(([i, n], k) => {
+      const x = Math.max(4, Math.min(96, +i.x)), y = Math.max(6, Math.min(94, +i.y));
+      if (!isFinite(x) || !isFinite(y)) return '';
+      return `<button type="button" class="scan-pin${isOn(i) ? '' : ' off'}${i._base === 'add' ? ' add' : ''}${fresh ? ' fresh' : ''}" data-scan-idx="${n}" style="left:${x}%;top:${y}%;--d:${300 + k * 90}ms" aria-label="${esc(i.item)}">${k + 1}</button>`;
+    }).join('');
+    layoutScanPins();
+    const img = document.getElementById('preview');
+    if (img && !img.complete) img.addEventListener('load', layoutScanPins, { once: true });
+  }
+
+  const toggle = idx => {
+    const it = state.roomScan.items[idx];
+    if (!it) return;
+    if (it._base === 'add') { it.locked = !it.locked; }
+    else if (it.verdict === 'keep') { it.verdict = it._base; it._orig = null; it.locked = false; }
+    else { it._orig = it.verdict; it.verdict = 'keep'; it.locked = true; }
+    renderRoomScanPanel();
+  };
+  const hl = (idx, on) => document.querySelectorAll(`[data-scan-idx="${idx}"]`).forEach(e => e.classList.toggle('hl', on));
+  [...box.querySelectorAll('.rs-li'), ...(layer ? layer.querySelectorAll('.scan-pin') : [])].forEach(el => {
+    const idx = +el.dataset.scanIdx;
+    el.addEventListener('click', () => toggle(idx));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(idx); } });
+    el.addEventListener('mouseenter', () => hl(idx, true));
+    el.addEventListener('mouseleave', () => hl(idx, false));
   });
 }
 
