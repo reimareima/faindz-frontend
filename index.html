@@ -66,7 +66,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Premium light palette — warm cream undertone, not sterile white */
@@ -2246,7 +2246,7 @@
   .room-scan-panel { margin: 4px 0 22px; text-align: left; }
   .room-scan-panel:empty, body[data-mode="shop"] .room-scan-panel { display: none; }
   .room-scan-panel { margin-top: 26px; }
-  .rs-cap { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-subtle); padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,.12); }
+  .rs-cap { width: 100%; background: none; border-top: 0; border-left: 0; border-right: 0; font-family: inherit; cursor: default; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-subtle); padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,.12); }
   .rs-legend { list-style: none; margin: 0; padding: 0; }
   .rs-li { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; gap: 12px; padding: 12px 2px; border-bottom: 1px solid rgba(0,0,0,.07); cursor: pointer; transition: background .2s, opacity .2s; }
   .rs-li.fresh { opacity: 0; animation: rsIn .5s ease forwards; animation-delay: var(--d); }
@@ -2260,6 +2260,16 @@
   .rs-li.off .rs-name { text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
   .rs-li.off .rs-v { color: var(--text-subtle); }
   .rs-hint { font-size: 12.5px; color: var(--text-subtle); margin: 12px 2px 0; }
+  .rs-hint-m, .rs-caret { display: none; }
+  @media (max-width: 1023px) {
+    .room-scan-panel { margin-top: 14px; }
+    .rs-cap { cursor: pointer; }
+    .rs-caret { display: inline-block; width: 7px; height: 7px; margin-left: 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .2s; }
+    .rs-cap[aria-expanded="true"] .rs-caret { transform: translateY(1px) rotate(-135deg); }
+    .rs-legend:not(.open), .rs-legend:not(.open) ~ .rs-hint { display: none; }
+    .rs-legend:not(.open) ~ .rs-hint-m { display: block; font-size: 12.5px; color: var(--text-subtle); margin: 10px 2px 0; }
+    .scan-pin { width: 26px; height: 26px; font-size: 11.5px; }
+  }
   .scan-pins { position: absolute; pointer-events: none; z-index: 3; }
   .scan-pin { pointer-events: auto; position: absolute; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%;
     display: grid; place-items: center; padding: 0; cursor: pointer; font: 600 12.5px/1 Inter, system-ui, sans-serif;
@@ -11242,14 +11252,16 @@ function renderRoomScanPanel() {
   const changes = list.filter(([i]) => isOn(i)).length;
 
   box.innerHTML = `
-    <div class="rs-cap"><span>${de ? 'Gelesen von Faindz' : 'Read by Faindz'}</span><span>${changes} ${de ? (changes === 1 ? 'Änderung' : 'Änderungen') : (changes === 1 ? 'change' : 'changes')}</span></div>
-    <ol class="rs-legend">${list.map(([i, n], k) => `
+    <button type="button" class="rs-cap" aria-expanded="${!!scan._open}"><span>${de ? 'Gelesen von Faindz' : 'Read by Faindz'}</span><span>${changes} ${de ? (changes === 1 ? 'Änderung' : 'Änderungen') : (changes === 1 ? 'change' : 'changes')}<i class="rs-caret"></i></span></button>
+    <ol class="rs-legend${scan._open ? ' open' : ''}">${list.map(([i, n], k) => `
       <li class="rs-li${isOn(i) ? '' : ' off'}${fresh ? ' fresh' : ''}" data-scan-idx="${n}" role="button" tabindex="0" aria-pressed="${isOn(i)}" style="--d:${k * 60}ms" title="${esc(i.note)}">
         <span class="rs-n">${num(k)}</span>
         <span class="rs-name">${esc(i.item)}</span>
         <span class="rs-v">${isOn(i) ? verb[i._base] : (i._base === 'add' ? skip : stay)}</span>
       </li>`).join('')}</ol>
-    <p class="rs-hint">${de ? 'Tippe auf ein Teil, das so bleiben soll.' : 'Tap anything that should stay as it is.'}</p>`;
+    <p class="rs-hint">${de ? 'Tippe auf ein Teil, das so bleiben soll.' : 'Tap anything that should stay as it is.'}</p>
+    <p class="rs-hint-m">${de ? 'Tippe auf einen Punkt im Foto, wenn das Teil bleiben soll.' : 'Tap a marker in the photo to keep that piece.'}</p>`;
+  box.querySelector('.rs-cap').addEventListener('click', () => { scan._open = !scan._open; renderRoomScanPanel(); });
 
   const pinsFresh = scan._located && !scan._pinsShown;
   if (scan._located) scan._pinsShown = true;
