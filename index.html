@@ -2269,6 +2269,14 @@
   .rs-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .2s; }
   .rs-row.on .rs-switch { background: #e91e63; }
   .rs-row.on .rs-switch::after { transform: translateX(16px); }
+  .rs-more { display: none; }
+  .room-scan-panel:empty, body[data-mode="shop"] .room-scan-panel { display: none; }
+  @media (min-width: 1024px) { .room-scan-panel { margin-top: 28px; } .rs-next { display: none; } }
+  @media (max-width: 1023px) {
+    .room-scan-panel { margin-top: 20px; }
+    .rs-body:not(.open) { display: none; }
+    .rs-more { display: inline-flex; font: inherit; font-size: 14px; font-weight: 500; color: #e91e63; background: none; border: 0; padding: 0 2px 8px; cursor: pointer; }
+  }
   .rs-next { font-size: 13px; color: var(--text-subtle); margin: 4px 0 0 2px; }
   .room-scan { margin: 18px auto 0; max-width: 440px; text-align: left; display: none; }
   .room-scan.show { display: block; animation: scanIn .5s ease both; }
@@ -5000,6 +5008,8 @@
         <span data-i18n="upload.changePill">Change photo</span>
       </label>
     </div>
+    <!-- Room read result: sits under the photo so the style ideas stay at the top of the right column -->
+    <div class="room-scan-panel chips-reimagine" id="roomScanPanel"></div>
 
   </div>
 
@@ -5028,7 +5038,6 @@
 
     <!-- Style Suggestions: AI-generated direction cards (rendered on demand) -->
     <div class="style-cards-section chips-reimagine" id="styleCardsSection">
-      <div class="room-scan-panel" id="roomScanPanel"></div>
       <div class="style-cards-grid" id="styleCardsGrid">
         <!-- Cards rendered here dynamically -->
       </div>
@@ -11205,8 +11214,11 @@ function renderRoomScanPanel() {
     <p class="rs-explain">${de
       ? `Faindz würde <b>${changes} ${changes === 1 ? 'Sache' : 'Dinge'}</b> ändern. Schalte aus, was so bleiben soll, wie es ist. Fenster, Wände und Einbauten bleiben immer.`
       : `Faindz would change <b>${changes} ${changes === 1 ? 'thing' : 'things'}</b>. Switch off anything that should stay as it is. Windows, walls and built-ins always stay.`}</p>
-    ${html}
+    <div class="rs-body${scan._open ? ' open' : ''}">${html}</div>
+    <button type="button" class="rs-more">${scan._open ? (de ? 'Liste einklappen' : 'Hide list') : (de ? 'Liste ansehen und anpassen' : 'See and adjust the list')}</button>
     <p class="rs-next">${de ? 'Jetzt unten einen Stil wählen oder deinen Wunsch eingeben.' : 'Now pick a style below or type your wish.'}</p>`;
+  const more = box.querySelector('.rs-more');
+  if (more) more.addEventListener('click', () => { scan._open = !scan._open; renderRoomScanPanel(); });
   const det = box.querySelector('.rs-keep');
   if (det) det.addEventListener('toggle', () => { scan._keepOpen = det.open; });
   box.querySelectorAll('.rs-row').forEach(el => {
