@@ -7155,6 +7155,11 @@ async function generateStyleSuggestions() {
       if (state.imageBase64 !== scanImage) return; // photo changed meanwhile
       state.roomScan = scan;
       renderRoomScanPanel();
+      if (scan) {
+        locateScanItems(scan, scanImage, state.imageMimeType)
+          .catch(err => console.warn('[scan] locate failed, using rough positions:', err))
+          .finally(() => { if (state.roomScan === scan) { scan._located = true; renderRoomScanPanel(); } });
+      }
     })
     .catch(err => console.warn('[scan] room read failed:', err))
     .finally(() => {
@@ -11160,6 +11165,31 @@ function renderRoomScan(scan) {
 
 // Interactive version under "Lass faindz den Raum lesen": tap a row to
 // switch between "bleibt" and the suggested change.
+// Precise marker positions: Gemini points at each item the scan found
+async function locateScanItems(scan, imageBase64, mimeType) {
+  const items = scan.items || [];
+  const names = items.map((i, n) => `${n}: ${i.item} (${i.where})${i.verdict === 'add' ? ' [MISSING: point to where it would best be placed]' : ''}`).join('\n');
+  const res = await fetch(GEMINI_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'gemini-3.8-flash', body: {
+      contents: [{ parts: [
+        { text: 'Point to each listed object in this room photo. The point must lie ON the object itself (on its most visible surface, never in a gap between parts). Return JSON array [{"i":index,"point":[y,x]}] normalized 0-1000.\n' + names },
+        { inline_data: { mime_type: mimeType || 'image/jpeg', data: imageBase64 } }
+      ] }],
+      generationConfig: { responseMimeType: 'application/json', thinkingConfig: { thinkingLevel: 'low' } }
+    } })
+  });
+  if (!res.ok) throw new Error('locate ' + res.status);
+  const j = await res.json();
+  const txt = (j?.candidates?.[0]?.content?.parts || []).filter(p => p.text && !p.thought).map(p => p.text).join('');
+  const arr = JSON.parse(txt);
+  arr.forEach(o => {
+    const it = items[o.i];
+    if (!it || !Array.isArray(o.point)) return;
+    it.x = o.point[1] / 10; it.y = o.point[0] / 10;
+  });
+}
+
 // Room read UI: numbered markers on the photo + an editorial legend under it
 function scanPinsLayer() {
   const wrap = document.getElementById('previewWrap');
@@ -11219,11 +11249,14 @@ function renderRoomScanPanel() {
       </li>`).join('')}</ol>
     <p class="rs-hint">${de ? 'Tippe auf ein Teil, das so bleiben soll.' : 'Tap anything that should stay as it is.'}</p>`;
 
-  if (layer) {
+  const pinsFresh = scan._located && !scan._pinsShown;
+  if (scan._located) scan._pinsShown = true;
+  if (layer && !scan._located) layer.innerHTML = '';
+  if (layer && scan._located) {
     layer.innerHTML = list.map(([i, n], k) => {
       const x = Math.max(4, Math.min(96, +i.x)), y = Math.max(6, Math.min(94, +i.y));
       if (!isFinite(x) || !isFinite(y)) return '';
-      return `<button type="button" class="scan-pin${isOn(i) ? '' : ' off'}${i._base === 'add' ? ' add' : ''}${fresh ? ' fresh' : ''}" data-scan-idx="${n}" style="left:${x}%;top:${y}%;--d:${300 + k * 90}ms" aria-label="${esc(i.item)}">${k + 1}</button>`;
+      return `<button type="button" class="scan-pin${isOn(i) ? '' : ' off'}${i._base === 'add' ? ' add' : ''}${pinsFresh ? ' fresh' : ''}" data-scan-idx="${n}" style="left:${x}%;top:${y}%;--d:${k * 80}ms" aria-label="${esc(i.item)}">${k + 1}</button>`;
     }).join('');
     layoutScanPins();
     const img = document.getElementById('preview');
