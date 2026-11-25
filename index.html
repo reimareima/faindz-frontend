@@ -4887,6 +4887,16 @@
     .upload-section { padding: 40px 20px; }
     .settings { padding: 24px; }
   }
+
+/* Google sign-in dialog */
+.gis-modal{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(26,26,26,.45);padding:20px;animation:gisFade .18s ease}
+.gis-card{position:relative;background:#f8f6f2;border-radius:20px;padding:40px 32px 34px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.gis-title{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:30px;line-height:1.15;margin:0 0 12px;color:#1a1a1a}
+.gis-text{font-size:15px;line-height:1.5;color:#766f68;margin:0 0 26px}
+.gis-button{display:flex;justify-content:center;min-height:44px}
+.gis-close{position:absolute;top:12px;right:14px;border:0;background:none;font-size:26px;line-height:1;color:#766f68;cursor:pointer;padding:6px}
+.gis-close:hover{color:#1a1a1a}
+@keyframes gisFade{from{opacity:0}to{opacity:1}}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -5538,7 +5548,87 @@ function renderAuthUI() {
 // Fallback: if the popup is blocked (some mobile browsers), we fall back
 // to the classic full-page redirect with a warning to the user that they
 // should save their work first.
+// Google sign-in via Google Identity Services: the Google dialog then
+// says "faindz.de" instead of the Supabase project domain. Google gives us
+// an ID token that Supabase turns into a session (signInWithIdToken).
+// If the Google script can't load, the old Supabase popup flow is used.
+const GOOGLE_CLIENT_ID = '940091224066-7qbvpupgqliorihd7uj1hagbgutp2coc.apps.googleusercontent.com';
+let gisPromise = null;
+function loadGis() {
+  if (window.google?.accounts?.id) return Promise.resolve(true);
+  if (!gisPromise) gisPromise = new Promise(resolve => {
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.async = true;
+    s.onload = () => resolve(!!window.google?.accounts?.id);
+    s.onerror = () => { gisPromise = null; resolve(false); };
+    document.head.appendChild(s);
+    setTimeout(() => resolve(!!window.google?.accounts?.id), 6000);
+  });
+  return gisPromise;
+}
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function closeGisModal() {
+  document.getElementById('gisModal')?.remove();
+}
 async function signInWithGoogle() {
+  if (!sb) {
+    alert('Auth ist gerade nicht verfügbar. Bitte später erneut versuchen.');
+    return;
+  }
+  const ok = await loadGis();
+  if (!ok || !window.crypto?.subtle) return signInWithGoogleLegacy();
+  const tr = (k) => (typeof t === 'function' ? t(k) : k);
+  closeGisModal();
+  const rawNonce = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashedNonce = await sha256Hex(rawNonce);
+  const modal = document.createElement('div');
+  modal.id = 'gisModal';
+  modal.className = 'gis-modal';
+  modal.innerHTML = `
+    <div class="gis-card" role="dialog" aria-modal="true" aria-labelledby="gisTitle">
+      <button type="button" class="gis-close" aria-label="${escapeHtml(tr('auth.gisClose'))}">&times;</button>
+      <h2 id="gisTitle" class="gis-title">${escapeHtml(tr('auth.gisTitle'))}</h2>
+      <p class="gis-text">${escapeHtml(tr('auth.gisText'))}</p>
+      <div id="gisButton" class="gis-button"></div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeGisModal(); });
+  modal.querySelector('.gis-close').addEventListener('click', closeGisModal);
+
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    nonce: hashedNonce,
+    use_fedcm_for_button: true,
+    callback: async (resp) => {
+      try {
+        const { error } = await sb.auth.signInWithIdToken({
+          provider: 'google',
+          token: resp.credential,
+          nonce: rawNonce,
+        });
+        if (error) throw error;
+        closeGisModal();
+        // onAuthStateChange re-renders the header and runs the post-signin save
+      } catch (err) {
+        console.error('[auth] id token sign in failed:', err);
+        closeGisModal();
+        alert(tr('auth.error'));
+        renderAuthUI();
+      }
+    },
+  });
+  google.accounts.id.renderButton(document.getElementById('gisButton'), {
+    type: 'standard', theme: 'outline', size: 'large', shape: 'pill',
+    text: 'continue_with', logo_alignment: 'left', width: 280,
+    locale: currentLang === 'en' ? 'en' : 'de',
+  });
+}
+
+async function signInWithGoogleLegacy() {
   if (!sb) {
     alert('Auth ist gerade nicht verfügbar. Bitte später erneut versuchen.');
     return;
@@ -6548,6 +6638,9 @@ const I18N = {
     'auth.savedItems': 'Saved items',
     'auth.signOut': 'Sign out',
     'auth.error': 'Sign in failed. Please try again.',
+    'auth.gisTitle': 'Sign in to faindz',
+    'auth.gisText': 'Save your looks and favourite pieces and find them again on any device.',
+    'auth.gisClose': 'Close',
     'auth.popupBlocked': 'Your browser blocked the sign-in popup. Continue with a full redirect? Your current work might be lost — consider saving first.',
     'showcase.before': 'Before',
     'showcase.after': 'After',
@@ -6782,6 +6875,9 @@ const I18N = {
     'auth.savedItems': 'Gespeicherte Artikel',
     'auth.signOut': 'Abmelden',
     'auth.error': 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
+    'auth.gisTitle': 'Bei faindz anmelden',
+    'auth.gisText': 'Speichere deine Looks und Lieblingsstücke und finde sie auf jedem Gerät wieder.',
+    'auth.gisClose': 'Schließen',
     'auth.popupBlocked': 'Dein Browser hat das Anmelde-Popup blockiert. Mit einer vollständigen Weiterleitung fortfahren? Deine aktuelle Arbeit könnte verloren gehen.',
     'showcase.before': 'Vorher',
     'showcase.after': 'Nachher',
