@@ -66,7 +66,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Premium light palette — warm cream undertone, not sterile white */
@@ -2268,6 +2269,7 @@
     .rs-cap[aria-expanded="true"] .rs-caret { transform: translateY(1px) rotate(-135deg); }
     .rs-legend:not(.open), .rs-legend:not(.open) ~ .rs-hint { display: none; }
     .rs-legend:not(.open) ~ .rs-hint-m { display: block; font-size: 12.5px; color: var(--text-subtle); margin: 10px 2px 0; }
+    .rs-hint-m b { color: var(--text); font-weight: 500; }
     .scan-pin { width: 26px; height: 26px; font-size: 11.5px; }
   }
   .scan-pins { position: absolute; pointer-events: none; z-index: 3; }
@@ -11260,7 +11262,12 @@ function renderRoomScanPanel() {
         <span class="rs-v">${isOn(i) ? verb[i._base] : (i._base === 'add' ? skip : stay)}</span>
       </li>`).join('')}</ol>
     <p class="rs-hint">${de ? 'Tippe auf ein Teil, das so bleiben soll.' : 'Tap anything that should stay as it is.'}</p>
-    <p class="rs-hint-m">${de ? 'Tippe auf einen Punkt im Foto, wenn das Teil bleiben soll.' : 'Tap a marker in the photo to keep that piece.'}</p>`;
+    <p class="rs-hint-m">${(() => {
+      const last = scan._last != null ? list.findIndex(([, n]) => n === scan._last) : -1;
+      if (last < 0) return de ? 'Tippe auf einen Punkt im Foto, wenn das Teil bleiben soll.' : 'Tap a marker in the photo to keep that piece.';
+      const [i] = list[last];
+      return `<b>${num(last)} ${esc(i.item)}</b> · ${isOn(i) ? verb[i._base] : (i._base === 'add' ? skip : stay)}`;
+    })()}</p>`;
   box.querySelector('.rs-cap').addEventListener('click', () => { scan._open = !scan._open; renderRoomScanPanel(); });
 
   const pinsFresh = scan._located && !scan._pinsShown;
@@ -11279,6 +11286,7 @@ function renderRoomScanPanel() {
 
   const toggle = idx => {
     const it = state.roomScan.items[idx];
+    scan._last = idx;
     if (!it) return;
     if (it._base === 'add') { it.locked = !it.locked; }
     else if (it.verdict === 'keep') { it.verdict = it._base; it._orig = null; it.locked = false; }
