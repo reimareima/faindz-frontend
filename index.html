@@ -64,9 +64,7 @@
 <meta name="verification" content="c81cd0955ab5523d060ec6581ede75c8" />
 
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,0..100;1,9..144,300..600,0..100&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root {
     /* Premium light palette — warm cream undertone, not sterile white */
@@ -4997,6 +4995,9 @@ body[data-state="empty"] .landing-stage .partner-strip{background:transparent;bo
 .partner-label{color:rgba(255,255,255,.78)}
 .partner-track img{filter:brightness(0) invert(1);opacity:.92}
 .partner-word{color:#fff;opacity:.92}
+/* Partner strip v4: at the top of the hero, clear of the upload button and photo tips */
+body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;border-top:0;border-bottom:1px solid rgba(255,255,255,.28)}
+@media (max-width:720px){body[data-state="empty"] .landing-stage .partner-strip{top:6px;height:44px}.partner-track li{height:44px}}
 .partner-marquee{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 </style>
 <script src="/src.js?v=20261124"></script>
@@ -5463,7 +5464,7 @@ window.addEventListener('load', function () {
 </script>
 
 <!-- Supabase JS SDK (v2) — loaded from official CDN before main app script -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/vendor/supabase-js.js"></script>
 
 <script>
 // ─── SUPABASE CLIENT ──────────────────────────────────────────────
@@ -8026,21 +8027,6 @@ let currentLookData = null;
   });
 })();
 
-// Partner pill: sit just above the bottom edge of the first screen
-(function () {
-  const strip = document.querySelector('.partner-strip');
-  const stage = document.getElementById('landingStage');
-  if (!strip || !stage) return;
-  const place = () => {
-    const top = stage.getBoundingClientRect().top + window.scrollY;
-    const gap = window.innerWidth <= 720 ? 16 : 28;
-    strip.style.top = Math.max(360, window.innerHeight - top - strip.offsetHeight - gap) + 'px';
-  };
-  place();
-  window.addEventListener('resize', place);
-  window.addEventListener('load', place);
-})();
-
 // ─── LOGO CLICK — Reset to home state ───
 const logoWrap = document.querySelector('.logo-wrap');
 if (logoWrap) {
@@ -8890,7 +8876,7 @@ function showProductMatch(card, best, shop) {
   meta.innerHTML = `
     <span class="shop-ad">${escapeHtml(t('shop.ad'))}</span>
     <a class="product-match" href="${escapeHtml(best.link)}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${shop}">
-      <span class="product-match-img"><img src="${escapeHtml(best.image)}" alt="" loading="lazy" decoding="async"></span>
+      <span class="product-match-img"><img src="${escapeHtml(pimg(best.image))}" alt="" loading="lazy" decoding="async"></span>
       <span class="product-match-body">
         <span class="product-match-title">${escapeHtml(best.title)}</span>
         ${best.price ? `<span class="product-match-price">${escapeHtml(formatEuro(best.price))}*${old}</span>` : ''}
@@ -8900,10 +8886,18 @@ function showProductMatch(card, best, shop) {
   // The shop's own picture first; if it doesn't load, Awin's copy; else no picture
   const img = meta.querySelector('img');
   img.addEventListener('error', function onErr() {
-    if (best.image2 && img.src !== best.image2) { img.src = best.image2; return; }
+    if (best.image2 && !img.dataset.alt) { img.dataset.alt = 1; img.src = pimg(best.image2); return; }
     img.removeEventListener('error', onErr);
     meta.querySelector('.product-match-img')?.remove();
   });
+}
+
+// Shop pictures go through our own image proxy (Vercel), so the visitor's
+// browser never talks to the shops' servers (no IP sent to third parties).
+function pimg(u, w = 640) {
+  if (!u || !/^https?:\/\//i.test(u)) return u;
+  try { if (/(^|\.)faindz\.de$/.test(new URL(u).hostname)) return u; } catch (e) { return u; }
+  return '/_vercel/image?url=' + encodeURIComponent(u) + '&w=' + w + '&q=75';
 }
 
 // ─── SIMILAR PRODUCTS (picture check) ─────────────────────────────
@@ -8978,7 +8972,7 @@ function showSimilar(card, matches) {
   const withRef = l => l + (l.includes('?') ? '&' : '?') + 'clickref=app-aehnlich';
   const items = matches.slice(0, 3).map(m => `
       <a class="similar-item" href="${escapeHtml(withRef(m.link))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${escapeHtml(m.shop)}" title="${escapeHtml(m.title)}">
-        <span class="similar-img"><img src="${escapeHtml(m.image)}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async"></span>
+        <span class="similar-img"><img src="${escapeHtml(pimg(m.image))}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async"></span>
         ${m.price ? `<span class="similar-price">${escapeHtml(formatEuro(m.price))}*</span>` : ''}
         <span class="similar-shop">${escapeHtml((SHOPS[m.shop] && (SHOPS[m.shop].short || SHOPS[m.shop].name)) || m.shop)}</span>
       </a>`).join('');
@@ -8990,7 +8984,7 @@ function showSimilar(card, matches) {
     <div class="similar-note">*${escapeHtml(t('shop.priceNote'))}</div>`;
   box.querySelectorAll('img').forEach((img, k) => img.addEventListener('error', () => {
     const m = matches[k];
-    if (m && m.image2 && img.src !== m.image2) img.src = m.image2;
+    if (m && m.image2 && !img.dataset.alt) { img.dataset.alt = 1; img.src = pimg(m.image2); }
     else img.closest('.similar-item')?.remove();
   }));
   const actions = card.querySelector('.shop-actions');
@@ -9209,7 +9203,7 @@ function loadHeic2any() {
   return new Promise((resolve, reject) => {
     if (window.heic2any) return resolve();
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.5/dist/heic2any.min.js';
+    script.src = '/vendor/heic2any.min.js';
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load HEIC converter'));
     document.head.appendChild(script);

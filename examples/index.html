@@ -36,9 +36,7 @@
 <meta name="twitter:description" content="AI-powered interior curation. Upload a photo, receive a vision — with shoppable pieces.">
 <meta name="twitter:image" content="social-card.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,0..100;1,9..144,300..600,0..100&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="/fonts/fonts.css" rel="stylesheet">
 <style>
   :root {
     /* Premium light palette — warm cream undertone, not sterile white */
@@ -3917,7 +3915,7 @@
 </div>
 
 <!-- Supabase JS SDK (v2) — loaded from official CDN before main app script -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/vendor/supabase-js.js"></script>
 
 <script>
 // ─── SUPABASE CLIENT ──────────────────────────────────────────────
@@ -6004,7 +6002,7 @@ function loadHeic2any() {
   return new Promise((resolve, reject) => {
     if (window.heic2any) return resolve();
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.5/dist/heic2any.min.js';
+    script.src = '/vendor/heic2any.min.js';
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load HEIC converter'));
     document.head.appendChild(script);

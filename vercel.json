@@ -3,12 +3,88 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(self), microphone=(), geolocation=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
       ]
     }
-  ]
+  ],
+  "images": {
+    "sizes": [
+      256,
+      640,
+      1200
+    ],
+    "formats": [
+      "image/webp"
+    ],
+    "minimumCacheTTL": 2678400,
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "i.otto.de"
+      },
+      {
+        "protocol": "https",
+        "hostname": "media.hoeffner.de"
+      },
+      {
+        "protocol": "https",
+        "hostname": "images.rugvista.net"
+      },
+      {
+        "protocol": "https",
+        "hostname": "**.rugvista.net"
+      },
+      {
+        "protocol": "https",
+        "hostname": "cdn.shopify.com"
+      },
+      {
+        "protocol": "https",
+        "hostname": "www.teppich.de"
+      },
+      {
+        "protocol": "https",
+        "hostname": "**.teppich.de"
+      },
+      {
+        "protocol": "https",
+        "hostname": "**.productserve.com"
+      },
+      {
+        "protocol": "https",
+        "hostname": "**.awin1.com"
+      },
+      {
+        "protocol": "https",
+        "hostname": "casa-moro.de"
+      },
+      {
+        "protocol": "https",
+        "hostname": "**.casa-moro.de"
+      },
+      {
+        "protocol": "https",
+        "hostname": "lh3.googleusercontent.com"
+      }
+    ]
+  }
 }
