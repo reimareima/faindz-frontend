@@ -8020,6 +8020,21 @@ let currentLookData = null;
   });
 })();
 
+// Partner pill: sit just above the bottom edge of the first screen
+(function () {
+  const strip = document.querySelector('.partner-strip');
+  const stage = document.getElementById('landingStage');
+  if (!strip || !stage) return;
+  const place = () => {
+    const top = stage.getBoundingClientRect().top + window.scrollY;
+    const gap = window.innerWidth <= 720 ? 16 : 28;
+    strip.style.top = Math.max(360, window.innerHeight - top - strip.offsetHeight - gap) + 'px';
+  };
+  place();
+  window.addEventListener('resize', place);
+  window.addEventListener('load', place);
+})();
+
 // ─── LOGO CLICK — Reset to home state ───
 const logoWrap = document.querySelector('.logo-wrap');
 if (logoWrap) {
