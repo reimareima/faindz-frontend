@@ -4999,6 +4999,25 @@ body[data-state="empty"] .landing-stage .partner-strip{background:transparent;bo
 body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;border-top:0;border-bottom:1px solid rgba(255,255,255,.28)}
 @media (max-width:720px){body[data-state="empty"] .landing-stage .partner-strip{top:6px;height:44px}.partner-track li{height:44px}}
 .partner-marquee{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+
+/* Mobile hero v5: calmer. One screen, fewer layers, static partner line at the bottom */
+@media (max-width:720px){
+  body[data-state="empty"] .landing-stage{height:calc(100svh - 76px)!important;min-height:560px!important;max-height:760px}
+  body[data-state="empty"] .landing-stage .partner-strip{top:auto!important;bottom:18px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);height:auto;padding:12px 0 0;border-bottom:0;border-top:1px solid rgba(255,255,255,.22);justify-content:center}
+  .partner-label{display:none}
+  .partner-marquee{-webkit-mask-image:none;mask-image:none;overflow:visible}
+  .partner-track{animation:none;width:auto;flex-wrap:wrap;justify-content:center;gap:2px 0}
+  .partner-track li{height:auto}
+  .partner-track li[aria-hidden="true"]{display:none}
+  .partner-track li+li:not([aria-hidden])::before{content:"\00b7";margin:0 9px;color:rgba(255,255,255,.55)}
+  .partner-word{font-size:12.5px;font-weight:500;letter-spacing:.01em;opacity:.8}
+  .mode-switch{transform:scale(.9)}
+  .hero h1{font-size:40px!important;line-height:1.04!important;letter-spacing:-.01em}
+  .hero h1 .hero-text-reimagine>span,.hero h1 .hero-text-shop>span{display:block}
+  .landing-stage .hero-subtitle{font-size:15px!important;line-height:1.5!important;max-width:300px;margin-left:auto;margin-right:auto;opacity:.9}
+  body[data-state="empty"] #uploadZone{box-shadow:none!important}
+  .photo-tips-link{font-size:13px;opacity:.85}
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
