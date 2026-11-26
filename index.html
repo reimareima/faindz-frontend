@@ -4945,6 +4945,12 @@ body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-c
 .viz-edit-submit.is-loading .viz-edit-submit-arrow{display:none!important;animation:none!important}
 .viz-edit-submit.is-loading .viz-edit-submit-label::after{content:'';display:inline-block;width:18px;margin-left:4px;text-align:left;animation:editDots 1.2s steps(4,end) infinite}
 @keyframes editDots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+/* ─── Editorial hero (Nov 2026): serif headline, no cyan, no emoji ─── */
+.hero h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 300; letter-spacing: -0.025em; line-height: 1.02; font-variation-settings: "opsz" 144, "SOFT" 30; }
+.hero h1 .gradient-text { color: inherit; -webkit-text-fill-color: currentColor; font-weight: 300; font-style: italic; }
+.mode-btn .mode-icon { display: none; }
+.mode-btn { letter-spacing: 0; }
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -6471,7 +6477,7 @@ const I18N = {
     'hero.reimagine.subtitle': 'Upload a photograph. Faindz analyzes the space, curates a vision, and brings it to life with shoppable pieces.',
     'hero.shop.subtitle': 'Saw a look you love? Drop the inspiration photo. Faindz identifies every piece and finds it on your favorite marketplaces.',
     // Mode switch
-    'mode.reimagine': 'Reimagine my space',
+    'mode.reimagine': 'Reimagine my room',
     'mode.shop': 'Shop a look',
     // Upload
     'upload.title.empty': 'Upload an image',
@@ -6708,14 +6714,14 @@ const I18N = {
   },
   de: {
     // Hero
-    'hero.reimagine.title.line1': 'Dein Space,',
+    'hero.reimagine.title.line1': 'Dein Raum,',
     'hero.reimagine.title.line2': 'neu gestaltet.',
     'hero.shop.title.line1': 'Shop',
     'hero.shop.title.line2': 'den Look.',
     'hero.reimagine.subtitle': 'Foto hochladen. Faindz erkennt den Stil und schlägt Möbel vor, die direkt zu kaufen sind.',
     'hero.shop.subtitle': 'Einen Look gesehen, der dir gefällt? Foto hochladen und Faindz findet jedes Teil bei deinen Marktplätzen.',
     // Mode switch
-    'mode.reimagine': 'Space neu gestalten',
+    'mode.reimagine': 'Raum neu gestalten',
     'mode.shop': 'Look shoppen',
     // Upload
     'upload.title.empty': 'Bild hochladen',
