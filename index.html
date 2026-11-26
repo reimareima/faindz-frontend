@@ -4955,6 +4955,27 @@ body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-c
 .mode-indicator { background: #fff; border: 0; box-shadow: none; border-radius: 999px; }
 .mode-switch { border-radius: 999px; }
 .mode-btn { border-radius: 999px; }
+
+/* Partner strip at the bottom of the hero: official partner logos, slow marquee */
+.partner-strip{display:none}
+body[data-state="empty"] .landing-stage .partner-strip{display:flex;align-items:center;gap:28px;position:absolute;left:0;right:0;bottom:0;z-index:3;height:76px;padding:0 0 0 48px;background:#fff;border-top:1px solid rgba(26,26,26,.06)}
+.partner-label{flex:0 0 auto;font:600 11px/1 'Inter',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9a928a}
+.partner-marquee{flex:1;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.partner-track{display:flex;align-items:center;gap:72px;margin:0;padding:0;list-style:none;width:max-content;animation:partnerScroll 36s linear infinite}
+.partner-track li{flex:0 0 auto;display:flex;align-items:center;height:76px}
+.partner-track img{height:26px;width:auto;display:block}
+.partner-word{font:600 19px/1 'Inter',sans-serif;letter-spacing:-.01em;color:#1a1a1a;white-space:nowrap}
+.partner-marquee:hover .partner-track{animation-play-state:paused}
+@keyframes partnerScroll{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}
+@media (prefers-reduced-motion:reduce){.partner-track{animation:none}}
+@media (max-width:720px){
+  body[data-state="empty"] .landing-stage .partner-strip{height:60px;padding-left:18px;gap:16px}
+  .partner-label{font-size:9.5px;letter-spacing:.14em;max-width:72px;line-height:1.3}
+  .partner-track{gap:44px}.partner-track li{height:60px}.partner-track img{height:20px}.partner-word{font-size:15px}
+}
+/* Mode switch: no blue focus ring on mouse click, keep it for keyboard */
+.mode-btn:focus{outline:none}
+.mode-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -5069,6 +5090,10 @@ body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-c
       <input type="file" id="fileInput" accept="image/*">
     </label>
     <button type="button" class="photo-tips-link" id="photoTipsLink" data-i18n="tips.link">Tips for the best photo</button>
+    <div class="partner-strip" aria-label="Partnershops">
+      <span class="partner-label" data-i18n="partners.label">Our partner shops</span>
+      <div class="partner-marquee"><ul class="partner-track"><li><img src="https://www.otto.de/partnerprogramm/ftp/Partnerwerbemittel/Logo/Logo_234x60.jpg" alt="OTTO" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li><span class="partner-word">Möbel Höffner</span></li><li><img src="https://a1.awin1.com/ads/awin/53143/imgdelogo-1764245295641.png" alt="teppich.de" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li><img src="https://a1.awin1.com/ads/awin/63806/imgrugvista-text-dark-468x60-1695631500839.png" alt="Rugvista" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li><span class="partner-word">Casa Moro</span></li><li aria-hidden="true"><img src="https://www.otto.de/partnerprogramm/ftp/Partnerwerbemittel/Logo/Logo_234x60.jpg" alt="OTTO" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li aria-hidden="true"><span class="partner-word">Möbel Höffner</span></li><li aria-hidden="true"><img src="https://a1.awin1.com/ads/awin/53143/imgdelogo-1764245295641.png" alt="teppich.de" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li aria-hidden="true"><img src="https://a1.awin1.com/ads/awin/63806/imgrugvista-text-dark-468x60-1695631500839.png" alt="Rugvista" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li aria-hidden="true"><span class="partner-word">Casa Moro</span></li><li aria-hidden="true"><img src="https://www.otto.de/partnerprogramm/ftp/Partnerwerbemittel/Logo/Logo_234x60.jpg" alt="OTTO" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li aria-hidden="true"><span class="partner-word">Möbel Höffner</span></li><li aria-hidden="true"><img src="https://a1.awin1.com/ads/awin/53143/imgdelogo-1764245295641.png" alt="teppich.de" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li aria-hidden="true"><img src="https://a1.awin1.com/ads/awin/63806/imgrugvista-text-dark-468x60-1695631500839.png" alt="Rugvista" loading="lazy" decoding="async" referrerpolicy="no-referrer"></li><li aria-hidden="true"><span class="partner-word">Casa Moro</span></li></ul></div>
+    </div>
     <!-- Format caption shown under the pink pill button on the hero.
          Hidden once the user has uploaded (post-upload state takes over). -->
     <p class="upload-hint" data-i18n="upload.sub.empty">JPG · PNG · HEIC up to 20MB</p>
@@ -6488,6 +6513,7 @@ const I18N = {
     'upload.title.shrunk': 'Change photo',
     'upload.sub.empty': 'JPG · PNG · HEIC up to 20MB',
     'tips.link': 'Tips for the best photo',
+    'partners.label': 'Our partner shops',
     'tips.title': 'The best photo',
     'tips.1h': 'From a corner', 'tips.1': 'Stand in a corner or doorway so as much of the room as possible is in the picture.',
     'tips.2h': 'Normal lens, no 0.5×', 'tips.2': 'The ultra-wide lens bends walls. Use 1× and hold the phone straight at chest height.',
@@ -6732,6 +6758,7 @@ const I18N = {
     'upload.title.shrunk': 'Foto ändern',
     'upload.sub.empty': 'JPG · PNG · HEIC bis 20 MB',
     'tips.link': 'Tipps für das beste Foto',
+    'partners.label': 'Unsere Partnershops',
     'tips.title': 'So wird dein Foto ideal',
     'tips.1h': 'Aus der Ecke', 'tips.1': 'Stell dich in eine Ecke oder in die Tür, damit möglichst viel vom Raum aufs Bild passt.',
     'tips.2h': 'Normales Objektiv, kein 0,5×', 'tips.2': 'Der Weitwinkel verbiegt Wände. Nimm 1× und halte das Handy gerade auf Brusthöhe.',
