@@ -11038,7 +11038,15 @@ function appendEditProducts(newProducts, versionLabel) {
 //     what changes is the SCOPE of permitted change.
 // ═══════════════════════════════════════════════════════════════════
 
-const REIMAGINE_OUTPUT_SCHEMA_DE = `Antworte AUSSCHLIESSLICH mit gültigem JSON in DIESER Struktur:
+const REIMAGINE_OUTPUT_SCHEMA_DE = `RÄUMLICHES DENKEN (gilt für jeden Vorschlag):
+- Laufwege, Türen (inkl. Aufschlag), Fenster und Heizkörper bleiben frei und erreichbar.
+- Größen passen zum Raum: kleine Räume bekommen schlanke, leichte Möbel, große Räume ausreichend Volumen.
+- Licht in Ebenen denken: Grundlicht, Arbeitslicht, Akzentlicht, wo es Sinn ergibt.
+- Visuelles Gewicht ausbalancieren, freie Flächen bewusst lassen, ein klarer Blickfang.
+- Die Persönlichkeit der Wohnung bleibt erkennbar, kein generischer Showroom und nicht jeder Raum in Beige, Bouclé und Travertin.
+- Jedes Teil hat einen sichtbaren oder praktischen Zweck.
+
+Antworte AUSSCHLIESSLICH mit gültigem JSON in DIESER Struktur:
 
 {
   "style_identified": "Kurze Stilbeschreibung des resultierenden Looks in 4–7 Wörtern",
@@ -11072,7 +11080,15 @@ QUALITÄTS-FILTER (immer aktiv, in jedem Modus):
 - KEIN CHAOS: Kein Pinterest-/Showroom-Look, keine überladene Deko.
 - BEVORZUGE: Wenige starke Stücke statt viele mittelmäßige.`;
 
-const REIMAGINE_OUTPUT_SCHEMA_EN = `Respond ONLY with valid JSON in THIS structure:
+const REIMAGINE_OUTPUT_SCHEMA_EN = `SPATIAL THINKING (applies to every suggestion):
+- Keep walkways, doors (including their swing), windows and radiators clear and reachable.
+- Scale fits the room: small rooms get slim, light furniture, large rooms enough volume.
+- Think in layers of light: ambient, task and accent where it makes sense.
+- Balance visual weight, leave deliberate empty space, one clear focal point.
+- The home keeps its personality: no generic showroom, not every room in beige, bouclé and travertine.
+- Every piece has a visible or practical purpose.
+
+Respond ONLY with valid JSON in THIS structure:
 
 {
   "style_identified": "Short style description of the resulting look in 4–7 words",
@@ -11373,7 +11389,7 @@ VERDICT, judged against the wish:
 - remove: clutter or things that do not belong in a styled room and should simply be cleared away, not replaced: moving boxes, cleaning tools (vacuum, ironing board), laundry, drying racks, loose cables, packaging, office equipment lying around, piles of stuff
 - targeted_edit: only the object the user names may be restyle/replace/remove, everything else keep
 - style_shift: be decisive, every visible piece that does not clearly speak the target style is restyle or replace
-- enhance: be a demanding editorial stylist, not a polite guest. Colourful, patterned or random textiles that fight the palette are restyle. At least half of the listed items are restyle or replace.
+- enhance: be a demanding editorial stylist, not a polite guest. Colourful, patterned or random textiles that fight the palette are restyle. How much to change depends on the room: if it is bare, cluttered or the pieces fight each other, be bold and restyle or replace plenty. If it is already well put together, keep its good pieces and add only what is really missing (often light, a rug, textiles, art). There is no minimum number of changes; visual impact beats quantity.
 
 ONLY for enhance and style_shift (NEVER for targeted_edit): ALSO add to "items" what is MISSING and would lift the room the most (e.g. "no curtains", "no rug", "only one cold ceiling light", "bare walls"), with verdict "add" and "where" = where it should go. Add 1-3 of these. For "add", "item" names the THING to add, never the gap: "großes Bild an der Wand links", not "leere Wandfläche".
 Do not list architecture (walls, floor, ceiling, radiators, windows, doors, built-ins) in "items", it belongs in "architecture".
