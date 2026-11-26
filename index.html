@@ -11458,11 +11458,19 @@ function scanContextForImage(scan) {
     medium: 'Carry out every listed change fully and visibly, but only by restyling furniture, textiles, lighting and decor.',
     strong: 'Carry out every listed change fully and boldly, but only by restyling furniture, textiles, lighting, decor and, if listed, wall colour.'
   }[scan.change_level] || '';
+  // Pieces the user keeps (verdict keep, or a change switched off) must come
+  // back identical, not redrawn in a new shape, colour or angle.
+  const kept = (scan.items || [])
+    .filter(i => i.verdict === 'keep' && i.item)
+    .map(i => i.item);
+  const keepLine = kept.length
+    ? `KEEP IDENTICAL (same shape, size, colour, material, position and angle as in the input): ${kept.join('; ')}.\n`
+    : '';
   return `
 ROOM CONTEXT (read from the input photo): ${scan.room_type || ''}. Architecture: ${scan.architecture || ''}. Light: ${scan.light || ''}.
 INTENSITY: ${strength}
 GEOMETRY LOCK: this is the same room photographed from the same spot. Keep the exact lens and field of view (also if it is a wide-angle phone photo), every window and door with its exact size, shape and position, all built-in furniture and fitted wardrobes in their exact colour, and the position and orientation of the bed, sofa and tables. Never invent new windows, walls or built-ins.
-`;
+${keepLine}`;
 }
 
 // Classify the user's INITIAL generate request into one of three intents,
@@ -12111,7 +12119,7 @@ async function generateWithGemini(imagePrompt, products, geminiKey) {
   const fullPrompt = `Edit this photograph of a real room. Return one photorealistic image from the identical camera position.
 
 PRESERVE EXACTLY (keep identical to the input photo):
-- Camera angle, lens, framing and crop
+- Camera angle, lens, framing and crop: the same field of view, no zooming out, no extra ceiling, floor or wall at the edges. Objects cut off at the image edges in the input stay cut off at the same place.
 - Room architecture: walls, ceiling, mouldings, windows, doors, radiators
 - Floor material and pattern (it may be partly covered by a rug)
 - The position and footprint of large furniture
