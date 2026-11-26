@@ -4976,6 +4976,18 @@ body[data-state="empty"] .landing-stage .partner-strip{display:flex;align-items:
 /* Mode switch: no blue focus ring on mouse click, keep it for keyboard */
 .mode-btn:focus{outline:none}
 .mode-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+/* Partner strip v2: floating white pill inside the first screen */
+body[data-state="empty"] .landing-stage .partner-strip{left:50%;right:auto;bottom:28px;transform:translateX(-50%);width:min(860px,calc(100% - 48px));max-width:none;height:60px;padding:0 8px 0 28px;border:0;border-radius:999px;box-shadow:0 10px 30px -12px rgba(0,0,0,.25)}
+.partner-track li{height:60px}.partner-track img{height:22px}.partner-word{font-size:17px}
+@media (max-width:720px){body[data-state="empty"] .landing-stage .partner-strip{bottom:16px;height:52px;padding-left:18px;width:calc(100% - 24px)}.partner-track li{height:52px}.partner-track img{height:18px}}
+/* Home sections in the editorial look */
+.hm-eyebrow,.hm-card .t{color:#c2185b;text-transform:uppercase;letter-spacing:.16em;font-size:11.5px}
+.hm-title{font-family:'Fraunces',Georgia,serif;font-weight:300;letter-spacing:-.02em;line-height:1.08;font-variation-settings:"opsz" 144,"SOFT" 30}
+.hm-steps h3,.hm-card .n{font-family:'Fraunces',Georgia,serif;font-weight:400;letter-spacing:-.01em}
+.hm-steps li::before{background:none;color:#e91e63;font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:22px;width:auto;height:auto;justify-content:flex-start}
+.hm-cta{box-shadow:none}
+.hm-ba input:focus-visible ~ .hm-ba-knob{outline-color:#e91e63}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
