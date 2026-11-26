@@ -412,3 +412,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-text); out
 /* Quieter pink button: no glow */
 .pill-pink { box-shadow: none; }
 .pill-pink:hover { transform: none; box-shadow: none; filter: brightness(0.95); }
+/* Accent: brand pink instead of cyan, labels as small caps like the Partnershop */
+:root { --cyan: #e91e63; --cyan-text: #c2185b; }
+.card .topic, .next-up .topic, .shop-item .what, .prose .era-kicker, .back-box strong {
+  text-transform: uppercase; letter-spacing: 0.14em; font-size: 11.5px; font-weight: 600;
+}
