@@ -12301,6 +12301,7 @@ async function generateWithGemini(imagePrompt, products, geminiKey) {
 
 PRESERVE EXACTLY (keep identical to the input photo):
 - Camera angle, lens, framing and crop: the same field of view, no zooming out, no extra ceiling, floor or wall at the edges. Objects cut off at the image edges in the input stay cut off at the same place.
+- Foreground surfaces at the edges (a wall corner, column or door frame close to the camera) stay exactly where they are, even if they block part of the room. Do not remove them, do not correct lens distortion, do not straighten or rotate the view.
 - Room architecture: walls, ceiling, mouldings, windows, doors, radiators
 - Floor material and pattern (it may be partly covered by a rug)
 - The position and footprint of large furniture
