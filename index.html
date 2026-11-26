@@ -4915,6 +4915,31 @@ body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-c
 .tips-list p{margin:3px 0 0;font-size:14px;line-height:1.5;color:#766f68}
 .tips-ok{display:block;text-align:center;background:#e91e63;color:#fff;border-radius:999px;padding:13px 20px;font:600 15px 'Inter',sans-serif;cursor:pointer}
 .tips-ok:hover{background:#d81b60}
+
+/* Anpassen: faindz look */
+.viz-edit{background:#f8f6f2;border:0;border-radius:22px;padding:34px 36px 36px}
+.viz-edit-header{margin-bottom:20px}
+.viz-edit-eyebrow{font-size:11px;letter-spacing:.2em;color:#9a928a;margin-bottom:10px}
+.viz-edit-title{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.01em;line-height:1.15;color:#1a1a1a}
+.viz-edit-chips{gap:8px;margin-bottom:22px}
+.edit-chip{background:#fff;border:1px solid #e6e0d8;padding:9px 16px;font-size:13px;color:#3a3530}
+.edit-chip:hover{border-color:#e91e63;color:#e91e63;background:#fff;transform:none}
+.edit-chip.is-active{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+.viz-edit-input-wrap{background:#fff;border:1px solid #e6e0d8;border-radius:999px;padding:6px 6px 6px 24px;gap:12px;align-items:center;transition:border-color .2s,box-shadow .2s}
+.viz-edit-input-wrap:focus-within{border-color:#1a1a1a;box-shadow:0 0 0 4px rgba(26,26,26,.04)}
+.viz-edit-input{border:0;background:transparent;min-height:0;height:24px;max-height:24px;padding:0;resize:none;font-size:15px;line-height:24px;overflow:hidden;white-space:nowrap}
+.viz-edit-input:focus{border:0;box-shadow:none}
+.viz-edit-input::placeholder{font-family:'Fraunces',Georgia,serif;font-style:italic;color:#9a928a;font-size:16px}
+.viz-edit-submit{background:#e91e63;color:#fff;border-radius:999px;min-height:48px;padding:0 22px 0 24px;font-size:14.5px;gap:10px;align-self:center}
+.viz-edit-submit:hover{background:#d81b60;transform:none;box-shadow:0 8px 20px -8px rgba(233,30,99,.55)}
+.viz-edit-submit:disabled{background:#e91e63;opacity:.35}
+@media (max-width:720px){
+  .viz-edit{padding:26px 20px 24px;border-radius:18px}
+  .viz-edit-title{font-size:26px}
+  .viz-edit-input-wrap{border-radius:18px;flex-direction:column;align-items:stretch;padding:14px 14px 10px 18px}
+  .viz-edit-input{height:auto;max-height:96px;white-space:normal;min-height:48px}
+  .viz-edit-submit{align-self:flex-end;min-height:44px}
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -5219,7 +5244,7 @@ body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-c
           ></textarea>
           <button type="button" class="viz-edit-submit" id="vizEditSubmit">
             <span class="viz-edit-submit-label" data-i18n="edit.submit">Apply</span>
-            <span class="viz-edit-submit-arrow" aria-hidden="true">→</span>
+            <svg class="viz-edit-submit-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="13 6 19 12 13 18"></polyline></svg>
           </button>
         </div>
 
@@ -6473,8 +6498,8 @@ const I18N = {
     'styleCards.triggerLoading': 'Reading the room',
     // Edit / Refine feature
     'edit.eyebrow': 'Refine',
-    'edit.title': 'Want to tweak something?',
-    'edit.placeholder': 'Make the sofa red, add a vintage rug…',
+    'edit.title': 'Something different?',
+    'edit.placeholder': 'For example: the sofa in sage green, a patterned rug …',
     'edit.submit': 'Apply',
     'edit.submitLoading': 'Refining',
     'edit.chip.sofaColor': 'Change sofa color',
@@ -6717,8 +6742,8 @@ const I18N = {
     'styleCards.triggerLoading': 'Faindz liest den Raum',
     // Edit / Refine feature
     'edit.eyebrow': 'Anpassen',
-    'edit.title': 'Möchtest du etwas anpassen?',
-    'edit.placeholder': 'Mach das Sofa rot, füge einen Vintage-Teppich hinzu…',
+    'edit.title': 'Noch etwas anders?',
+    'edit.placeholder': 'Zum Beispiel: das Sofa in Salbeigrün, ein Teppich mit Muster …',
     'edit.submit': 'Anpassen',
     'edit.submitLoading': 'Generiere',
     'edit.chip.sofaColor': 'Sofa-Farbe ändern',
@@ -12085,7 +12110,7 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
       applyEdit(text);
     });
     input.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
         submitBtn.click();
       }
@@ -12146,7 +12171,8 @@ function refreshEditChips(products) {
     btn.type = 'button';
     btn.className = 'edit-chip';
     btn.dataset.dynamic = '1';
-    btn.textContent = de ? `${title} anders` : `Different ${title}`;
+    const noun = String(title).split(/[\s,(]/)[0];
+    btn.textContent = de ? `${noun} tauschen` : `Swap ${noun.toLowerCase()}`;
     btn.dataset.editPrompt = de
       ? `Ersetze nur ${title} durch eine andere passende Variante (andere Form oder Farbe). Alles andere bleibt genau gleich.`
       : `Replace only the ${title} with a different fitting variant (other shape or colour). Everything else stays exactly the same.`;
