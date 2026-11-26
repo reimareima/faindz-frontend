@@ -4901,6 +4901,20 @@
 /* Room read never shows on the empty home screen */
 body[data-state="empty"] .room-scan-panel,
 body[data-state="empty"] .scan-pins { display: none !important; }
+
+/* Photo tips link + dialog */
+.photo-tips-link{display:none}
+body[data-state="empty"] .landing-stage .photo-tips-link{display:block;margin:14px auto 0;background:none;border:0;color:#fff;font:500 14px/1.4 'Inter',sans-serif;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.6);cursor:pointer;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-color:#fff}
+.tips-card{text-align:left;max-width:440px}
+.tips-card .gis-title{margin-bottom:22px}
+.tips-list{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:16px}
+.tips-list li{display:grid;grid-template-columns:34px 1fr;gap:6px;align-items:start}
+.tips-n{font-family:'Fraunces',Georgia,serif;font-style:italic;color:#e91e63;font-size:20px;line-height:1.2}
+.tips-list strong{display:block;font:600 15px/1.35 'Inter',sans-serif;color:#1a1a1a}
+.tips-list p{margin:3px 0 0;font-size:14px;line-height:1.5;color:#766f68}
+.tips-ok{display:block;text-align:center;background:#e91e63;color:#fff;border-radius:999px;padding:13px 20px;font:600 15px 'Inter',sans-serif;cursor:pointer}
+.tips-ok:hover{background:#d81b60}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -5014,6 +5028,7 @@ body[data-state="empty"] .scan-pins { display: none !important; }
       </div>
       <input type="file" id="fileInput" accept="image/*">
     </label>
+    <button type="button" class="photo-tips-link" id="photoTipsLink" data-i18n="tips.link">Tips for the best photo</button>
     <!-- Format caption shown under the pink pill button on the hero.
          Hidden once the user has uploaded (post-upload state takes over). -->
     <p class="upload-hint" data-i18n="upload.sub.empty">JPG · PNG · HEIC up to 20MB</p>
@@ -6432,6 +6447,13 @@ const I18N = {
     'upload.title.empty': 'Upload an image',
     'upload.title.shrunk': 'Change photo',
     'upload.sub.empty': 'JPG · PNG · HEIC up to 20MB',
+    'tips.link': 'Tips for the best photo',
+    'tips.title': 'The best photo',
+    'tips.1h': 'From a corner', 'tips.1': 'Stand in a corner or doorway so as much of the room as possible is in the picture.',
+    'tips.2h': 'Normal lens, no 0.5×', 'tips.2': 'The ultra-wide lens bends walls. Use 1× and hold the phone straight at chest height.',
+    'tips.3h': 'Daylight', 'tips.3': 'Take the photo during the day, ceiling light off. Faindz sees colours and materials more accurately.',
+    'tips.4h': 'Mess is fine', 'tips.4': 'No need to tidy up. Faindz spots what can go and clears it in the design.',
+    'tips.ok': 'Got it, upload photo',
     'upload.sub.shrunk': 'Upload another image to start over',
     'upload.changePill': 'Change photo',
     // Prompt
@@ -6669,6 +6691,13 @@ const I18N = {
     'upload.title.empty': 'Bild hochladen',
     'upload.title.shrunk': 'Foto ändern',
     'upload.sub.empty': 'JPG · PNG · HEIC bis 20 MB',
+    'tips.link': 'Tipps für das beste Foto',
+    'tips.title': 'So wird dein Foto ideal',
+    'tips.1h': 'Aus der Ecke', 'tips.1': 'Stell dich in eine Ecke oder in die Tür, damit möglichst viel vom Raum aufs Bild passt.',
+    'tips.2h': 'Normales Objektiv, kein 0,5×', 'tips.2': 'Der Weitwinkel verbiegt Wände. Nimm 1× und halte das Handy gerade auf Brusthöhe.',
+    'tips.3h': 'Bei Tageslicht', 'tips.3': 'Fotografiere tagsüber mit ausgeschaltetem Deckenlicht. So erkennt faindz Farben und Materialien genauer.',
+    'tips.4h': 'Unordnung ist okay', 'tips.4': 'Aufräumen musst du nicht. faindz erkennt, was weg kann, und räumt im Entwurf auf.',
+    'tips.ok': 'Verstanden, Foto hochladen',
     'upload.sub.shrunk': 'Anderes Bild hochladen',
     'upload.changePill': 'Foto ändern',
     // Prompt
@@ -7884,6 +7913,29 @@ async function downscaleImage(base64DataUrl, maxWidth = 600, quality = 0.85) {
 // Track currently displayed look so save/heart buttons know what to bookmark
 let currentLookId = null;
 let currentLookData = null;
+
+// Photo tips: small dialog behind a text link under the upload button
+(function () {
+  const link = document.getElementById('photoTipsLink');
+  if (!link) return;
+  const tr = k => (typeof t === 'function' ? t(k) : k);
+  const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  link.addEventListener('click', () => {
+    document.getElementById('tipsModal')?.remove();
+    const m = document.createElement('div');
+    m.id = 'tipsModal'; m.className = 'gis-modal';
+    const rows = [1, 2, 3, 4].map(n => `<li><span class="tips-n">0${n}</span><div><strong>${esc(tr('tips.' + n + 'h'))}</strong><p>${esc(tr('tips.' + n))}</p></div></li>`).join('');
+    m.innerHTML = `<div class="gis-card tips-card" role="dialog" aria-modal="true" aria-labelledby="tipsTitle">
+      <button type="button" class="gis-close" aria-label="${esc(tr('auth.gisClose'))}">&times;</button>
+      <h2 id="tipsTitle" class="gis-title">${esc(tr('tips.title'))}</h2>
+      <ol class="tips-list">${rows}</ol>
+      <label for="fileInput" class="tips-ok">${esc(tr('tips.ok'))}</label>
+    </div>`;
+    document.body.appendChild(m);
+    const close = () => m.remove();
+    m.addEventListener('click', e => { if (e.target === m || e.target.closest('.gis-close') || e.target.closest('.tips-ok')) setTimeout(close, 0); });
+  });
+})();
 
 // ─── LOGO CLICK — Reset to home state ───
 const logoWrap = document.querySelector('.logo-wrap');
