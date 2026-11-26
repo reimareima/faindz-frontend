@@ -4988,6 +4988,10 @@ body[data-state="empty"] .landing-stage .partner-strip{left:50%;right:auto;botto
 .hm-steps li::before{background:none;color:#e91e63;font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:22px;width:auto;height:auto;justify-content:flex-start}
 .hm-cta{box-shadow:none}
 .hm-ba input:focus-visible ~ .hm-ba-knob{outline-color:#e91e63}
+
+/* keep the partner pill inside the first screen even when the hero is taller than the viewport */
+body[data-state="empty"] .landing-stage .partner-strip{bottom:auto;top:calc(100vh - 100px);top:calc(100svh - 100px)}
+@media (max-width:720px){body[data-state="empty"] .landing-stage .partner-strip{top:calc(100svh - 76px)}}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
