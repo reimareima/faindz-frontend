@@ -11277,20 +11277,18 @@ function buildTargetedEditPrompt(lang, userPrompt) {
 NUTZERWUNSCH: "${userPrompt}"
 
 DEINE AUFGABE:
-Setze AUSSCHLIESSLICH diesen einen Wunsch um. Alles andere im Raum bleibt identisch — gleiche Möbel, gleiche Wandfarbe, gleicher Boden, gleiches Licht, gleiche Komposition, gleiche Perspektive.
+Der Wunsch des Nutzers ist der Kern. Setze ihn so um, dass ein inspirierendes Ergebnis entsteht, das man sofort nachkaufen möchte, nicht ein Katalog-Standardteil vor einer kahlen Wand. Architektur, Perspektive, Boden und alles, was nicht zur gewünschten Zone gehört, bleiben identisch.
 
 REGELN:
-- Mache GENAU die Änderung, die der Nutzer beschrieben hat. Nichts darüber hinaus.
-- KEIN Restyling des Raums.
-- Verändere KEINE unbeteiligten Möbel, Deko, Wände, Böden, Beleuchtung oder Farbpalette.
-- Verbessere oder "veredle" NICHTS, was der Nutzer nicht erwähnt hat.
-- Wenn der Nutzer ein Objekt ERSETZEN will: tausche nur dieses eine Objekt. Das neue Objekt sollte zur bestehenden Stilwelt des Raums passen.
-- Wenn der Nutzer eine FARBE ändern will: ändere nur diese eine Oberfläche.
-- Wenn der Nutzer etwas HINZUFÜGEN will: füge nur dieses eine Objekt hinzu, an glaubwürdiger Position.
+- Die gewünschten Stücke sind die Hauptdarsteller: wähle eine Ausführung mit Charakter (warmes Holz, schöne Griffe, interessante Form, ruhige Farbe), keine generischen weißen Standardmöbel.
+- Gestalte den Wunsch als stimmige ZONE: ergänze direkt in diesem Bereich 2–4 passende Begleitstücke, die den Wunsch erst schön machen. Beispiele: Garderobe → Sitzbank, Spiegel, Wandleuchte, Läufer, Körbe; Schrank → Leuchte, Bild oder Pflanze daneben, evtl. Akzentfarbe an der Wand dahinter.
+- Ist der Raum fast leer oder sehr kahl, darf die Zone mutiger sein (z. B. Akzentwand oder Wandpaneele hinter der Zone).
+- Alles außerhalb dieser Zone bleibt unverändert. Kein Restyling des ganzen Raums.
+- Sagt der Nutzer ausdrücklich "nur" oder will er nur eine FARBE ändern oder etwas ENTFERNEN: dann wirklich nur genau das, ohne Begleitstücke.
 - Wenn der Nutzer etwas ENTFERNEN will: ersetze den Platz durch das, was glaubwürdig dahinter wäre (Wand, Boden, Fensterblick).
 
 PRODUKT-LISTE:
-Für diesen gezielten Edit listest du NUR die Produkte, die durch deine Änderung neu sind oder ersetzt wurden. Das sind typischerweise 1–3 Produkte. Wenn der Nutzer eine Farbe ändert (ohne Produktwechsel), kann die products-Liste leer sein — gib trotzdem ein leeres Array.
+Liste die gewünschten Stücke und die Begleitstücke der Zone, typischerweise 3–6 Produkte. Wenn der Nutzer eine Farbe ändert (ohne Produktwechsel), kann die products-Liste leer sein — gib trotzdem ein leeres Array.
 
 Bewahre die bestehende Material- und Farbharmonie des Raums. Selbst wenn der Nutzer ein rotes Sofa will: das rote Sofa muss zur bestehenden Beleuchtung, Wandfarbe und den anderen Texturen passen.
 
@@ -11303,20 +11301,18 @@ WICHTIG: Das style_identified-Feld soll den BESTEHENDEN Stil des Raums beschreib
 USER'S REQUEST: "${userPrompt}"
 
 YOUR TASK:
-Apply ONLY this one request. Everything else in the room stays identical — same furniture, same wall color, same flooring, same lighting, same composition, same perspective.
+The user's request is the core. Fulfil it so the result is inspiring, something people want to buy right away, not a catalogue standard piece in front of a bare wall. Architecture, perspective, floor and everything outside the requested zone stay identical.
 
 RULES:
-- Make EXACTLY the change the user described. Nothing beyond it.
-- DO NOT restyle the room.
-- DO NOT alter unrelated furniture, decor, walls, floors, lighting, or color palette.
-- DO NOT "improve" or "refine" anything the user didn't mention.
-- If the user wants to REPLACE an object: swap only that one object. The new object should fit the room's existing style world.
-- If the user wants to CHANGE a COLOR: change only that one surface.
-- If the user wants to ADD something: add only that one object, at a believable position.
+- The requested pieces are the heroes: pick versions with character (warm wood, nice handles, interesting shape, calm colour), no generic white standard furniture.
+- Design the request as a coherent ZONE: add 2–4 matching companion pieces right in that area that make it beautiful. Examples: coat rack → bench, mirror, wall light, runner, baskets; wardrobe → lamp, art or plant next to it, maybe an accent colour on the wall behind.
+- If the room is nearly empty or very bare, the zone may be bolder (e.g. accent wall or wall panelling behind it).
+- Everything outside this zone stays unchanged. No restyle of the whole room.
+- If the user explicitly says "only", or only wants a COLOR change or to REMOVE something: do exactly that, without companion pieces.
 - If the user wants to REMOVE something: replace the space with what would believably be behind it (wall, floor, window view).
 
 PRODUCT LIST:
-For this targeted edit you list ONLY the products that are new or replaced by your change. Typically 1–3 products. If the user only changes a color (no product swap), the products array can be empty — still return an empty array.
+List the requested pieces and the zone's companion pieces, typically 3–6 products. If the user only changes a color (no product swap), the products array can be empty — still return an empty array.
 
 Preserve the room's existing material and color harmony. Even if the user wants a red sofa: the red sofa must work with the existing lighting, wall color, and other textures.
 
@@ -12231,6 +12227,20 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
 
 // The supported output shape closest to the uploaded photo, so the
 // design keeps the photo's framing (before/after line up)
+// Center-crop an <img> to "W:H". Returns null when it already fits (within 3%).
+async function cropToAspect(img, ar) {
+  const [x, y] = ar.split(':').map(Number);
+  const w = img.naturalWidth, h = img.naturalHeight, target = x / y, r = w / h;
+  if (!w || !h || Math.abs(Math.log(r / target)) < 0.03) return null;
+  const cw = r > target ? Math.round(h * target) : w;
+  const ch = r > target ? h : Math.round(w / target);
+  const scale = Math.min(1, 2048 / Math.max(cw, ch));
+  const c = document.createElement('canvas');
+  c.width = Math.round(cw * scale); c.height = Math.round(ch * scale);
+  c.getContext('2d').drawImage(img, (w - cw) / 2, (h - ch) / 2, cw, ch, 0, 0, c.width, c.height);
+  return { data: c.toDataURL('image/jpeg', 0.92).split(',')[1], mime: 'image/jpeg' };
+}
+
 function closestAspectRatio(w, h) {
   if (!w || !h) return null;
   const R = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'];
@@ -12302,6 +12312,21 @@ ${imagePrompt}
 ${itemsLine}${scanContextForImage(state.roomScan)}
 Result: a believable photo a real person could take in this home after redecorating, not a 3D render. Natural colours, no added text, no people.`;
 
+  // Gemini only returns fixed formats (21:9, 16:9, ...). A photo in between
+  // (e.g. a 2.1:1 wide-angle shot) came back re-framed, so before and after
+  // showed different views. Crop the input to the format first and show the
+  // "before" in the same frame.
+  const ar = closestAspectRatio(preview.naturalWidth, preview.naturalHeight);
+  let inData = state.imageBase64, inMime = state.imageMimeType;
+  if (ar) {
+    try {
+      const c = await cropToAspect(preview, ar);
+      if (c) { inData = c.data; inMime = c.mime; }
+      const vb = document.getElementById('vizBefore');
+      if (vb) { vb.style.aspectRatio = ar.replace(':', ' / '); vb.style.objectFit = 'cover'; }
+    } catch (e) { /* send the original */ }
+  }
+
   const response = await fetch(
     GEMINI_URL,
     {
@@ -12313,13 +12338,12 @@ Result: a believable photo a real person could take in this home after redecorat
           contents: [{
             parts: [
               { text: fullPrompt },
-              { inline_data: { mime_type: state.imageMimeType, data: state.imageBase64 } }
+              { inline_data: { mime_type: inMime, data: inData } }
             ]
           }],
           generationConfig: {
             responseModalities: ['Image'],
-            ...(closestAspectRatio(preview.naturalWidth, preview.naturalHeight)
-              ? { imageConfig: { aspectRatio: closestAspectRatio(preview.naturalWidth, preview.naturalHeight) } } : {}),
+            ...(ar ? { imageConfig: { aspectRatio: ar } } : {}),
           }
         }
       })
