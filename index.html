@@ -9489,7 +9489,7 @@ Respond ONLY with valid JSON in this format (no markdown fences, no preamble):
       "name": "A specific German Amazon search query for this item (always German for marketplace results). Be detailed enough to find similar pieces. Example: 'Stehlampe Bogenlampe Messing Marmorfuß' rather than 'Lampe'.",
       ${PRODUCT_ATTRS_FIELD}
       "reason": "${currentLang === 'de' ? 'EIN klarer deutscher Satz (max 15 Wörter), was du im Bild siehst.' : 'ONE plain English sentence (max 15 words) describing what you see.'}",
-      "price_range": "e.g. '60-150€' — realistic estimated range on Amazon DE for similar items",
+      "price_range": "e.g. '60-150€' — realistic estimated range in German online shops for similar items",
       "priority": "must" if it's a defining piece of the look, "nice" if it's a smaller accent,
       "x": 0.45,
       "y": 0.62
@@ -9775,7 +9775,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON.
   Der Raum soll teuer wirken durch gute Komposition und Materialität — nicht durch offensichtlichen Luxus.
 
   Beende IMMER mit:
-  'Editorial interior photography, refined architectural styling, tactile natural materials, believable scale and proportions, soft realistic shadows, subtle material imperfections, premium residential atmosphere, magazine-quality interior photography, natural balanced lighting, highly photorealistic.'",
+  'A real photo of this lived-in home after redecorating, same camera and daylight as the input, believable scale, soft natural shadows, subtle real-world imperfections, highly photorealistic.'",
 
   "products": [
     {
@@ -10063,7 +10063,7 @@ Respond ONLY with valid JSON.
   The room should feel expensive through composition and materiality rather than obvious luxury.
 
   ALWAYS end with:
-  'Editorial interior photography, refined architectural styling, tactile natural materials, believable scale and proportions, soft realistic shadows, subtle material imperfections, premium residential atmosphere, magazine-quality interior photography, natural balanced lighting, highly photorealistic.'",
+  'A real photo of this lived-in home after redecorating, same camera and daylight as the input, believable scale, soft natural shadows, subtle real-world imperfections, highly photorealistic.'",
 
   "products": [
     {
@@ -10819,7 +10819,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON, keine Markdown-Zäune, kein Vorab-T
     {
       "category": "z.B. MÖBEL, BELEUCHTUNG, DEKO, TEXTIL, WANDGESTALTUNG",
       "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
-      "name": "Konkreter deutscher Suchbegriff für Amazon, spezifisch genug für gute Treffer",
+      "name": "Konkreter deutscher Suchbegriff, wie ihn ein Möbel-Onlineshop (OTTO, Höffner) versteht, spezifisch genug für gute Treffer",
       ${PRODUCT_ATTRS_FIELD}
       "reason": "1 Satz: was hat sich verändert und warum passt das neue Item",
       "price_range": "z.B. '200-400€'",
@@ -10839,7 +10839,7 @@ Respond ONLY with valid JSON, no markdown fences, no preamble:
     {
       "category": "e.g. FURNITURE, LIGHTING, DECOR, TEXTILES, WALL DESIGN",
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
-      "name": "Concrete German Amazon search query, specific enough for good hits",
+      "name": "Concrete German search query a furniture web shop (OTTO, Höffner) understands, specific enough for good hits",
       ${PRODUCT_ATTRS_FIELD}
       "reason": "1 sentence: what changed and why it fits",
       "price_range": "e.g. '200-400€'",
@@ -11051,7 +11051,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in DIESER Struktur:
 {
   "style_identified": "Kurze Stilbeschreibung des resultierenden Looks in 4–7 Wörtern",
 
-  "image_prompt": "ENGLISCH. Ein einziger zusammenhängender Bearbeitungs-Prompt für ein KI-Bildmodell. Beschreibe das Endergebnis konkret und visuell: jedes neue Element mit exakter Position, Material, Farbe, Größe, Textur, Lichtverhalten, Schatten. Was unverändert bleiben muss, klar benennen. Vermeide künstliche Symmetrie, Pinterest-Clutter, AI-overdesign. Beende IMMER mit: 'Editorial interior photography, refined architectural styling, tactile natural materials, believable scale and proportions, soft realistic shadows, subtle material imperfections, premium residential atmosphere, magazine-quality interior photography, natural balanced lighting, highly photorealistic.'",
+  "image_prompt": "ENGLISCH. Ein einziger zusammenhängender Bearbeitungs-Prompt für ein KI-Bildmodell. Beschreibe das Endergebnis konkret und visuell: jedes neue Element mit exakter Position, Material, Farbe, Größe, Textur, Lichtverhalten, Schatten. Beschreibe jedes Produkt mit GENAU derselben Farbe, demselben Material und derselben Form wie in seinen attrs, damit das Bild und die Shop-Treffer zusammenpassen. Was unverändert bleiben muss, klar benennen. Vermeide künstliche Symmetrie, Pinterest-Clutter, AI-overdesign. Beende IMMER mit: 'A real photo of this lived-in home after redecorating, same camera and daylight as the input, believable scale, soft natural shadows, subtle real-world imperfections, highly photorealistic.'",
 
   "products": [
     {
@@ -11060,7 +11060,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in DIESER Struktur:
       "visual_impact": "high | medium | low",
       "category": "BELEUCHTUNG | MÖBEL | TEXTIL | DEKO | KUNST | PFLANZEN | ORDNUNG | TECHNIK",
       "title": "Kurzer Anzeigename für die Produktliste, 2–4 Wörter, z.B. 'Ecksofa Samt grau'",
-      "name": "Massentauglicher Amazon-Suchbegriff mit 3–5 einfachen Wörtern (Deutsch)",
+      "name": "Deutscher Suchbegriff, wie ihn ein Möbel-Onlineshop (OTTO, Höffner) versteht, 3–5 einfache Wörter, z.B. 'Sideboard Eiche Rillen'",
       ${PRODUCT_ATTRS_FIELD}
       "material": "z.B. Bouclé | Leinen | Eiche geräuchert | Travertin | Messing gebürstet",
       "reason": "1 Satz: was dieses Produkt für DIESEN Raum konkret verbessert",
@@ -11074,7 +11074,8 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in DIESER Struktur:
 QUALITÄTS-FILTER (immer aktiv, in jedem Modus):
 - KOPPLUNG: Jedes Produkt MUSS im image_prompt vorkommen.
 - KEINE GEISTER: Keine Objekte im image_prompt, die nicht in products stehen.
-- SHOPPABLE: Produktnamen müssen realistisch viele Treffer bei Amazon/IKEA/Zara Home/Otto/Westwing/H&M Home/Wayfair liefern.
+- SHOPPABLE: Nur Produkte, die es so bei großen deutschen Möbel- und Wohnshops (OTTO, Höffner, Teppich-Shops) zu kaufen gibt. Keine Einzelstücke, keine Sonderanfertigungen, keine Designer-Raritäten.
+- PREISREALISMUS: Mittleres Preissegment, das sich ein normaler Haushalt leisten kann. Der Look soll nachkaufbar sein, nicht nur schön.
 - MATERIAL-KOHÄRENZ: Max. 3 dominante Töne + 1 dezenter Akzent.
 - REALISTISCHE MASSSTÄBE: Glaubwürdige Proportionen.
 - KEIN CHAOS: Kein Pinterest-/Showroom-Look, keine überladene Deko.
@@ -11093,7 +11094,7 @@ Respond ONLY with valid JSON in THIS structure:
 {
   "style_identified": "Short style description of the resulting look in 4–7 words",
 
-  "image_prompt": "IN ENGLISH. A single coherent editing prompt for an AI image model. Describe the end result concretely and visually: every new element with exact placement, material, color, scale, texture, lighting behavior, shadows. Name clearly what must remain unchanged. Avoid artificial symmetry, Pinterest clutter, AI overdesign. ALWAYS end with: 'Editorial interior photography, refined architectural styling, tactile natural materials, believable scale and proportions, soft realistic shadows, subtle material imperfections, premium residential atmosphere, magazine-quality interior photography, natural balanced lighting, highly photorealistic.'",
+  "image_prompt": "IN ENGLISH. A single coherent editing prompt for an AI image model. Describe the end result concretely and visually: every new element with exact placement, material, color, scale, texture, lighting behavior, shadows. Describe each product with EXACTLY the same colour, material and shape as in its attrs, so the image and the shop matches agree. Name clearly what must remain unchanged. Avoid artificial symmetry, Pinterest clutter, AI overdesign. ALWAYS end with: 'A real photo of this lived-in home after redecorating, same camera and daylight as the input, believable scale, soft natural shadows, subtle real-world imperfections, highly photorealistic.'",
 
   "products": [
     {
@@ -11102,7 +11103,7 @@ Respond ONLY with valid JSON in THIS structure:
       "visual_impact": "high | medium | low",
       "category": "LIGHTING | FURNITURE | TEXTILE | DECOR | ART | PLANTS | STORAGE | TECH",
       "title": "Short display name for the product list, 2–4 words, in the same language as the reason field, e.g. 'Grey velvet corner sofa'",
-      "name": "Mass-market-friendly Amazon search phrase with 3–5 simple words (in German for marketplace results)",
+      "name": "German search phrase a furniture web shop (OTTO, Höffner) understands, 3–5 simple words, e.g. 'Sideboard Eiche Rillen'",
       ${PRODUCT_ATTRS_FIELD}
       "material": "e.g. bouclé | linen | smoked oak | travertine | brushed brass",
       "reason": "One sentence: what this specifically improves about THIS room",
@@ -11116,7 +11117,8 @@ Respond ONLY with valid JSON in THIS structure:
 QUALITY FILTERS (always active, every mode):
 - COUPLING: Every product MUST appear in image_prompt.
 - NO GHOSTS: No objects in image_prompt that don't exist in products[].
-- SHOPPABLE: Product names must yield realistic results on Amazon/IKEA/Zara Home/Otto/Westwing/H&M Home/Wayfair.
+- SHOPPABLE: Only products that big German furniture and home shops (OTTO, Höffner, rug shops) actually sell. No one-offs, no custom builds, no designer rarities.
+- PRICE REALISM: Mid-range prices a normal household can afford. The look must be buyable, not just pretty.
 - MATERIAL COHERENCE: Max 3 dominant tones + 1 restrained accent.
 - REALISTIC SCALE: Believable proportions.
 - NO CLUTTER: No Pinterest/showroom look, no excessive decoration.
@@ -11129,7 +11131,7 @@ function buildEnhancePrompt(lang) {
 Der Nutzer hat KEINEN konkreten Stilwunsch und KEINEN spezifischen Edit-Wunsch. Er will, dass der Raum besser aussieht — Wow-Effekt, aber kuratiert, nicht Pinterest-Chaos.
 
 DEINE PHILOSOPHIE:
-- Du DARFST und SOLLST den Raum sichtbar verwandeln. Halbe Transformationen sind langweilig.
+- Der Unterschied soll sofort sichtbar sein. Wie viel du änderst, hängt vom Raum ab: Kahle, unruhige oder zusammengewürfelte Räume verwandelst du mutig. Bei schon guten Räumen behältst du die guten Stücke und ergänzt gezielt, was fehlt.
 - Dein "Wow" entsteht durch: starke Komposition, edle Materialien, präzise Lichtstimmung, ein klares Hero-Piece. NICHT durch viel Deko.
 - Du machst aus dem bestehenden Stil die beste Version seiner selbst. Wenn der Raum modern ist, wird er kuratiert modern. Wenn er traditionell ist, wird er kuratiert traditionell.
 - Ein Betrachter soll Vorher/Nachher sofort erkennen — der Raum wirkt deutlich teurer, kohärenter und magazinwürdiger.
@@ -11154,7 +11156,7 @@ KOMPOSITIONS-REGELN (Editorial-Stylist-DNA):
 - 2–3 SUPPORTING: Teppich, Beleuchtung, Beistelltisch
 - 1–2 ACCENTS: kleine Details die Materialwelt + Atmosphäre tragen
 - Insgesamt 5–7 Produkte. Bei kleinen oder vollen Räumen 4–5.
-- Material-Welt: max. 3 dominante Töne + 1 dezenter Akzent. Materialien spielen miteinander (z.B. warmes Holz + Bouclé + matte Keramik + gebürstetes Messing).
+- Material-Welt: max. 3 dominante Töne + 1 dezenter Akzent. Leite die Palette aus dem ab, was bleibt (Boden, Wände, Licht, große Möbel) und aus dem Charakter der Wohnung. Jeder Raum bekommt seine eigene Welt, nicht immer Beige mit Bouclé (z.B. Nussbaum + Salbeigrün + Leinen, Eiche hell + Terrakotta + Rattan, Schwarz + Walnuss + Creme, Blau + Messing + Weiß).
 - Bevorzuge wenige große, wirkungsstarke Stücke statt viele kleine Deko-Objekte.
 
 ${REIMAGINE_OUTPUT_SCHEMA_DE}`;
@@ -11164,7 +11166,7 @@ ${REIMAGINE_OUTPUT_SCHEMA_DE}`;
 The user has NO specific style request and NO specific edit request. They want the room to look better — wow effect, but curated, not Pinterest chaos.
 
 YOUR PHILOSOPHY:
-- You MAY and SHOULD transform the room visibly. Half-transformations are boring.
+- The difference must be visible at once. How much you change depends on the room: bare, restless or mismatched rooms get a bold transformation. Rooms that already work keep their good pieces and get exactly what is missing.
 - Your "wow" comes from: strong composition, refined materials, precise lighting mood, a clear hero piece. NOT from lots of decor.
 - You turn the existing style into the best version of itself. Modern room → curated modern. Traditional → curated traditional.
 - A viewer should immediately recognize before/after — the room appears significantly more expensive, more coherent, more magazine-worthy.
@@ -11189,7 +11191,7 @@ COMPOSITION RULES (editorial stylist DNA):
 - 2–3 SUPPORTING: rug, lighting, side table
 - 1–2 ACCENTS: small details that carry materiality + atmosphere
 - 5–7 products total. Small or already-full rooms: 4–5.
-- Material world: max 3 dominant tones + 1 restrained accent. Materials play together (e.g. warm wood + bouclé + matte ceramic + brushed brass).
+- Material world: max 3 dominant tones + 1 restrained accent. Derive the palette from what stays (floor, walls, light, large furniture) and from the home's character. Each room gets its own world, not always beige with bouclé (e.g. walnut + sage green + linen, light oak + terracotta + rattan, black + walnut + cream, blue + brass + white).
 - Prefer fewer large impactful pieces over many small decorative objects.
 
 ${REIMAGINE_OUTPUT_SCHEMA_EN}`;
@@ -11375,7 +11377,7 @@ Write room_type, current_style and every item, where and note in ${currentLang =
 
 INTENT:
 - style_shift: the wish names a style or aesthetic direction (boho, japandi, scandi, industrial, warmer with more wood, ...)
-- targeted_edit: the wish names ONE specific object or surface to change, add, remove or recolour
+- targeted_edit: the wish names one or a few specific objects or surfaces to change, add, remove or recolour (e.g. "Garderobe und neuer Schrank")
 - enhance: vague, empty or general wish ("schöner machen", "make it better")
 - style + object together → style_shift
 
@@ -11383,7 +11385,7 @@ X/Y: for every item give the centre of that piece in the photo as percent of ima
 ITEMS: list the 4-10 most visible furniture pieces, lamps, textiles, rug, curtains, wall art, plants. Be concrete about colour and material.
 BUILT-INS ARE ARCHITECTURE: built-in wardrobes and closets, fitted kitchens, wall panelling, sliding doors, fireplaces, stairs, beams and anything fixed to the walls are part of "architecture" and always KEEP. Never restyle or replace them, even if their colour is loud.
 VERDICT, judged against the wish:
-- keep: ONLY if the piece already looks premium AND fits one calm, cohesive palette (architecture, good floors, a good TV are typical keeps)
+- keep: if the piece looks good and fits one calm, cohesive palette (or the wish does not touch it) (architecture, good floors, a good TV are typical keeps)
 - restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe, and for loud or mismatched bedding/cushions)
 - replace: small or medium piece (lamp, rug, curtains, side table, chair, shelf, art, textiles, decor) that clashes with the wish, looks cheap, dated, worn, loud or random
 - remove: clutter or things that do not belong in a styled room and should simply be cleared away, not replaced: moving boxes, cleaning tools (vacuum, ironing board), laundry, drying racks, loose cables, packaging, office equipment lying around, piles of stuff
@@ -11680,7 +11682,7 @@ INTENTS:
    - "mehr skandinavisch" → style_shift
    - "warmer und gemütlicher mit mehr Holz" → style_shift (style direction even without naming)
 
-2) "targeted_edit" — the user names ONE specific thing to change, add, remove, or recolor. Everything else should stay essentially the same.
+2) "targeted_edit" — the user names one or a few specific things to change, add, remove, or recolor (e.g. "coat rack and a new wardrobe"). Everything else should stay essentially the same.
    Signals: imperatives directed at a specific object ("change the X", "remove the Y", "add an X", "make the X red", "swap Z for W").
    Examples:
    - "change the couch to red" → targeted_edit
@@ -11748,7 +11750,7 @@ async function buildEditPromptWithClaude(prevImageUrl, userEditRequest, signal) 
   });
   const mimeType = imgBlob.type || 'image/jpeg';
 
-  const systemPrompt = `You are an expert at writing precise image-edit prompts for Gemini 2.5 Flash Image, given a styled interior photograph and a user's edit request.
+  const systemPrompt = `You are an expert at writing precise image-edit prompts for an AI image-edit model, given a styled interior photograph and a user's edit request.
 
 Your job has two parts:
 
@@ -11777,6 +11779,7 @@ For "surgical" mode:
 - Describe the change concretely with reference to what you see in the actual image (e.g. "the wooden sideboard with brass handles in front of the left window").
 - Describe what fills the space if something is removed (the wall, window view, flooring that would believably be behind it).
 - Tell Gemini explicitly to preserve all other furniture, decor, materials, colors, lighting direction, shadows, and camera perspective.
+- If something is ADDED or REPLACED, describe a piece with character that fits the room (material, colour, shape, size), never a generic placeholder.
 - Use positive phrasing ("preserve X exactly", "keep Y identical") rather than negations ("do not change X").
 - End with: "Match the photographic style, color grading, and lighting of the input image exactly."
 
@@ -11911,7 +11914,7 @@ async function applyEdit(rawPrompt) {
       console.warn('[edit] Claude classifier failed, falling back to raw prompt:', claudeErr);
       // Fallback: pass the user's raw text directly to Gemini.
       // Wrap it minimally so Gemini at least knows it's an edit instruction.
-      editImagePrompt = `Edit this interior photograph based on the following user request: "${editPrompt}". Keep the camera perspective and overall room layout consistent with the input image.`;
+      editImagePrompt = `Edit this interior photograph based on the following user request: "${editPrompt}". Keep the camera position, framing, architecture, floor and every piece the request does not mention identical to the input image. Match its lighting and colour grading. Photorealistic, no text, no people.`;
       editMode = 'fallback';
     }
 
@@ -12327,6 +12330,7 @@ PRESERVE EXACTLY (keep identical to the input photo):
 CHANGE (apply these instructions):
 ${imagePrompt}
 ${itemsLine}${scanContextForImage(state.roomScan)}
+New pieces look like real products you could order: correct proportions, visible construction details (legs, handles, seams), true-to-life materials, and they cast shadows that match the room. Add nothing beyond the change instructions.
 Result: a believable photo a real person could take in this home after redecorating, not a 3D render. Natural colours, no added text, no people.`;
 
   // Gemini only returns fixed formats (21:9, 16:9, ...). A photo in between
