@@ -4940,6 +4940,11 @@ body[data-state="empty"] .landing-stage .photo-tips-link:hover{text-decoration-c
   .viz-edit-input{height:auto;max-height:96px;white-space:normal;min-height:48px}
   .viz-edit-submit{align-self:flex-end;min-height:44px}
 }
+
+/* Anpassen: no spinning arrow while generating, three calm dots instead */
+.viz-edit-submit.is-loading .viz-edit-submit-arrow{display:none!important;animation:none!important}
+.viz-edit-submit.is-loading .viz-edit-submit-label::after{content:'';display:inline-block;width:18px;margin-left:4px;text-align:left;animation:editDots 1.2s steps(4,end) infinite}
+@keyframes editDots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
