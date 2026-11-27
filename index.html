@@ -6700,6 +6700,7 @@ const I18N = {
     'results.shopOn': 'Shop on {market}',
     'shop.viewAt': 'Similar at {market}',
     'shop.similar': 'Similar in shops',
+    'shop.ideas': 'Ideas from the shops',
     'shop.ad': 'Ad',
     'shop.styleLink': 'More {style} pieces in our partner shop',
     'shop.priceNote': 'incl. VAT, plus shipping',
@@ -6945,6 +6946,7 @@ const I18N = {
     'results.shopOn': 'Bei {market} kaufen',
     'shop.viewAt': 'Ähnliche bei {market}',
     'shop.similar': 'Ähnlich im Shop',
+    'shop.ideas': 'Ideen aus dem Shop',
     'shop.ad': 'Anzeige',
     'shop.styleLink': 'Mehr im Stil {style} ansehen',
     'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
@@ -9019,15 +9021,17 @@ async function findSimilarPart(image, products, offset, run) {
   } catch (e) { /* proxy unreachable: nothing to show */ }
   if (!data || !Array.isArray(data.results) || run !== similarRun) return;
   data.results.forEach((r, i) => {
-    if (!r || !r.matches || !r.matches.length) return;
+    if (!r) return;
+    const close = r.matches && r.matches.length, ideas = !close && r.ideas && r.ideas.length;
+    if (!close && !ideas) return;
     const card = document.getElementById(`product-card-${offset + i}`);
-    if (card && card.isConnected) showSimilar(card, r.matches);
+    if (card && card.isConnected) showSimilar(card, close ? r.matches : r.ideas, !close);
   });
 }
 
-function showSimilar(card, matches) {
+function showSimilar(card, matches, isIdea = false) {
   card.querySelector('.similar')?.remove();
-  const withRef = l => l + (l.includes('?') ? '&' : '?') + 'clickref=app-aehnlich';
+  const withRef = l => l + (l.includes('?') ? '&' : '?') + (isIdea ? 'clickref=app-ideen' : 'clickref=app-aehnlich');
   const items = matches.slice(0, 3).map(m => `
       <a class="similar-item" href="${escapeHtml(withRef(m.link))}" target="_blank" rel="sponsored noopener noreferrer" data-shop="${escapeHtml(m.shop)}" title="${escapeHtml(m.title)}">
         <span class="similar-img"><img src="${escapeHtml(pimg(m.image))}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async"></span>
@@ -9037,7 +9041,7 @@ function showSimilar(card, matches) {
   const box = document.createElement('div');
   box.className = 'similar';
   box.innerHTML = `
-    <div class="similar-head"><span class="similar-label">${escapeHtml(t('shop.similar'))}</span><span class="shop-ad">${escapeHtml(t('shop.ad'))}</span></div>
+    <div class="similar-head"><span class="similar-label">${escapeHtml(t(isIdea ? 'shop.ideas' : 'shop.similar'))}</span><span class="shop-ad">${escapeHtml(t('shop.ad'))}</span></div>
     <div class="similar-row">${items}</div>
     <div class="similar-note">*${escapeHtml(t('shop.priceNote'))}</div>`;
   box.querySelectorAll('img').forEach((img, k) => img.addEventListener('error', () => {
