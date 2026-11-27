@@ -5080,7 +5080,7 @@ html, body { overflow-x: clip; }
   body[data-state="results"] #productsGrid {
     display: flex !important; grid-template-columns: none !important; flex-wrap: nowrap; gap: 12px;
     overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    margin: 0 -20px; padding: 2px 20px 14px; scroll-padding-left: 20px; align-items: stretch;
+    margin: 0 -20px; padding: 2px 20px 14px; scroll-padding-left: 20px; align-items: flex-start;
   }
   body[data-state="results"] #productsGrid::-webkit-scrollbar { display: none; }
   body[data-state="results"] #productsGrid > .product-card { flex: 0 0 80%; max-width: 320px; scroll-snap-align: start; }
@@ -6739,7 +6739,7 @@ const I18N = {
     'results.priority.must': 'Essential',
     'results.priority.nice': 'Refined',
     'results.shopOn': 'Shop on {market}',
-    'shop.viewAt': 'Similar at {market}',
+    'shop.viewAt': '{market}',
     'shop.similar': 'Similar in shops',
     'shop.ideas': 'Ideas from the shops',
     'swipe.title': 'The pieces in this look',
@@ -6988,7 +6988,7 @@ const I18N = {
     'results.priority.must': 'Essenziell',
     'results.priority.nice': 'Akzent',
     'results.shopOn': 'Bei {market} kaufen',
-    'shop.viewAt': 'Ähnliche bei {market}',
+    'shop.viewAt': '{market}',
     'shop.similar': 'Ähnlich im Shop',
     'shop.ideas': 'Ideen aus dem Shop',
     'swipe.title': 'Die Teile aus diesem Look',
