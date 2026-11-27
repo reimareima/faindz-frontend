@@ -5032,6 +5032,13 @@ body[data-state="uploaded"] .mode-btn, body[data-state="results"] .mode-btn,
 body[data-state="loading"] .mode-btn { color: #7a716a; }
 body[data-state="uploaded"] .mode-btn.active, body[data-state="results"] .mode-btn.active,
 body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
+
+/* "+N" on the other-shops button, so it reads as a choice */
+.shop-more-count { display: none; }
+@media (max-width: 768px) {
+  .shop-more { width: auto !important; padding: 0 10px !important; gap: 4px; display: inline-flex; align-items: center; }
+  .shop-more-count { display: inline; font-size: 12px; font-weight: 600; }
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -8760,7 +8767,7 @@ function buildShopActions(p, opts = {}) {
     </a>`).join('');
 
   const toggle = expanded ? '' : `
-    <button class="shop-more" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="${escapeHtml(t('shop.more'))}" title="${escapeHtml(t('shop.more'))}">${SHOP_ICON_CHEVRON}</button>`;
+    <button class="shop-more" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="${escapeHtml(t('shop.more'))}" title="${escapeHtml(t('shop.more'))}"><span class="shop-more-count">+${more.length}</span>${SHOP_ICON_CHEVRON}</button>`;
 
   return `
     <div class="shop-actions shop-actions--${variant}${expanded ? ' is-open' : ''}">
