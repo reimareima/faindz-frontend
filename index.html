@@ -5064,6 +5064,26 @@ html, body { overflow-x: clip; }
 .viz-title { font-family: 'Fraunces', Georgia, serif; font-weight: 400; font-size: 26px; letter-spacing: -0.01em; }
 .viz-disclaimer { font-size: 13px; line-height: 1.5; }
 @media (max-width: 768px) { .viz-title { font-size: 24px; } }
+
+/* Phones v2: after image only, the product cards right under it as a swipe row,
+   "Noch etwas ändern?" and "Look speichern" after the products */
+.swipe-head { display: none; }
+@media (max-width: 768px) {
+  .visualization .viz-grid > .viz-side:first-child { display: none; }
+  .visualization.show { margin-bottom: 20px; }
+  .swipe-head:not([hidden]) { display: flex; align-items: baseline; justify-content: space-between; margin: 0 2px 12px; }
+  .swipe-head-title { font-family: 'Fraunces', Georgia, serif; font-size: 22px; color: var(--text); }
+  .swipe-head-hint { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #9a8f84; font-weight: 600; }
+  .swipe-head-hint::after { content: " \2192"; color: #e91e63; }
+  body[data-state="results"] #productsGrid {
+    display: flex !important; grid-template-columns: none !important; flex-wrap: nowrap; gap: 12px;
+    overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    margin: 0 -20px; padding: 2px 20px 14px; scroll-padding-left: 20px; align-items: stretch;
+  }
+  body[data-state="results"] #productsGrid::-webkit-scrollbar { display: none; }
+  body[data-state="results"] #productsGrid > .product-card { flex: 0 0 80%; max-width: 320px; scroll-snap-align: start; }
+  .after-products > .viz-edit, .after-products > .save-cloud-banner { margin-top: 18px; }
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -5390,7 +5410,12 @@ html, body { overflow-x: clip; }
       </div>
     </div>
 
+    <div class="swipe-head" id="swipeHead" hidden>
+      <span class="swipe-head-title" data-i18n="swipe.title">The pieces in this look</span>
+      <span class="swipe-head-hint" data-i18n="swipe.hint">swipe</span>
+    </div>
     <div class="products-grid" id="productsGrid"></div>
+    <div class="after-products" id="afterProducts"></div>
 
     <!-- Link to the matching Partnershop style page (see updateShopStyleLink) -->
     <a class="shop-style-link" id="shopStyleLink" href="/shop/" hidden>
@@ -6715,6 +6740,8 @@ const I18N = {
     'shop.viewAt': 'Similar at {market}',
     'shop.similar': 'Similar in shops',
     'shop.ideas': 'Ideas from the shops',
+    'swipe.title': 'The pieces in this look',
+    'swipe.hint': 'swipe',
     'shop.fallback': 'Explore the selection at {market}',
     'shop.ad': 'Ad',
     'shop.styleLink': 'More {style} pieces in our partner shop',
@@ -6962,6 +6989,8 @@ const I18N = {
     'shop.viewAt': 'Ähnliche bei {market}',
     'shop.similar': 'Ähnlich im Shop',
     'shop.ideas': 'Ideen aus dem Shop',
+    'swipe.title': 'Die Teile aus diesem Look',
+    'swipe.hint': 'wischen',
     'shop.fallback': 'Auswahl bei {market} entdecken',
     'shop.ad': 'Anzeige',
     'shop.styleLink': 'Mehr im Stil {style} ansehen',
@@ -8101,6 +8130,29 @@ let currentLookData = null;
   const edit = document.getElementById('vizEdit');
   const head = edit && edit.querySelector('.viz-edit-header');
   if (head) head.addEventListener('click', () => edit.classList.toggle('is-open'));
+})();
+
+// Phones: "Noch etwas ändern?" and "Look speichern" move below the product
+// row, so the products come right after the image. Back on wider screens.
+(function () {
+  const mq = window.matchMedia('(max-width: 768px)');
+  const edit = document.getElementById('vizEdit');
+  const save = document.getElementById('saveCloudBanner');
+  const after = document.getElementById('afterProducts');
+  const head = document.getElementById('swipeHead');
+  const grid = document.getElementById('productsGrid');
+  if (!edit || !save || !after || !grid) return;
+  const homeParent = save.parentNode;
+  // remember the original spot (save sits right before edit)
+  const anchor = document.createElement('span'); anchor.className = 'viz-edit-anchor'; anchor.hidden = true;
+  homeParent.insertBefore(anchor, save);
+  function place2() {
+    if (mq.matches) { if (save.parentNode !== after) after.append(save, edit); }
+    else if (save.parentNode === after) { homeParent.insertBefore(save, anchor.nextSibling); homeParent.insertBefore(edit, save.nextSibling); }
+  }
+  place2();
+  (mq.addEventListener ? mq.addEventListener('change', place2) : mq.addListener(place2));
+  if (head) new MutationObserver(() => { head.hidden = !grid.querySelector('.product-card'); }).observe(grid, { childList: true });
 })();
 
 // ─── LOGO CLICK — Reset to home state ───
