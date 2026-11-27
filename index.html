@@ -11610,7 +11610,7 @@ INTENT:
 
 X/Y: for every item give the centre of that piece in the photo as percent of image width (x, 0 = left edge) and height (y, 0 = top edge). For "add" items give the spot where it would go. Be precise, these numbers place markers on the photo.
 ITEMS: list the 4-10 most visible furniture pieces, lamps, textiles, rug, curtains, wall art, plants. Be concrete about colour and material.
-BUILT-INS ARE ARCHITECTURE: built-in wardrobes and closets, fitted kitchens, wall panelling, sliding doors, fireplaces, stairs, beams and anything fixed to the walls are part of "architecture" and always KEEP. Never restyle or replace them, even if their colour is loud.
+BUILT-INS ARE ARCHITECTURE: built-in wardrobes and closets, fitted kitchens, wall panelling, sliding doors, fireplaces, stairs, beams and anything fixed to the walls are part of "architecture" and KEEP by default, even if their colour is loud. Only when the user's wish explicitly names them (e.g. "Einbauschrank weiß streichen") are they restyle.
 VERDICT, judged against the wish:
 - keep: if the piece looks good and fits one calm, cohesive palette (or the wish does not touch it) (architecture, good floors, a good TV are typical keeps)
 - restyle: keep the piece and its position, change fabric/colour/finish (use for large furniture like sofa, bed, dining table, wardrobe, and for loud or mismatched bedding/cushions)
@@ -12558,7 +12558,7 @@ PRESERVE EXACTLY (keep identical to the input photo):
 - Camera angle, lens, framing and crop: the same field of view, no zooming out, no extra ceiling, floor or wall at the edges. Objects cut off at the image edges in the input stay cut off at the same place.
 - Foreground surfaces at the edges (a wall corner, column or door frame close to the camera) stay exactly where they are, even if they block part of the room. Do not remove them, do not correct lens distortion, do not straighten or rotate the view.
 - Room architecture: walls, ceiling, mouldings, windows, doors, radiators
-- Built-in furniture (fitted wardrobes, built-in shelving, fitted kitchens, panelling) with its exact colour and finish, even when it is bold
+- Built-in furniture (fitted wardrobes, built-in shelving, fitted kitchens, panelling) with its exact colour and finish, even when it is bold, unless the change instructions below explicitly change it
 - Floor material and pattern (it may be partly covered by a rug)
 - The position and footprint of large furniture
 - Direction and colour of the natural light, with matching shadows
