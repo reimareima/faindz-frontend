@@ -5039,6 +5039,17 @@ body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
   .shop-more { width: auto !important; padding: 0 10px !important; gap: 4px; display: inline-flex; align-items: center; }
   .shop-more-count { display: inline; font-size: 12px; font-weight: 600; }
 }
+
+/* Phones: "Noch etwas ändern?" folded until tapped, so the products come sooner */
+@media (max-width: 768px) {
+  .viz-edit:not(.is-open) .viz-edit-chips,
+  .viz-edit:not(.is-open) .viz-edit-input-wrap { display: none; }
+  .viz-edit:not(.is-open) { padding-bottom: 18px; }
+  .viz-edit .viz-edit-header { cursor: pointer; position: relative; padding-right: 32px; margin-bottom: 0; }
+  .viz-edit.is-open .viz-edit-header { margin-bottom: 14px; }
+  .viz-edit .viz-edit-header::after { content: "+"; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 26px; line-height: 1; color: #c2185b; transition: transform .2s; }
+  .viz-edit.is-open .viz-edit-header::after { transform: translateY(-50%) rotate(45deg); }
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -6602,7 +6613,7 @@ const I18N = {
     'styleCards.triggerLoading': 'Reading the room',
     // Edit / Refine feature
     'edit.eyebrow': 'Refine',
-    'edit.title': 'Something different?',
+    'edit.title': 'Change something?',
     'edit.placeholder': 'For example: the sofa in sage green, a patterned rug …',
     'edit.submit': 'Apply',
     'edit.submitLoading': 'Refining',
@@ -6847,7 +6858,7 @@ const I18N = {
     'styleCards.triggerLoading': 'Faindz liest den Raum',
     // Edit / Refine feature
     'edit.eyebrow': 'Anpassen',
-    'edit.title': 'Noch etwas anders?',
+    'edit.title': 'Noch etwas ändern?',
     'edit.placeholder': 'Zum Beispiel: das Sofa in Salbeigrün, ein Teppich mit Muster …',
     'edit.submit': 'Anpassen',
     'edit.submitLoading': 'Generiere',
@@ -8065,6 +8076,13 @@ let currentLookData = null;
     const close = () => m.remove();
     m.addEventListener('click', e => { if (e.target === m || e.target.closest('.gis-close') || e.target.closest('.tips-ok')) setTimeout(close, 0); });
   });
+})();
+
+// Phones: tap the "Noch etwas ändern?" header to unfold it
+(function () {
+  const edit = document.getElementById('vizEdit');
+  const head = edit && edit.querySelector('.viz-edit-header');
+  if (head) head.addEventListener('click', () => edit.classList.toggle('is-open'));
 })();
 
 // ─── LOGO CLICK — Reset to home state ───
