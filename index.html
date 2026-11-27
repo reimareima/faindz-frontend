@@ -5098,12 +5098,12 @@ html, body { overflow-x: clip; }
   }
   #productsGrid .pc-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
   #productsGrid .pc-media-tag { position: absolute; left: 8px; bottom: 8px; background: rgba(255,255,255,.92); color: #1a1a1a; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 999px; }
-  #productsGrid .pc-media.is-loading { background: linear-gradient(100deg, #f3efe9 30%, #faf7f3 50%, #f3efe9 70%); background-size: 200% 100%; animation: pcShimmer 1.4s linear infinite; border-color: transparent; }
+  body[data-state="results"] #productsGrid .pc-media.is-loading { background: linear-gradient(100deg, #f3efe9 30%, #faf7f3 50%, #f3efe9 70%); background-size: 200% 100%; animation: pcShimmer 1.4s linear infinite; border-color: transparent; }
   @keyframes pcShimmer { to { background-position: -200% 0; } }
-  #productsGrid .pc-media.is-text { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; padding: 18px 20px; background: linear-gradient(160deg, #f7f3ed 0%, #ede6dc 100%); border-color: transparent; }
+  body[data-state="results"] #productsGrid .pc-media.is-text { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; padding: 18px 20px; background: linear-gradient(160deg, #f7f3ed 0%, #ede6dc 100%); border-color: transparent; }
   #productsGrid .pc-text-name { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; line-height: 1.15; color: #2a241f; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   #productsGrid .pc-text-cta { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: #7a6f65; }
-  #productsGrid .pc-text-cta i { font-style: normal; color: #e91e63; }
+  #productsGrid .pc-text-name i { font-style: normal; color: #e91e63; }
   /* same text block height on every card */
   #productsGrid .product-card .product-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5em; }
   #productsGrid .product-card .product-reason { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.9em; margin-bottom: 10px; }
@@ -9199,8 +9199,9 @@ function textMedia(card) {
   const shop = main ? ((main.querySelector('.shop-name-short') || main.querySelector('.shop-main-name') || {}).textContent || '').trim() : '';
   media.classList.remove('is-loading'); media.classList.add('is-text');
   if (main) { media.href = main.href; media.target = '_blank'; media.rel = 'sponsored noopener noreferrer'; media.removeAttribute('aria-hidden'); media.removeAttribute('tabindex'); }
-  media.innerHTML = `<span class="pc-text-name">${escapeHtml(name)}</span>`
-    + (shop ? `<span class="pc-text-cta">${escapeHtml(currentLang === 'de' ? 'Bei ' + shop + ' entdecken' : 'Explore at ' + shop)} <i>\u2192</i></span>` : '');
+  const cat = (card.querySelector('.product-category') || {}).textContent || '';
+  media.innerHTML = `<span class="pc-text-cta">${escapeHtml(cat)}</span>`
+    + `<span class="pc-text-name">${escapeHtml(shop ? (currentLang === 'de' ? 'Die Auswahl bei ' + shop : 'The selection at ' + shop) : name)} <i>\u2192</i></span>`;
 }
 
 function showSimilar(card, matches, isIdea = false) {
