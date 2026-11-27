@@ -9200,8 +9200,7 @@ function textMedia(card) {
   media.classList.remove('is-loading'); media.classList.add('is-text');
   if (main) { media.href = main.href; media.target = '_blank'; media.rel = 'sponsored noopener noreferrer'; media.removeAttribute('aria-hidden'); media.removeAttribute('tabindex'); }
   const cat = (card.querySelector('.product-category') || {}).textContent || '';
-  media.innerHTML = `<span class="pc-text-cta">${escapeHtml(cat)}</span>`
-    + `<span class="pc-text-name">${escapeHtml(shop ? (currentLang === 'de' ? 'Die Auswahl bei ' + shop : 'The selection at ' + shop) : name)} <i>\u2192</i></span>`;
+  media.innerHTML = `<span class="pc-text-name">${escapeHtml(shop ? (currentLang === 'de' ? 'Die Auswahl bei ' + shop : 'The selection at ' + shop) : name)} <i>\u2192</i></span>`;
 }
 
 function showSimilar(card, matches, isIdea = false) {
