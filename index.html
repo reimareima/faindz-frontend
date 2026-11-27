@@ -5025,6 +5025,8 @@ body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;bord
 @media (max-width: 768px) {
   body[data-state="results"] .results-header { display: none; }
   .visualization .viz-header { display: none; }
+  .product-card.has-hero .similar-item:first-child { display: none; }
+  .product-card.has-hero .similar:has(.similar-item:only-child) { display: none; }
   .visualization.show { display: flex; flex-direction: column; padding: 18px; }
   .visualization > * { order: 5; }
   .visualization .viz-header { order: 1; }
@@ -5057,7 +5059,12 @@ body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;bord
   .viz-edit .viz-edit-header::after { content: "+"; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-size: 22px; color: #c2185b; transition: transform .2s; }
   .viz-edit.is-open .viz-edit-header::after { transform: translateY(-50%) rotate(45deg); }
 
+  /* product cards: shop photo on top, less text */
+  .product-hero { margin: -4px -4px 10px; border-radius: 12px; overflow: hidden; background: #fff; aspect-ratio: 1; display: grid; place-items: center; border: 1px solid rgba(0,0,0,.05); }
+  .product-hero img { width: 100%; height: 100%; object-fit: contain; }
+  .product-card .product-reason { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 }
+@media (min-width: 769px) { .product-hero { display: none; } }
 
 /* Mode switch on light pages (photo uploaded, results): warm grey track, white pill, dark text */
 body[data-state="uploaded"] .mode-switch, body[data-state="results"] .mode-switch,
@@ -5074,9 +5081,13 @@ body[data-state="uploaded"] .mode-btn.active, body[data-state="results"] .mode-b
 body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
 
 /* Mobile cards v2: same look as the strip, icon tile when there is no shop photo */
+.product-hero.is-placeholder { display: none; }
 .shop-more-count { display: none; }
 @media (max-width: 768px) {
-  .look-item-img.is-placeholder { display: grid; place-items: center; color: #b3a89c; background: linear-gradient(160deg, #f6f3ee, #ece7e0); }
+  .product-hero.is-placeholder, .look-item-img.is-placeholder { display: grid; place-items: center; color: #b3a89c; background: linear-gradient(160deg, #f6f3ee, #ece7e0); }
+  .product-hero.is-placeholder { aspect-ratio: 1; margin: -4px -4px 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,.05); }
+  .product-card .heart-btn { z-index: 3; }
+  .product-card .product-reason { -webkit-line-clamp: 2; font-size: 13px; }
   .shop-more { width: auto !important; padding: 0 10px !important; gap: 4px; display: inline-flex; align-items: center; }
   .shop-more-count { display: inline; font-size: 12px; font-weight: 600; }
 }
@@ -9135,6 +9146,19 @@ function showSimilar(card, matches) {
   const actions = card.querySelector('.shop-actions');
   if (actions) actions.before(box); else card.append(box);
   card.classList.add('has-similar');
+  if (!card.querySelector('.product-hero:not(.is-placeholder)') && matches[0] && matches[0].image) {
+    card.querySelector('.product-hero.is-placeholder')?.remove();
+    const hero = document.createElement('a');
+    hero.className = 'product-hero';
+    hero.href = withRef(matches[0].link); hero.target = '_blank'; hero.rel = 'sponsored noopener noreferrer';
+    const im = document.createElement('img');
+    im.src = pimg(matches[0].image); im.alt = matches[0].title || ''; im.loading = 'lazy'; im.decoding = 'async';
+    im.addEventListener('error', () => hero.remove());
+    hero.append(im);
+    const cat = card.querySelector('.product-category');
+    if (cat) cat.before(hero); else card.prepend(hero);
+    card.classList.add('has-hero');
+  }
 }
 
 // Fill a rendered card with its feed matches once they arrive
@@ -10463,6 +10487,7 @@ function buildProductCard(p, i, opts = {}) {
       </svg>
     </button>
     ${badgeHtml}
+    <span class="product-hero is-placeholder" aria-hidden="true">${catIconSvg(p.category)}</span>
     <div class="product-category">${escapeHtml(p.category)}</div>
     <h3 class="product-name">${escapeHtml(productTitle(p))}</h3>
     <p class="product-reason">${escapeHtml(p.reason)}</p>
