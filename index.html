@@ -12007,6 +12007,7 @@ For "surgical" mode:
 - Describe what fills the space if something is removed (the wall, window view, flooring that would believably be behind it).
 - Tell Gemini explicitly to preserve all other furniture, decor, materials, colors, lighting direction, shadows, and camera perspective.
 - If something is ADDED or REPLACED, describe a piece with character that fits the room (material, colour, shape, size), never a generic placeholder.
+- If the user refers to the ORIGINAL ("wie vorher", "wie davor", "like before", "original colour"), look at the second image (the original photo) and describe exactly that colour, material or object from it, e.g. "repaint the built-in wardrobe fronts in the saturated cobalt blue of the original photo".
 - Use positive phrasing ("preserve X exactly", "keep Y identical") rather than negations ("do not change X").
 - End with: "Match the photographic style, color grading, and lighting of the input image exactly."
 
@@ -12024,7 +12025,7 @@ Respond ONLY with valid JSON (no markdown fences, no preamble):
 
   const userMessage = `User's edit request: "${userEditRequest}"
 
-Look at the attached image (the current styled version of their room) and produce the classification + image_prompt.`;
+Image 1 is the current styled version of their room (the one to edit). Image 2 is the original photo before any styling, for reference. Produce the classification + image_prompt.`;
 
   const response = await fetch(ANTHROPIC_URL, {
     method: 'POST',
@@ -12039,6 +12040,7 @@ Look at the attached image (the current styled version of their room) and produc
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType, data: imgBase64 } },
+          ...(state.imageBase64 ? [{ type: 'image', source: { type: 'base64', media_type: state.imageMimeType || 'image/jpeg', data: state.imageBase64 } }] : []),
           { type: 'text', text: userMessage }
         ]
       }]
@@ -12392,6 +12394,12 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
     r.readAsDataURL(imgBlob);
   });
   const mimeType = imgBlob.type || 'image/jpeg';
+  // keep the edited picture in the same format as the one being edited
+  let ar = null;
+  try {
+    const im = new Image(); im.src = prevImageUrl; await im.decode();
+    ar = closestAspectRatio(im.naturalWidth, im.naturalHeight);
+  } catch (e) { /* format unknown: Gemini picks */ }
 
   const url = GEMINI_URL;
   const body = {
@@ -12399,11 +12407,12 @@ async function generateEditWithGemini(prevImageUrl, prompt, geminiKey, signal) {
     body: {
       contents: [{
         parts: [
-          { text: prompt },
-          { inline_data: { mime_type: mimeType, data: imgBase64 } }
+          { text: prompt + (state.imageBase64 ? '\n\nImage 1 is the picture to edit; return an edited version of image 1 with its exact framing. Image 2 is the original photo of the room, only as a reference for colours, materials or objects the request wants back.' : '') },
+          { inline_data: { mime_type: mimeType, data: imgBase64 } },
+          ...(state.imageBase64 ? [{ inline_data: { mime_type: state.imageMimeType || 'image/jpeg', data: state.imageBase64 } }] : [])
         ]
       }],
-      generationConfig: { responseModalities: ['Image'] }
+      generationConfig: { responseModalities: ['Image'], ...(ar ? { imageConfig: { aspectRatio: ar } } : {}) }
     }
   };
 
@@ -12549,6 +12558,7 @@ PRESERVE EXACTLY (keep identical to the input photo):
 - Camera angle, lens, framing and crop: the same field of view, no zooming out, no extra ceiling, floor or wall at the edges. Objects cut off at the image edges in the input stay cut off at the same place.
 - Foreground surfaces at the edges (a wall corner, column or door frame close to the camera) stay exactly where they are, even if they block part of the room. Do not remove them, do not correct lens distortion, do not straighten or rotate the view.
 - Room architecture: walls, ceiling, mouldings, windows, doors, radiators
+- Built-in furniture (fitted wardrobes, built-in shelving, fitted kitchens, panelling) with its exact colour and finish, even when it is bold
 - Floor material and pattern (it may be partly covered by a rug)
 - The position and footprint of large furniture
 - Direction and colour of the natural light, with matching shadows
