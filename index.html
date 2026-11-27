@@ -5112,6 +5112,13 @@ html, body { overflow-x: clip; }
   #productsGrid .product-card .shop-actions { margin-top: auto; }
   #productsGrid .product-card .heart-btn { top: 22px; right: 22px; z-index: 3; }
 }
+
+/* Card hover: only on devices with a mouse (on phones the tapped card kept glowing),
+   and a neutral lift instead of the old cyan glow */
+.product-card:hover { border-color: rgba(0,0,0,.14); box-shadow: var(--shadow-lg); }
+@media (hover: none) {
+  .product-card:hover, .product-card:active { transform: none; border-color: var(--border); box-shadow: none; }
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
