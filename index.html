@@ -5065,6 +5065,20 @@ body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;bord
   .product-card .product-reason { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 }
 @media (min-width: 769px) { .product-hero { display: none; } }
+
+/* Mode switch on light pages (photo uploaded, results): warm grey track, white pill, dark text */
+body[data-state="uploaded"] .mode-switch, body[data-state="results"] .mode-switch,
+body[data-state="loading"] .mode-switch {
+  background: #ece8e2; border: 0; box-shadow: none;
+}
+body[data-state="uploaded"] .mode-indicator, body[data-state="results"] .mode-indicator,
+body[data-state="loading"] .mode-indicator {
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+body[data-state="uploaded"] .mode-btn, body[data-state="results"] .mode-btn,
+body[data-state="loading"] .mode-btn { color: #7a716a; }
+body[data-state="uploaded"] .mode-btn.active, body[data-state="results"] .mode-btn.active,
+body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
