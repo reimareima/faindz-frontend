@@ -5019,6 +5019,50 @@ body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;bord
   body[data-state="empty"] #uploadZone{box-shadow:none!important}
   .photo-tips-link{font-size:13px;opacity:.85}
 }
+
+/* Mobile results v1: the after image first, products right under it */
+.look-strip { display: none; }
+@media (max-width: 768px) {
+  body[data-state="results"] .results-header { margin-bottom: 14px; }
+  body[data-state="results"] .results-title { font-size: 24px; }
+  .visualization.show { display: flex; flex-direction: column; padding: 18px; }
+  .visualization > * { order: 5; }
+  .visualization .viz-header { order: 1; }
+  .visualization .viz-grid { order: 2; }
+  .visualization .viz-grid > .viz-side:first-child { display: none; }
+  .visualization .viz-thumbnails { order: 3; }
+  .visualization .look-strip { order: 4; }
+  .visualization .viz-edit { order: 6; }
+  .visualization .save-cloud-banner { order: 7; }
+  .viz-disclaimer { display: none; }
+
+  .look-strip:not([hidden]) { display: block; margin: 18px -18px 4px; }
+  .look-strip-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 18px 10px; }
+  .look-strip-title { font-family: 'Fraunces', Georgia, serif; font-size: 20px; color: var(--text); }
+  .look-strip-all { font-size: 13px; color: #c2185b; text-decoration: none; font-weight: 500; }
+  .look-strip-row { display: flex; gap: 10px; overflow-x: auto; padding: 0 18px 6px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .look-strip-row::-webkit-scrollbar { display: none; }
+  .look-item { flex: 0 0 138px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--text); }
+  .look-item-img { width: 138px; height: 138px; border-radius: 14px; background: #f4f1ec; border: 1px solid rgba(0,0,0,.06); overflow: hidden; display: grid; place-items: center; }
+  .look-item-img img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+  .look-item-img .look-item-cat { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #9a8f84; padding: 0 10px; text-align: center; }
+  .look-item-name { font-size: 13px; font-weight: 500; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .look-item-price { font-size: 13px; font-weight: 600; }
+  .look-item-shop { font-size: 11px; color: #fff; background: #111; border-radius: 999px; padding: 6px 10px; text-align: center; font-weight: 600; }
+
+  /* "Noch etwas anders?" folded until tapped */
+  .viz-edit:not(.is-open) .viz-edit-chips,
+  .viz-edit:not(.is-open) .viz-edit-input-wrap { display: none; }
+  .viz-edit .viz-edit-header { cursor: pointer; position: relative; padding-right: 28px; }
+  .viz-edit .viz-edit-header::after { content: "+"; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-size: 22px; color: #c2185b; transition: transform .2s; }
+  .viz-edit.is-open .viz-edit-header::after { transform: translateY(-50%) rotate(45deg); }
+
+  /* product cards: shop photo on top, less text */
+  .product-hero { margin: -4px -4px 10px; border-radius: 12px; overflow: hidden; background: #fff; aspect-ratio: 1; display: grid; place-items: center; border: 1px solid rgba(0,0,0,.05); }
+  .product-hero img { width: 100%; height: 100%; object-fit: contain; }
+  .product-card .product-reason { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+}
+@media (min-width: 769px) { .product-hero { display: none; } }
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -5285,6 +5329,15 @@ body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;bord
 
       <!-- Version thumbnails: Vorher · V1 · V2 · ... -->
       <div class="viz-thumbnails" id="vizThumbnails"></div>
+
+      <!-- Mobile: shop the look right under the image -->
+      <div class="look-strip" id="lookStrip" hidden>
+        <div class="look-strip-head">
+          <span class="look-strip-title" data-i18n="strip.title">Shop this look</span>
+          <a class="look-strip-all" href="#productsGrid" data-i18n="strip.all">All pieces</a>
+        </div>
+        <div class="look-strip-row" id="lookStripRow"></div>
+      </div>
 
       <!-- Save-to-Cloud Banner: zeigt Login-CTA wenn nicht eingeloggt,
            sonst dezenten "Gespeichert"-Status -->
@@ -6555,6 +6608,8 @@ const I18N = {
     'upload.title.empty': 'Upload an image',
     'upload.title.shrunk': 'Change photo',
     'upload.sub.empty': 'JPG · PNG · HEIC up to 20MB',
+    'strip.title': 'Shop this look',
+    'strip.all': 'All pieces',
     'tips.link': 'Tips for the best photo',
     'partners.label': 'Our partner shops',
     'tips.title': 'The best photo',
@@ -6800,6 +6855,8 @@ const I18N = {
     'upload.title.empty': 'Bild hochladen',
     'upload.title.shrunk': 'Foto ändern',
     'upload.sub.empty': 'JPG · PNG · HEIC bis 20 MB',
+    'strip.title': 'Diese Möbel shoppen',
+    'strip.all': 'Alle Teile',
     'tips.link': 'Tipps für das beste Foto',
     'partners.label': 'Unsere Partnershops',
     'tips.title': 'So wird dein Foto ideal',
@@ -8047,6 +8104,57 @@ let currentLookData = null;
   });
 })();
 
+// ─── MOBILE: SHOP-THE-LOOK STRIP ───────────────────────────────────
+// Mirrors the product cards in a swipeable row right under the image,
+// so the products are on the first screen on phones. Rebuilt whenever
+// the cards or their shop matches change.
+(function () {
+  const row = document.getElementById('lookStripRow');
+  const strip = document.getElementById('lookStrip');
+  const grid = document.getElementById('productsGrid');
+  if (!row || !strip || !grid) return;
+  const tag = (l, ref) => l.replace(/clickref=app(?=&|$)/, 'clickref=' + ref);
+  function build() {
+    const cards = [...grid.querySelectorAll('.product-card')];
+    if (!cards.length) { strip.hidden = true; row.innerHTML = ''; return; }
+    row.innerHTML = '';
+    cards.forEach(card => {
+      const name = (card.querySelector('.product-name') || {}).textContent || '';
+      const cat = (card.querySelector('.product-category') || {}).textContent || '';
+      const simImg = card.querySelector('.similar-img img');
+      const simPrice = card.querySelector('.similar-price');
+      const range = card.querySelector('.product-price');
+      const main = card.querySelector('.shop-main');
+      const sim = card.querySelector('.similar-item');
+      const a = document.createElement('a');
+      a.className = 'look-item';
+      if (sim) { a.href = sim.href.replace('clickref=app-aehnlich', 'clickref=app-leiste'); a.target = '_blank'; a.rel = 'sponsored noopener noreferrer'; }
+      else if (main) { a.href = tag(main.href, 'app-leiste'); a.target = '_blank'; a.rel = 'sponsored noopener noreferrer'; }
+      else { a.href = '#' + card.id; }
+      const box = document.createElement('span'); box.className = 'look-item-img';
+      if (simImg && simImg.src) { const im = document.createElement('img'); im.src = simImg.src; im.alt = name; im.loading = 'lazy'; box.append(im); }
+      else { const c = document.createElement('span'); c.className = 'look-item-cat'; c.textContent = cat; box.append(c); }
+      const n = document.createElement('span'); n.className = 'look-item-name'; n.textContent = name;
+      const p = document.createElement('span'); p.className = 'look-item-price'; p.textContent = simPrice ? simPrice.textContent : (range ? range.textContent : '');
+      const shop = document.createElement('span'); shop.className = 'look-item-shop';
+      const shopName = sim ? (sim.querySelector('.similar-shop') || {}).textContent : (main ? ((main.querySelector('.shop-name-short') || main.querySelector('.shop-main-name') || {}).textContent || '') : '');
+      shop.textContent = shopName ? (currentLang === 'de' ? 'Bei ' : 'At ') + shopName.trim() : (currentLang === 'de' ? 'Ansehen' : 'View');
+      a.append(box, n, p, shop);
+      row.append(a);
+    });
+    strip.hidden = false;
+  }
+  let t0 = 0;
+  new MutationObserver(() => { clearTimeout(t0); t0 = setTimeout(build, 120); })
+    .observe(grid, { childList: true, subtree: true });
+  strip.querySelector('.look-strip-all').addEventListener('click', e => {
+    e.preventDefault(); grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  const edit = document.getElementById('vizEdit');
+  const head = edit && edit.querySelector('.viz-edit-header');
+  if (head) head.addEventListener('click', () => edit.classList.toggle('is-open'));
+})();
+
 // ─── LOGO CLICK — Reset to home state ───
 const logoWrap = document.querySelector('.logo-wrap');
 if (logoWrap) {
@@ -9010,6 +9118,17 @@ function showSimilar(card, matches) {
   const actions = card.querySelector('.shop-actions');
   if (actions) actions.before(box); else card.append(box);
   card.classList.add('has-similar');
+  if (!card.querySelector('.product-hero') && matches[0] && matches[0].image) {
+    const hero = document.createElement('a');
+    hero.className = 'product-hero';
+    hero.href = withRef(matches[0].link); hero.target = '_blank'; hero.rel = 'sponsored noopener noreferrer';
+    const im = document.createElement('img');
+    im.src = pimg(matches[0].image); im.alt = matches[0].title || ''; im.loading = 'lazy'; im.decoding = 'async';
+    im.addEventListener('error', () => hero.remove());
+    hero.append(im);
+    const cat = card.querySelector('.product-category');
+    if (cat) cat.before(hero); else card.prepend(hero);
+  }
 }
 
 // Fill a rendered card with its feed matches once they arrive
