@@ -9012,7 +9012,17 @@ async function findSimilar(imageUrl, products, offset = 0) {
   if (!imageUrl || !Array.isArray(products) || !products.length) return;
   const run = offset ? similarRun : ++similarRun;
   let image;
-  try { image = await designToJpeg(imageUrl); } catch (e) { return; }
+  try { image = await designToJpeg(imageUrl); }
+  catch (e) {
+    // Phones pause pages in the background (switching apps while the room
+    // renders): try again once the page is visible again.
+    if (document.visibilityState === 'visible') await new Promise(r => setTimeout(r, 800));
+    else await new Promise(r => document.addEventListener('visibilitychange', function h() {
+      if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', h); r(); }
+    }));
+    if (run !== similarRun) return;
+    try { image = await designToJpeg(imageUrl); } catch (e2) { console.warn('[similar] design image failed', e2); return; }
+  }
   // Two items per request, all requests at once: each card fills in as
   // soon as its own check is done instead of waiting for the slowest one.
   const parts = [];
