@@ -5079,18 +5079,6 @@ body[data-state="uploaded"] .mode-btn, body[data-state="results"] .mode-btn,
 body[data-state="loading"] .mode-btn { color: #7a716a; }
 body[data-state="uploaded"] .mode-btn.active, body[data-state="results"] .mode-btn.active,
 body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
-
-/* Mobile cards v2: same look as the strip, icon tile when there is no shop photo */
-.product-hero.is-placeholder { display: none; }
-.shop-more-count { display: none; }
-@media (max-width: 768px) {
-  .product-hero.is-placeholder, .look-item-img.is-placeholder { display: grid; place-items: center; color: #b3a89c; background: linear-gradient(160deg, #f6f3ee, #ece7e0); }
-  .product-hero.is-placeholder { aspect-ratio: 1; margin: -4px -4px 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,.05); }
-  .product-card .heart-btn { z-index: 3; }
-  .product-card .product-reason { -webkit-line-clamp: 2; font-size: 13px; }
-  .shop-more { width: auto !important; padding: 0 10px !important; gap: 4px; display: inline-flex; align-items: center; }
-  .shop-more-count { display: inline; font-size: 12px; font-weight: 600; }
-}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -8161,7 +8149,7 @@ let currentLookData = null;
       else { a.href = '#' + card.id; }
       const box = document.createElement('span'); box.className = 'look-item-img';
       if (simImg && simImg.src) { const im = document.createElement('img'); im.src = simImg.src; im.alt = name; im.loading = 'lazy'; box.append(im); }
-      else { box.classList.add('is-placeholder'); box.innerHTML = catIconSvg(cat); }
+      else { const c = document.createElement('span'); c.className = 'look-item-cat'; c.textContent = cat; box.append(c); }
       const n = document.createElement('span'); n.className = 'look-item-name'; n.textContent = name;
       const p = document.createElement('span'); p.className = 'look-item-price'; p.textContent = simPrice ? simPrice.textContent : (range ? range.textContent : '');
       const shop = document.createElement('span'); shop.className = 'look-item-shop';
@@ -8883,7 +8871,7 @@ function buildShopActions(p, opts = {}) {
     </a>`).join('');
 
   const toggle = expanded ? '' : `
-    <button class="shop-more" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="${escapeHtml(t('shop.more'))}" title="${escapeHtml(t('shop.more'))}"><span class="shop-more-count">+${more.length}</span>${SHOP_ICON_CHEVRON}</button>`;
+    <button class="shop-more" type="button" aria-expanded="false" aria-controls="${panelId}" aria-label="${escapeHtml(t('shop.more'))}" title="${escapeHtml(t('shop.more'))}">${SHOP_ICON_CHEVRON}</button>`;
 
   return `
     <div class="shop-actions shop-actions--${variant}${expanded ? ' is-open' : ''}">
@@ -9146,8 +9134,7 @@ function showSimilar(card, matches) {
   const actions = card.querySelector('.shop-actions');
   if (actions) actions.before(box); else card.append(box);
   card.classList.add('has-similar');
-  if (!card.querySelector('.product-hero:not(.is-placeholder)') && matches[0] && matches[0].image) {
-    card.querySelector('.product-hero.is-placeholder')?.remove();
+  if (!card.querySelector('.product-hero') && matches[0] && matches[0].image) {
     const hero = document.createElement('a');
     hero.className = 'product-hero';
     hero.href = withRef(matches[0].link); hero.target = '_blank'; hero.rel = 'sponsored noopener noreferrer';
@@ -10442,23 +10429,6 @@ function formatPriceRange(str) {
 // opts.tag        — affiliate tag (Amazon)
 // opts.region     — amazon region (default amazon.de)
 // opts.fromVersion— if set (e.g. "V2"), card gets a version badge
-// Line icon per product category, for cards and strip items without a shop photo
-function catIconSvg(category) {
-  const c = String(category || '').toLowerCase();
-  const P = {
-    lamp: '<path d="M9 3h6l3 7H6z"/><path d="M12 10v9"/><path d="M8 21h8"/>',
-    sofa: '<path d="M4 12V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M3 12h18v5H3z"/><path d="M5 17v2M19 17v2"/>',
-    rug: '<rect x="4" y="5" width="16" height="14" rx="1"/><path d="M8 9h8M8 12h8M8 15h8"/>',
-    art: '<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 16l5-5 4 4 3-3 4 4"/>',
-    plant: '<path d="M12 21v-8"/><path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7z"/><path d="M12 15c0-3-2-5-5-5 0 3 2 5 5 5z"/><path d="M8 21h8"/>',
-    vase: '<path d="M9 3h6"/><path d="M10 3c0 3-4 5-4 10a6 6 0 0 0 12 0c0-5-4-7-4-10"/>',
-    box: '<path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/>',
-  };
-  const k = /leucht|licht|lamp|light/.test(c) ? 'lamp' : /textil|teppich|rug|vorhang/.test(c) ? 'rug' : /kunst|art|bild/.test(c) ? 'art'
-    : /pflanz|plant/.test(c) ? 'plant' : /deko|decor/.test(c) ? 'vase' : /möbel|moebel|furni/.test(c) ? 'sofa' : 'box';
-  return `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[k]}</svg>`;
-}
-
 function buildProductCard(p, i, opts = {}) {
   const tag = opts.tag || getSetting('affiliateTag');
   const fromVersion = opts.fromVersion || null;
@@ -10487,7 +10457,6 @@ function buildProductCard(p, i, opts = {}) {
       </svg>
     </button>
     ${badgeHtml}
-    <span class="product-hero is-placeholder" aria-hidden="true">${catIconSvg(p.category)}</span>
     <div class="product-category">${escapeHtml(p.category)}</div>
     <h3 class="product-name">${escapeHtml(productTitle(p))}</h3>
     <p class="product-reason">${escapeHtml(p.reason)}</p>
