@@ -5086,6 +5086,32 @@ html, body { overflow-x: clip; }
   body[data-state="results"] #productsGrid > .product-card { flex: 0 0 80%; max-width: 320px; scroll-snap-align: start; }
   .after-products > .viz-edit, .after-products > .save-cloud-banner { margin-top: 18px; }
 }
+
+/* Phone swipe cards v3: one shape for every card */
+.pc-media { display: none; }
+@media (max-width: 768px) {
+  body[data-state="results"] #productsGrid { align-items: stretch !important; }
+  body[data-state="results"] #productsGrid > .product-card { padding: 14px 14px 16px; }
+  body[data-state="results"] #productsGrid .pc-media {
+    display: block; position: relative; margin: 0 0 14px; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden;
+    background: #fff; border: 1px solid rgba(0,0,0,.06); text-decoration: none; color: inherit;
+  }
+  #productsGrid .pc-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  #productsGrid .pc-media-tag { position: absolute; left: 8px; bottom: 8px; background: rgba(255,255,255,.92); color: #1a1a1a; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 999px; }
+  #productsGrid .pc-media.is-loading { background: linear-gradient(100deg, #f3efe9 30%, #faf7f3 50%, #f3efe9 70%); background-size: 200% 100%; animation: pcShimmer 1.4s linear infinite; border-color: transparent; }
+  @keyframes pcShimmer { to { background-position: -200% 0; } }
+  #productsGrid .pc-media.is-text { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 10px; padding: 18px 20px; background: linear-gradient(160deg, #f7f3ed 0%, #ede6dc 100%); border-color: transparent; }
+  #productsGrid .pc-text-name { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; line-height: 1.15; color: #2a241f; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  #productsGrid .pc-text-cta { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: #7a6f65; }
+  #productsGrid .pc-text-cta i { font-style: normal; color: #e91e63; }
+  /* same text block height on every card */
+  #productsGrid .product-card .product-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5em; }
+  #productsGrid .product-card .product-reason { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.9em; margin-bottom: 10px; }
+  /* the photo row and the fallback line live in the media area on phones */
+  #productsGrid .product-card .similar, #productsGrid .product-card .similar-fallback, #productsGrid .product-card .product-match { display: none !important; }
+  #productsGrid .product-card .shop-actions { margin-top: auto; }
+  #productsGrid .product-card .heart-btn { top: 22px; right: 22px; z-index: 3; }
+}
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -9095,6 +9121,12 @@ function finishSimilar() {
   if (!grid) return;
   const cards = [...grid.querySelectorAll(':scope > .product-card')];
   cards.forEach(card => {
+    const pm = card.querySelector('.product-match');
+    if (pm && card.querySelector('.pc-media.is-loading')) {
+      const im = pm.querySelector('img');
+      if (im) fillMedia(card, { image: im.getAttribute('src').replace(/^\/_vercel\/image\?url=([^&]+).*$/, (x, u) => decodeURIComponent(u)), shop: pm.dataset.shop, title: (pm.querySelector('.product-match-title') || {}).textContent }, pm.href);
+    }
+    if (!card.querySelector('.similar, .product-match') && card.querySelector('.pc-media.is-loading')) textMedia(card);
     if (card.querySelector('.similar, .product-match, .similar-fallback')) return;
     const main = card.querySelector('.shop-main');
     const actions = card.querySelector('.shop-actions');
@@ -9142,6 +9174,35 @@ async function findSimilarPart(image, products, offset, run) {
   });
 }
 
+// Phone swipe cards: the top area shows the first shop photo, or a quiet
+// typographic tile when there is none, so every card has the same shape.
+function fillMedia(card, m, href) {
+  const media = card.querySelector('.pc-media');
+  if (!media || !m || !m.image) return;
+  media.classList.remove('is-loading', 'is-text');
+  media.href = href; media.target = '_blank'; media.rel = 'sponsored noopener noreferrer';
+  media.removeAttribute('aria-hidden'); media.removeAttribute('tabindex');
+  const shop = (SHOPS[m.shop] && (SHOPS[m.shop].short || SHOPS[m.shop].name)) || m.shop || '';
+  media.innerHTML = `<img src="${escapeHtml(pimg(m.image))}" alt="${escapeHtml(m.title || '')}" loading="lazy" decoding="async">`
+    + `<span class="pc-media-tag">${escapeHtml(shop)}${m.price ? ' \u00b7 ' + escapeHtml(formatEuro(m.price)) : ''}</span>`;
+  const img = media.querySelector('img');
+  img.addEventListener('error', () => {
+    if (m.image2 && !img.dataset.alt) { img.dataset.alt = 1; img.src = pimg(m.image2); }
+    else textMedia(card);
+  });
+}
+function textMedia(card) {
+  const media = card.querySelector('.pc-media');
+  if (!media) return;
+  const main = card.querySelector('.shop-main');
+  const name = (card.querySelector('.product-name') || {}).textContent || '';
+  const shop = main ? ((main.querySelector('.shop-name-short') || main.querySelector('.shop-main-name') || {}).textContent || '').trim() : '';
+  media.classList.remove('is-loading'); media.classList.add('is-text');
+  if (main) { media.href = main.href; media.target = '_blank'; media.rel = 'sponsored noopener noreferrer'; media.removeAttribute('aria-hidden'); media.removeAttribute('tabindex'); }
+  media.innerHTML = `<span class="pc-text-name">${escapeHtml(name)}</span>`
+    + (shop ? `<span class="pc-text-cta">${escapeHtml(currentLang === 'de' ? 'Bei ' + shop + ' entdecken' : 'Explore at ' + shop)} <i>\u2192</i></span>` : '');
+}
+
 function showSimilar(card, matches, isIdea = false) {
   card.querySelector('.similar')?.remove();
   const withRef = l => l + (l.includes('?') ? '&' : '?') + (isIdea ? 'clickref=app-ideen' : 'clickref=app-aehnlich');
@@ -9165,6 +9226,7 @@ function showSimilar(card, matches, isIdea = false) {
   const actions = card.querySelector('.shop-actions');
   if (actions) actions.before(box); else card.append(box);
   card.classList.add('has-similar');
+  fillMedia(card, matches[0], withRef(matches[0].link));
 }
 
 // Fill a rendered card with its feed matches once they arrive
@@ -10476,6 +10538,7 @@ function buildProductCard(p, i, opts = {}) {
       </svg>
     </button>
     ${badgeHtml}
+    <a class="pc-media is-loading" tabindex="-1" aria-hidden="true"></a>
     <div class="product-category">${escapeHtml(p.category)}</div>
     <h3 class="product-name">${escapeHtml(productTitle(p))}</h3>
     <p class="product-reason">${escapeHtml(p.reason)}</p>
@@ -10499,6 +10562,8 @@ function buildProductCard(p, i, opts = {}) {
     });
   }
   attachShopMatch(card, p);
+  // never leave the phone media area shimmering if the photo check fails
+  setTimeout(() => { if (card.isConnected && card.querySelector('.pc-media.is-loading')) textMedia(card); }, 45000);
   return card;
 }
 
