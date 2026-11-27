@@ -5051,8 +5051,11 @@ body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
   .viz-edit.is-open .viz-edit-header::after { transform: translateY(-50%) rotate(45deg); }
 }
 
-.similar-fallback { display: block; margin: 10px 0 12px; padding: 12px 14px; border-radius: 12px; background: #f6f3ee; color: #1a1a1a; font-size: 13px; font-weight: 500; text-decoration: none; }
-.similar-fallback:hover { background: #efe9e1; }
+.similar-fallback { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 2px 10px; margin: 6px 0 14px; padding: 12px 0; border-top: 1px solid rgba(0,0,0,.08); border-bottom: 1px solid rgba(0,0,0,.08); color: #1a1a1a; text-decoration: none; }
+.similar-fallback .sf-eyebrow { grid-column: 1 / -1; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #9a8f84; font-weight: 600; }
+.similar-fallback .sf-line { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 16px; line-height: 1.3; }
+.similar-fallback .sf-arrow { color: #e91e63; font-size: 16px; transition: transform .2s; }
+.similar-fallback:hover .sf-arrow { transform: translateX(3px); }
 
 /* Phones: no sideways wobble (the full-bleed header was 12px wider than the screen) */
 html, body { overflow-x: clip; }
@@ -6712,7 +6715,7 @@ const I18N = {
     'shop.viewAt': 'Similar at {market}',
     'shop.similar': 'Similar in shops',
     'shop.ideas': 'Ideas from the shops',
-    'shop.fallback': 'Many matching models at {market} \u2192',
+    'shop.fallback': 'Explore the selection at {market}',
     'shop.ad': 'Ad',
     'shop.styleLink': 'More {style} pieces in our partner shop',
     'shop.priceNote': 'incl. VAT, plus shipping',
@@ -6959,7 +6962,7 @@ const I18N = {
     'shop.viewAt': 'Ähnliche bei {market}',
     'shop.similar': 'Ähnlich im Shop',
     'shop.ideas': 'Ideen aus dem Shop',
-    'shop.fallback': 'Viele passende Modelle bei {market} \u2192',
+    'shop.fallback': 'Auswahl bei {market} entdecken',
     'shop.ad': 'Anzeige',
     'shop.styleLink': 'Mehr im Stil {style} ansehen',
     'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
@@ -9046,7 +9049,10 @@ function finishSimilar() {
     const a = document.createElement('a');
     a.className = 'similar-fallback';
     a.href = main.href; a.target = '_blank'; a.rel = 'sponsored noopener noreferrer';
-    a.textContent = t('shop.fallback', { market: name });
+    const eb = document.createElement('span'); eb.className = 'sf-eyebrow'; eb.textContent = currentLang === 'de' ? 'Im Shop' : 'In the shop';
+    const ln = document.createElement('span'); ln.className = 'sf-line'; ln.textContent = t('shop.fallback', { market: name });
+    const ar = document.createElement('span'); ar.className = 'sf-arrow'; ar.setAttribute('aria-hidden', 'true'); ar.textContent = '\u2192';
+    a.append(eb, ln, ar);
     actions.before(a);
   });
   const withPhotos = cards.filter(c => c.querySelector('.similar, .product-match'));
