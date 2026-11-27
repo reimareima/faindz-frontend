@@ -5023,8 +5023,10 @@ body[data-state="empty"] .landing-stage .partner-strip{top:14px;bottom:auto;bord
 /* Mobile results v1: the after image first, products right under it */
 .look-strip { display: none; }
 @media (max-width: 768px) {
-  body[data-state="results"] .results-header { margin-bottom: 14px; }
-  body[data-state="results"] .results-title { font-size: 24px; }
+  body[data-state="results"] .results-header { display: none; }
+  .visualization .viz-header { display: none; }
+  .product-card.has-hero .similar-item:first-child { display: none; }
+  .product-card.has-hero .similar:has(.similar-item:only-child) { display: none; }
   .visualization.show { display: flex; flex-direction: column; padding: 18px; }
   .visualization > * { order: 5; }
   .visualization .viz-header { order: 1; }
@@ -8115,7 +8117,7 @@ let currentLookData = null;
   if (!row || !strip || !grid) return;
   const tag = (l, ref) => l.replace(/clickref=app(?=&|$)/, 'clickref=' + ref);
   function build() {
-    const cards = [...grid.querySelectorAll('.product-card')];
+    const cards = [...grid.querySelectorAll('.product-card')].sort((x, y) => (y.querySelector('.similar-img img') ? 1 : 0) - (x.querySelector('.similar-img img') ? 1 : 0));
     if (!cards.length) { strip.hidden = true; row.innerHTML = ''; return; }
     row.innerHTML = '';
     cards.forEach(card => {
@@ -9128,6 +9130,7 @@ function showSimilar(card, matches) {
     hero.append(im);
     const cat = card.querySelector('.product-category');
     if (cat) cat.before(hero); else card.prepend(hero);
+    card.classList.add('has-hero');
   }
 }
 
