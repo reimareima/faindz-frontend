@@ -5050,6 +5050,9 @@ body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
   .viz-edit .viz-edit-header::after { content: "+"; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 26px; line-height: 1; color: #c2185b; transition: transform .2s; }
   .viz-edit.is-open .viz-edit-header::after { transform: translateY(-50%) rotate(45deg); }
 }
+
+.similar-fallback { display: block; margin: 10px 0 12px; padding: 12px 14px; border-radius: 12px; background: #f6f3ee; color: #1a1a1a; font-size: 13px; font-weight: 500; text-decoration: none; }
+.similar-fallback:hover { background: #efe9e1; }
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
@@ -6701,6 +6704,7 @@ const I18N = {
     'shop.viewAt': 'Similar at {market}',
     'shop.similar': 'Similar in shops',
     'shop.ideas': 'Ideas from the shops',
+    'shop.fallback': 'Many matching models at {market} \u2192',
     'shop.ad': 'Ad',
     'shop.styleLink': 'More {style} pieces in our partner shop',
     'shop.priceNote': 'incl. VAT, plus shipping',
@@ -6947,6 +6951,7 @@ const I18N = {
     'shop.viewAt': 'Ähnliche bei {market}',
     'shop.similar': 'Ähnlich im Shop',
     'shop.ideas': 'Ideen aus dem Shop',
+    'shop.fallback': 'Viele passende Modelle bei {market} \u2192',
     'shop.ad': 'Anzeige',
     'shop.styleLink': 'Mehr im Stil {style} ansehen',
     'shop.priceNote': 'inkl. MwSt., zzgl. Versand',
@@ -9000,9 +9005,39 @@ async function findSimilar(imageUrl, products, offset = 0) {
   const run = offset ? similarRun : ++similarRun;
   let image;
   try { image = await designToJpeg(imageUrl); } catch (e) { return; }
-  // the proxy takes 8 per request
-  for (let k = 8; k < products.length; k += 8) findSimilarPart(image, products.slice(k, k + 8), offset + k, run);
-  return findSimilarPart(image, products.slice(0, 8), offset, run);
+  // Two items per request, all requests at once: each card fills in as
+  // soon as its own check is done instead of waiting for the slowest one.
+  const parts = [];
+  for (let k = 0; k < products.length; k += 2) parts.push(findSimilarPart(image, products.slice(k, k + 2), offset + k, run));
+  await Promise.all(parts);
+  if (run === similarRun) finishSimilar();
+}
+
+// After all checks: cards without shop photos move to the end, and get a
+// line that says there are matching products in the shop anyway.
+function finishSimilar() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+  const cards = [...grid.querySelectorAll(':scope > .product-card')];
+  cards.forEach(card => {
+    if (card.querySelector('.similar, .product-match, .similar-fallback')) return;
+    const main = card.querySelector('.shop-main');
+    const actions = card.querySelector('.shop-actions');
+    if (!main || !actions) return;
+    const name = ((main.querySelector('.shop-name-short') || main.querySelector('.shop-main-name') || {}).textContent || '').trim();
+    const a = document.createElement('a');
+    a.className = 'similar-fallback';
+    a.href = main.href; a.target = '_blank'; a.rel = 'sponsored noopener noreferrer';
+    a.textContent = t('shop.fallback', { market: name });
+    actions.before(a);
+  });
+  const withPhotos = cards.filter(c => c.querySelector('.similar, .product-match'));
+  const without = cards.filter(c => !c.querySelector('.similar, .product-match'));
+  if (!withPhotos.length || !without.length) return;
+  // Don't move cards the visitor is looking at right now
+  const r = grid.getBoundingClientRect();
+  if (r.top < window.innerHeight && r.bottom > 0) return;
+  [...withPhotos, ...without].forEach(c => grid.appendChild(c));
 }
 
 async function findSimilarPart(image, products, offset, run) {
