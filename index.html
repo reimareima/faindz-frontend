@@ -5053,6 +5053,14 @@ body[data-state="loading"] .mode-btn.active { color: #1a1a1a; }
 
 .similar-fallback { display: block; margin: 10px 0 12px; padding: 12px 14px; border-radius: 12px; background: #f6f3ee; color: #1a1a1a; font-size: 13px; font-weight: 500; text-decoration: none; }
 .similar-fallback:hover { background: #efe9e1; }
+
+/* Phones: no sideways wobble (the full-bleed header was 12px wider than the screen) */
+html, body { overflow-x: clip; }
+/* Vorher · Nachher heading: editorial, no technical "Gemini" status next to it */
+.viz-meta { display: none; }
+.viz-title { font-family: 'Fraunces', Georgia, serif; font-weight: 400; font-size: 26px; letter-spacing: -0.01em; }
+.viz-disclaimer { font-size: 13px; line-height: 1.5; }
+@media (max-width: 768px) { .viz-title { font-size: 24px; } }
 </style>
 <script src="/src.js?v=20261124"></script>
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
